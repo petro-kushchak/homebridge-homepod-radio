@@ -25,9 +25,10 @@ let hap: HAP;
 export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   private readonly name: string;
   public readonly model: string;
-  public readonly homepodIP: string;
+  public readonly homepodId: string;
   public readonly radioUrl: string;
   public readonly trackName: string;
+  public readonly serialNumber: string;
 
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic =
@@ -39,7 +40,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     private api: API,
   ) {
     hap = api.hap;
-    this.homepodIP = config.homepodIP;
+    this.homepodId = config.homepodId;
 
     // extract name from config
     this.name = config.name;
@@ -47,6 +48,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
 
     this.radioUrl = config.radioUrl;
     this.trackName = config.trackName || 'Radio BBC';
+    this.serialNumber = config.serialNumber || '1.0.0.1';
 
     this.setupCustomCharacteristics();
 
@@ -62,21 +64,19 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   private setupCustomCharacteristics() {
     // Custom homekit characteristic for name of current track.
     // Source: homebridge-zp.
+    const thisCharacteristic = this.Characteristic;
     const uuid = '00000045-0000-1000-8000-656261617577';
     const currentTrackCharacteristic = function () {
-      this.Characteristic.call(this, 'Current Track', uuid);
+      thisCharacteristic.call(this, 'Current Track', uuid);
       this.setProps({
-        format: this.Characteristic.Formats.STRING,
-        perms: [
-          this.Characteristic.Perms.READ,
-          this.Characteristic.Perms.NOTIFY,
-        ],
+        format: thisCharacteristic.Formats.STRING,
+        perms: [thisCharacteristic.Perms.READ, thisCharacteristic.Perms.NOTIFY],
       });
       this.value = this.getDefaultValue();
     };
-    inherits(currentTrackCharacteristic, this.Characteristic);
-    (this.Characteristic as any).CurrentTrack = currentTrackCharacteristic;
-    (this.Characteristic as any).CurrentTrack.UUID = uuid;
+    inherits(currentTrackCharacteristic, thisCharacteristic);
+    (thisCharacteristic as any).CurrentTrack = currentTrackCharacteristic;
+    (thisCharacteristic as any).CurrentTrack.UUID = uuid;
   }
 
   private addAccessories() {

@@ -1,11 +1,9 @@
 {
-    "platforms": [
-        {
-            "platform": "HomepodRadioPlatform",
-            "name": "Homepod Radio",
-            "model": "Radio BBC",
-            "homepodIP": "192.168.1.100",
-            "radioUrl": "http://radio.com"
-        }
-    ]
+    "platform": "HomepodRadioPlatform",
+    "name": "Radio BBC",
+    "model": "Homepod Radio",
+    "trackName": "Radio BBC",
+    "serialNumber": "20020105:00",
+    "homepodId": "<homepod id>",
+    "radioUrl": "http://online.radio.ua/radio"
 }

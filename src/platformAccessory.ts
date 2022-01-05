@@ -18,17 +18,14 @@ export class HomepodRadioPlatformAccessory {
   private service: Service;
 
   private currentMediaState: CharacteristicValue;
-
   private targetMediaState: CharacteristicValue;
 
   constructor(
     private readonly platform: HomepodRadioPlatform,
     private readonly accessory: PlatformAccessory,
   ) {
+    this.device = new AirPlayDevice(this.platform.homepodId);
     this.currentMediaState = this.getMediaState();
-    this.targetMediaState =
-      this.platform.Characteristic.CurrentMediaState.PAUSE;
-    this.device = new AirPlayDevice(this.platform.homepodIP);
 
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -39,6 +36,10 @@ export class HomepodRadioPlatformAccessory {
       .setCharacteristic(
         this.platform.Characteristic.Model,
         this.platform.model,
+      )
+      .setCharacteristic(
+        this.platform.Characteristic.SerialNumber,
+        this.platform.serialNumber,
       )
       .setCharacteristic(
         this.platform.Characteristic.Name,
