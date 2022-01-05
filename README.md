@@ -9,6 +9,12 @@
 
 Homebridge accessory for streaming radio to Homepod mini
 
+## Streaming radio to HomePod
+Main idea is to stream with the following command:
+```
+ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
+```
+
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 
@@ -72,10 +78,4 @@ atvremote scan
 Identifiers:
  - F4:22:F0:10:33:71
  - F422F0103371
-```
-
-## Streaming radio to HomePod
-Main idea is to stream with the following command:
-```
-ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```
