@@ -1,0 +1,11 @@
+{
+    "platforms": [
+        {
+            "platform": "HomepodRadioPlatform",
+            "name": "Homepod Radio",
+            "model": "Radio BBC",
+            "homepodIP": "192.168.1.100",
+            "radioUrl": "http://radio.com"
+        }
+    ]
+}
