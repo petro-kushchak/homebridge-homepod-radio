@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   IndependentPlatformPlugin,
   Logging,
@@ -7,6 +8,9 @@ import {
   Characteristic,
   Service,
 } from 'homebridge';
+
+import { inherits } from 'util';
+
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
 
 const PLUGIN_NAME = 'homebridge-homepod-radio-platform';
@@ -23,6 +27,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly model: string;
   public readonly homepodIP: string;
   public readonly radioUrl: string;
+  public readonly trackName: string;
 
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic =
@@ -39,7 +44,11 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     // extract name from config
     this.name = config.name;
     this.model = config.model || 'Radio BBC';
+
     this.radioUrl = config.radioUrl;
+    this.trackName = config.trackName || 'Radio BBC';
+
+    this.setupCustomCharacteristics();
 
     this.api.on('didFinishLaunching', () => {
       this.logger.debug(
@@ -48,6 +57,26 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       );
       this.addAccessories();
     });
+  }
+
+  private setupCustomCharacteristics() {
+    // Custom homekit characteristic for name of current track.
+    // Source: homebridge-zp.
+    const uuid = '00000045-0000-1000-8000-656261617577';
+    const currentTrackCharacteristic = function () {
+      this.Characteristic.call(this, 'Current Track', uuid);
+      this.setProps({
+        format: this.Characteristic.Formats.STRING,
+        perms: [
+          this.Characteristic.Perms.READ,
+          this.Characteristic.Perms.NOTIFY,
+        ],
+      });
+      this.value = this.getDefaultValue();
+    };
+    inherits(currentTrackCharacteristic, this.Characteristic);
+    (this.Characteristic as any).CurrentTrack = currentTrackCharacteristic;
+    (this.Characteristic as any).CurrentTrack.UUID = uuid;
   }
 
   private addAccessories() {

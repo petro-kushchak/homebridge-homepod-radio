@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Service,
   PlatformAccessory,
@@ -62,6 +63,13 @@ export class HomepodRadioPlatformAccessory {
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetMediaState)
       .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
+
+    this.service.addOptionalCharacteristic(
+      (this.platform.Characteristic as any).CurrentTrack,
+    );
+    this.service
+      .getCharacteristic((this.platform.Characteristic as any).CurrentTrack)
+      .updateValue(this.platform.trackName);
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
     // setInterval(() => {
