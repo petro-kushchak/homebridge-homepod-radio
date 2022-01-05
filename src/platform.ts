@@ -53,7 +53,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     this.setupCustomCharacteristics();
 
     this.api.on('didFinishLaunching', () => {
-      this.logger.debug(
+      this.logger.info(
         'Finished initializing platform:',
         this.config.platform,
       );

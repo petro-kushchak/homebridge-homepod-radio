@@ -1,7 +1,7 @@
 {
   "displayName": "Homepod mini radio support",
   "name": "@petro-kushchak/homebridge-homepod-radio",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Homebridge accessory for streaming radio to Homepod mini",
   "license": "MIT",
   "repository": {
@@ -36,5 +36,8 @@
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.2"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2"
   }
 }

@@ -24,7 +24,7 @@ export class HomepodRadioPlatformAccessory {
     private readonly platform: HomepodRadioPlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-    this.device = new AirPlayDevice(this.platform.homepodId);
+    this.device = new AirPlayDevice(this.platform.homepodId, platform.logger);
     this.currentMediaState = this.getMediaState();
 
     this.accessory
@@ -73,10 +73,12 @@ export class HomepodRadioPlatformAccessory {
       .updateValue(this.platform.trackName);
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
-    // setInterval(() => {
-    //     this.currentMediaState = this.getMediaState();
-    //     this.service.getCharacteristic(this.platform.Characteristic.CurrentMediaState).updateValue(this.currentMediaState);
-    // }, 3000);
+    setInterval(() => {
+      this.currentMediaState = this.getMediaState();
+      this.service
+        .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
+        .updateValue(this.currentMediaState);
+    }, 3000);
   }
 
   getMediaState(): CharacteristicValue {
@@ -92,7 +94,7 @@ export class HomepodRadioPlatformAccessory {
    */
   getCurrentMediaState(callback: CharacteristicGetCallback) {
     this.currentMediaState = this.getMediaState();
-    this.platform.logger.debug(
+    this.platform.logger.info(
       'Triggered GET CurrentMediaState:',
       this.currentMediaState,
     );
@@ -107,7 +109,7 @@ export class HomepodRadioPlatformAccessory {
     callback: CharacteristicGetCallback,
   ) {
     this.targetMediaState = value;
-    this.platform.logger.debug('Triggered SET TargetMediaState:', value);
+    this.platform.logger.info('Triggered SET TargetMediaState:', value);
     if (
       value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
       value === this.platform.Characteristic.CurrentMediaState.STOP
