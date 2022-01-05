@@ -7,6 +7,8 @@
 
 # HomePod mini radio support
 
+Homebridge accessory for streaming radio to Homepod mini
+
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 
