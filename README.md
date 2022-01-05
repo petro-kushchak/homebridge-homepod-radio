@@ -28,5 +28,44 @@ For Homepod device you need to specify the IP address of the device.
 }
 ```
 
+## ffmpeg lib
+- install ffmpeg
+```
+sudo apt-get install ffmpeg
+```
+
 ## PyATV lib
-TBD
+
+- install python3  
+```
+sudo apt-get install python3
+```
+- install pip3
+``` 
+sudo apt-get install python3-pip
+```
+- install pyatv 
+```
+pip3 install pyatv
+```
+- make atvremote available for homebridge
+```
+sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
+```
+
+## Identify Homepod mini ID:
+- run command:
+```
+atvremote scan
+```
+- from output select one of Identifiers:
+```
+       Name: HomePod
+   Model/SW: HomePod Mini, tvOS 15.2
+    Address: 192.168.1.7
+        MAC: F4:22:F0:10:33:71
+ Deep Sleep: False
+Identifiers:
+ - F4:22:F0:10:33:71
+ - F422F0103371
+```

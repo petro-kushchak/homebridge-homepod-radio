@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as child from 'child_process';
 import { Logger } from 'homebridge';
@@ -8,7 +8,8 @@ import { Logger } from 'homebridge';
  */
 
 export class AirPlayDevice {
-  private process: child.ChildProcess = null;
+  private ffmpeg: child.ChildProcess = null;
+  private atvremote: child.ChildProcess = null;
 
   constructor(
     private readonly deviceIp: string,
@@ -19,18 +20,50 @@ export class AirPlayDevice {
     if (this.isPlaying()) {
       this.stop();
     }
-    const cmd = `ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.deviceIp} stream_file=-`;
-    this.process = child.exec(cmd, (error, stdout, stderr) => {
-      this.logger.info(stdout);
+
+    // create pipe for the command:
+    //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.deviceIp} stream_file=-
+
+    this.ffmpeg = child.spawn('ffmpeg', ['-i', streamUrl, '-f', 'mp3', '-']);
+    this.atvremote = child.spawn('atvremote', [
+      '--id',
+      this.deviceIp,
+      'stream_file=-',
+    ]);
+    this.ffmpeg.stdout.pipe(this.atvremote.stdin);
+
+    this.ffmpeg.on('data', (data) => {
+      this.logger.info(`ffmpeg data: ${data}`);
     });
+
+    this.atvremote.on('data', (data) => {
+      this.logger.info(`atvremote data: ${data}`);
+    });
+
+    this.logger.info(
+      `spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
+    );
   }
 
   public stop() {
-    this.process.kill();
-    this.process = null;
+    if (!this.isPlaying()) {
+      this.logger.info('Trying to stop stopped process!');
+      return;
+    }
+    try {
+      this.logger.info(
+        `Killing process: ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
+      );
+      this.atvremote.kill();
+      this.atvremote = null;
+      this.ffmpeg.kill();
+      this.ffmpeg = null;
+    } catch (err) {
+      this.logger.info(`Error while trying to stop: ${err}`);
+    }
   }
 
   public isPlaying(): boolean {
-    return !!this.process;
+    return !!this.ffmpeg && !!this.atvremote;
   }
 }
