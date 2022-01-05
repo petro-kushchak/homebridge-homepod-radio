@@ -12,11 +12,12 @@ import {
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
 
 import CurrentTrackCharacteristic = require('./currentTrackCharacteristic');
-
+import ChangeTrackCharacteristic = require('./changeTrackCharacteristic');
 const PLUGIN_NAME = 'homebridge-homepod-radio-platform';
 
 let hap: HAP;
 let CurrentTrackCharacteristicType;
+let ChangeTrackCharacteristicType;
 
 /**
  * Platform Accessory
@@ -33,9 +34,11 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
 
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic &
-    typeof CurrentTrackCharacteristicType = this.api.hap.Characteristic;
+    typeof CurrentTrackCharacteristicType &
+    typeof ChangeTrackCharacteristicType = this.api.hap.Characteristic;
 
   public readonly CurrentTrack;
+  public readonly ChangeTrack;
 
   constructor(
     public logger: Logging,
@@ -48,10 +51,19 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     this.CurrentTrack = CurrentTrackCharacteristic(api);
     CurrentTrackCharacteristicType = this.CurrentTrack;
 
+    this.ChangeTrack = ChangeTrackCharacteristic(api);
+    ChangeTrackCharacteristicType = this.ChangeTrack;
+
     this.Characteristic = Object.defineProperty(
       this.api.hap.Characteristic,
       'CurrentTrack',
       { value: this.CurrentTrack },
+    );
+
+    this.Characteristic = Object.defineProperty(
+      this.api.hap.Characteristic,
+      'ChangeTrack',
+      { value: this.ChangeTrack },
     );
 
     // extract name from config

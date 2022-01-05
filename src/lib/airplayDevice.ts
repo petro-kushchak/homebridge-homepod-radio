@@ -24,12 +24,17 @@ export class AirPlayDevice {
     // create pipe for the command:
     //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.homepodId} stream_file=-
 
-    this.ffmpeg = child.spawn('ffmpeg', ['-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-']);
-    this.atvremote = child.spawn('atvremote', [
-      '--id',
-      this.homepodId,
-      'stream_file=-',
-    ]);
+    this.ffmpeg = child.spawn(
+      'ffmpeg',
+      ['-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-'],
+      { detached: true },
+    );
+    this.atvremote = child.spawn(
+      'atvremote',
+      ['--id', this.homepodId, 'stream_file=-'],
+      { detached: true },
+    );
+
     this.ffmpeg.stdout.pipe(this.atvremote.stdin);
 
     this.ffmpeg.stderr.on('data', (data) => {
@@ -38,12 +43,10 @@ export class AirPlayDevice {
 
     this.ffmpeg.on('exit', (code, signal) => {
       this.logger.info(`ffmpeg exit: code ${code} signal ${signal}`);
-      this.ffmpeg = null;
     });
 
     this.atvremote.on('exit', (code, signal) => {
       this.logger.info(`atvremote exit: code ${code} signal ${signal}`);
-      this.atvremote = null;
     });
 
     this.atvremote.stderr.on('data', (data) => {
@@ -64,10 +67,16 @@ export class AirPlayDevice {
       this.logger.info(
         `Killing process: ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
       );
-      this.atvremote.kill();
-      this.atvremote = null;
-      this.ffmpeg.kill();
-      this.ffmpeg = null;
+      this.ffmpeg.stdout.unpipe();
+      setTimeout(() => {
+        this.ffmpeg.kill();
+        this.ffmpeg = null;
+      }, 2000);
+
+      setTimeout(() => {
+        this.atvremote.kill();
+        this.atvremote = null;
+      }, 5000);
     } catch (err) {
       this.logger.info(`Error while trying to stop: ${err}`);
     }

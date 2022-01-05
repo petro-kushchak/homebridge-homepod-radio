@@ -5,6 +5,7 @@ import {
   CharacteristicValue,
   CharacteristicGetCallback,
   CharacteristicEventTypes,
+  CharacteristicSetCallback,
 } from 'homebridge';
 import { AirPlayDevice } from './lib/airplayDevice';
 
@@ -65,11 +66,21 @@ export class HomepodRadioPlatformAccessory {
       .getCharacteristic(this.platform.Characteristic.TargetMediaState)
       .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
 
-    this.service.addCharacteristic(this.platform.Characteristic.CurrentTrack);
-
+    this.service.addOptionalCharacteristic(
+      this.platform.Characteristic.CurrentTrack,
+    );
     this.service
       .getCharacteristic(this.platform.Characteristic.CurrentTrack)
+      .on(CharacteristicEventTypes.GET, this.getCurrentTrack.bind(this))
       .updateValue(this.platform.trackName);
+
+    this.service.addOptionalCharacteristic(
+      this.platform.Characteristic.ChangeTrack,
+    );
+    this.service
+      .getCharacteristic(this.platform.Characteristic.ChangeTrack)
+      .on(CharacteristicEventTypes.SET, this.setChangeTrack.bind(this))
+      .updateValue(0);
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
     setInterval(() => {
@@ -78,6 +89,23 @@ export class HomepodRadioPlatformAccessory {
         .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
         .updateValue(this.currentMediaState);
     }, 3000);
+  }
+
+  setChangeTrack(
+    value: CharacteristicValue,
+    callback: CharacteristicSetCallback,
+  ): void {
+    this.platform.logger.info('Triggered SET setChangeTrack:', value);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.CurrentTrack,
+      this.platform.trackName,
+    );
+    callback(null);
+  }
+
+  getCurrentTrack(callback: CharacteristicGetCallback) {
+    this.platform.logger.info('Triggered GET CurrentTrack');
+    callback(undefined, this.platform.trackName);
   }
 
   getMediaState(): CharacteristicValue {
