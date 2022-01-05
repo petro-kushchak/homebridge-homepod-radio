@@ -5,7 +5,7 @@
 
 </p>
 
-# Homebridge accessory for streaming radio to Homepod mini
+# HomePod mini radio support
 
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
@@ -21,7 +21,7 @@ For Homepod device you need to specify the IP address of the device.
             "platform": "HomepodRadioPlatform",
             "name": "Homepod Radio",
             "model": "Radio BBC",
-            "homepodIP": "192.168.1.100",
+            "homepodId": "F422F0103371",
             "radioUrl": "http://radio.com"
         }
     ]
@@ -35,6 +35,8 @@ sudo apt-get install ffmpeg
 ```
 
 ## PyATV lib
+
+For streaming to HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
 
 - install python3  
 ```
@@ -68,4 +70,10 @@ atvremote scan
 Identifiers:
  - F4:22:F0:10:33:71
  - F422F0103371
+```
+
+## Streaming radio to HomePod
+Main idea is to stream with the following command:
+```
+ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```

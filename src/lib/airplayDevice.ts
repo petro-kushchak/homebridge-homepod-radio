@@ -12,7 +12,7 @@ export class AirPlayDevice {
   private atvremote: child.ChildProcess = null;
 
   constructor(
-    private readonly deviceIp: string,
+    private readonly homepodId: string,
     private readonly logger: Logger,
   ) {}
 
@@ -22,12 +22,12 @@ export class AirPlayDevice {
     }
 
     // create pipe for the command:
-    //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.deviceIp} stream_file=-
+    //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.homepodId} stream_file=-
 
     this.ffmpeg = child.spawn('ffmpeg', ['-i', streamUrl, '-f', 'mp3', '-']);
     this.atvremote = child.spawn('atvremote', [
       '--id',
-      this.deviceIp,
+      this.homepodId,
       'stream_file=-',
     ]);
     this.ffmpeg.stdout.pipe(this.atvremote.stdin);
