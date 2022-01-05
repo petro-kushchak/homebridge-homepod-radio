@@ -9,13 +9,14 @@ import {
   Service,
 } from 'homebridge';
 
-import { inherits } from 'util';
-
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
+
+import CurrentTrackCharacteristic = require('./currentTrackCharacteristic');
 
 const PLUGIN_NAME = 'homebridge-homepod-radio-platform';
 
 let hap: HAP;
+let CurrentTrackCharacteristicType;
 
 /**
  * Platform Accessory
@@ -31,8 +32,10 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly serialNumber: string;
 
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic =
-    this.api.hap.Characteristic;
+  public readonly Characteristic: typeof Characteristic &
+    typeof CurrentTrackCharacteristicType = this.api.hap.Characteristic;
+
+  public readonly CurrentTrack;
 
   constructor(
     public logger: Logging,
@@ -40,7 +43,16 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     private api: API,
   ) {
     hap = api.hap;
+
     this.homepodId = config.homepodId;
+    this.CurrentTrack = CurrentTrackCharacteristic(api);
+    CurrentTrackCharacteristicType = this.CurrentTrack;
+
+    this.Characteristic = Object.defineProperty(
+      this.api.hap.Characteristic,
+      'CurrentTrack',
+      { value: this.CurrentTrack },
+    );
 
     // extract name from config
     this.name = config.name;
@@ -50,33 +62,12 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     this.trackName = config.trackName || 'Radio BBC';
     this.serialNumber = config.serialNumber || '1.0.0.1';
 
-    this.setupCustomCharacteristics();
+    // this.setupCustomCharacteristics();
 
     this.api.on('didFinishLaunching', () => {
-      this.logger.info(
-        'Finished initializing platform:',
-        this.config.platform,
-      );
+      this.logger.info('Finished initializing platform:', this.config.platform);
       this.addAccessories();
     });
-  }
-
-  private setupCustomCharacteristics() {
-    // Custom homekit characteristic for name of current track.
-    // Source: homebridge-zp.
-    const thisCharacteristic = this.Characteristic;
-    const uuid = '00000045-0000-1000-8000-656261617577';
-    const currentTrackCharacteristic = function () {
-      thisCharacteristic.call(this, 'Current Track', uuid);
-      this.setProps({
-        format: thisCharacteristic.Formats.STRING,
-        perms: [thisCharacteristic.Perms.READ, thisCharacteristic.Perms.NOTIFY],
-      });
-      this.value = this.getDefaultValue();
-    };
-    inherits(currentTrackCharacteristic, thisCharacteristic);
-    (thisCharacteristic as any).CurrentTrack = currentTrackCharacteristic;
-    (thisCharacteristic as any).CurrentTrack.UUID = uuid;
   }
 
   private addAccessories() {

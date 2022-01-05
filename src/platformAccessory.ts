@@ -65,11 +65,10 @@ export class HomepodRadioPlatformAccessory {
       .getCharacteristic(this.platform.Characteristic.TargetMediaState)
       .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
 
-    this.service.addOptionalCharacteristic(
-      (this.platform.Characteristic as any).CurrentTrack,
-    );
+    this.service.addCharacteristic(this.platform.Characteristic.CurrentTrack);
+
     this.service
-      .getCharacteristic((this.platform.Characteristic as any).CurrentTrack)
+      .getCharacteristic(this.platform.Characteristic.CurrentTrack)
       .updateValue(this.platform.trackName);
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
@@ -116,7 +115,7 @@ export class HomepodRadioPlatformAccessory {
     ) {
       this.device.stop();
     } else {
-      this.device.play(this.platform.radioUrl);
+      this.device.play(this.platform.radioUrl, this.platform.trackName);
     }
     callback(null);
   }

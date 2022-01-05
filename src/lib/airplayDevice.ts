@@ -16,7 +16,7 @@ export class AirPlayDevice {
     private readonly logger: Logger,
   ) {}
 
-  public play(streamUrl: string) {
+  public play(streamUrl: string, streamName: string) {
     if (this.isPlaying()) {
       this.stop();
     }
@@ -24,7 +24,7 @@ export class AirPlayDevice {
     // create pipe for the command:
     //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.homepodId} stream_file=-
 
-    this.ffmpeg = child.spawn('ffmpeg', ['-i', streamUrl, '-f', 'mp3', '-']);
+    this.ffmpeg = child.spawn('ffmpeg', ['-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-']);
     this.atvremote = child.spawn('atvremote', [
       '--id',
       this.homepodId,
@@ -32,8 +32,8 @@ export class AirPlayDevice {
     ]);
     this.ffmpeg.stdout.pipe(this.atvremote.stdin);
 
-    this.ffmpeg.on('data', (data) => {
-      this.logger.info(`ffmpeg data: ${data}`);
+    this.ffmpeg.stderr.on('data', (data) => {
+      this.logger.info(`ffmpeg error: ${data}`);
     });
 
     this.ffmpeg.on('exit', (code, signal) => {
@@ -46,8 +46,8 @@ export class AirPlayDevice {
       this.atvremote = null;
     });
 
-    this.atvremote.on('data', (data) => {
-      this.logger.info(`atvremote data: ${data}`);
+    this.atvremote.stderr.on('data', (data) => {
+      this.logger.info(`atvremote error: ${data}`);
     });
 
     this.logger.info(
