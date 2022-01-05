@@ -1,19 +1,17 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+
 /**
  * AirPlay device
  */
 
 export class AirPlayDevice {
-    constructor (private readonly deviceIp: string) {
-        
-    }
+  constructor(private readonly deviceIp: string) {}
 
-    public play(streamUrl: string) {
-    }
+  public play(streamUrl: string) {}
 
-    public stop() {
-    }
+  public stop() {}
 
-    public isPlaying(): boolean {
-        return false;
-    }
+  public isPlaying(): boolean {
+    return false;
+  }
 }
