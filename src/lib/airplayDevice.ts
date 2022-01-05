@@ -36,6 +36,16 @@ export class AirPlayDevice {
       this.logger.info(`ffmpeg data: ${data}`);
     });
 
+    this.ffmpeg.on('exit', (code, signal) => {
+      this.logger.info(`ffmpeg exit: code ${code} signal ${signal}`);
+      this.ffmpeg = null;
+    });
+
+    this.atvremote.on('exit', (code, signal) => {
+      this.logger.info(`atvremote exit: code ${code} signal ${signal}`);
+      this.atvremote = null;
+    });
+
     this.atvremote.on('data', (data) => {
       this.logger.info(`atvremote data: ${data}`);
     });
