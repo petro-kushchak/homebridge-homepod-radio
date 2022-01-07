@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  IndependentPlatformPlugin,
-  Logging,
-  PlatformConfig,
-  API,
-  HAP,
-  Characteristic,
-  Service,
+    IndependentPlatformPlugin,
+    Logging,
+    PlatformConfig,
+    API,
+    HAP,
+    Characteristic,
+    Service,
 } from 'homebridge';
 
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
@@ -45,57 +45,56 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     private config: PlatformConfig,
     private api: API,
   ) {
-    hap = api.hap;
+      hap = api.hap;
 
-    this.homepodId = config.homepodId;
-    this.CurrentTrack = CurrentTrackCharacteristic(api);
-    CurrentTrackCharacteristicType = this.CurrentTrack;
+      this.homepodId = config.homepodId;
+      this.CurrentTrack = CurrentTrackCharacteristic(api);
+      CurrentTrackCharacteristicType = this.CurrentTrack;
 
-    this.ChangeTrack = ChangeTrackCharacteristic(api);
-    ChangeTrackCharacteristicType = this.ChangeTrack;
+      this.ChangeTrack = ChangeTrackCharacteristic(api);
+      ChangeTrackCharacteristicType = this.ChangeTrack;
 
-    this.Characteristic = Object.defineProperty(
-      this.api.hap.Characteristic,
-      'CurrentTrack',
-      { value: this.CurrentTrack },
-    );
+      this.Characteristic = Object.defineProperty(
+          this.api.hap.Characteristic,
+          'CurrentTrack',
+          { value: this.CurrentTrack },
+      );
 
-    this.Characteristic = Object.defineProperty(
-      this.api.hap.Characteristic,
-      'ChangeTrack',
-      { value: this.ChangeTrack },
-    );
+      this.Characteristic = Object.defineProperty(
+          this.api.hap.Characteristic,
+          'ChangeTrack',
+          { value: this.ChangeTrack },
+      );
 
-    // extract name from config
-    this.name = config.name;
-    this.model = config.model || 'Radio BBC';
+      // extract name from config
+      this.name = config.name;
+      this.model = config.model || 'Radio BBC';
 
-    this.radioUrl = config.radioUrl;
-    this.trackName = config.trackName || 'Radio BBC';
-    this.serialNumber = config.serialNumber || '1.0.0.1';
+      this.radioUrl = config.radioUrl;
+      this.trackName = config.trackName || 'Radio BBC';
+      this.serialNumber = config.serialNumber || '1.0.0.1';
 
-    // this.setupCustomCharacteristics();
+      // this.setupCustomCharacteristics();
 
-    this.api.on('didFinishLaunching', () => {
-      this.logger.info('Finished initializing platform:', this.config.platform);
-      this.addAccessories();
-    });
+      this.api.on('didFinishLaunching', () => {
+          this.logger.info('Finished initializing platform:', this.config.platform);
+          this.addAccessories();
+      });
   }
 
   private addAccessories() {
-    // Use Roons output_id to create the UUID. This will ensure the accessory is always in sync.
-    const uuid = hap.uuid.generate('homebridge:homepod:radio:' + this.name);
-    const accessory = new this.api.platformAccessory(this.name, uuid);
+      const uuid = hap.uuid.generate('homebridge:homepod:radio:' + this.name);
+      const accessory = new this.api.platformAccessory(this.name, uuid);
 
-    // Adding 26 as the category is some special sauce that gets this to work properly.
-    // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
-    accessory.category = 26;
+      // Adding 26 as the category is some special sauce that gets this to work properly.
+      // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
+      accessory.category = 26;
 
-    new HomepodRadioPlatformAccessory(this, accessory);
+      new HomepodRadioPlatformAccessory(this, accessory);
 
-    // SmartSpeaker service must be added as an external accessory.
-    // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
-    // There a no collision issues when calling this multiple times on accessories that already exist.
-    this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
+      // SmartSpeaker service must be added as an external accessory.
+      // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
+      // There a no collision issues when calling this multiple times on accessories that already exist.
+      this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
   }
 }
