@@ -13,13 +13,13 @@ const execAsync = promisify(child.exec);
  */
 
 export class AirPlayDevice {
-  private readonly lastSeenThresholdMs = 2000;
-  private readonly heartbeatTimeout = 3000;
+  private readonly lastSeenThresholdMs = 3000;
+  private readonly heartbeatTimeout = 5000;
   private readonly defaultPlayingStreamName: string = 'Streaming with pyatv';
 
   private ffmpeg: child.ChildProcess = null;
   private atvremote: child.ChildProcess = null;
-  private lastSeen: Record<string, number> = {};
+  private lastSeen: number;
   private heartbeat: NodeJS.Timeout;
 
   constructor(
@@ -59,17 +59,10 @@ export class AirPlayDevice {
               this.logger.info(
                   `Received from device: ${this.homepodId} title: ${title}`,
               );
-              if (title === '') {
-                  //need to restart streaming
-                  this.startStreaming(
-                      streamUrl,
-                      streamName,
-                      heartbeat,
-                      heartbeatFailed,
+              if (title === '' || title === this.defaultPlayingStreamName) {
+                  this.logger.info(
+                      'Restarting playback...',
                   );
-              } else if (title === this.defaultPlayingStreamName) {
-                  //not clear what happened
-                  this.logger.info('Looks like still playing but no hearbeat...');
                   //need to restart streaming
                   this.startStreaming(
                       streamUrl,
@@ -79,18 +72,16 @@ export class AirPlayDevice {
                   );
               } else {
                   //device is used to play something else, need to change state to "STOPPED"
-                  this.endStreaming(() => {
-                      this.logger.info('Streaming finished');
-                  });
+                  this.endStreaming();
+                  this.logger.info('Streaming finished');
               }
           });
       };
 
       if (this.isPlaying()) {
-          this.endStreaming(() => {
-              this.logger.info('Streaming finished');
-              this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
-          });
+          this.endStreaming();
+          this.logger.info('Streaming finished');
+          this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
       } else {
           this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
       }
@@ -104,23 +95,19 @@ export class AirPlayDevice {
       heartbeatFailed: () => void,
   ): void {
       this.logger.info(`Playback heartbeat, source: ${heatbeatType}`);
-      if (!this.lastSeen[heatbeatType]) {
-          this.lastSeen[heatbeatType] = Date.now();
-          return;
-      }
-      const lastSeenByType = Object.values(this.lastSeen);
-      const nearest = Math.max(...lastSeenByType);
-      const diff = Date.now() - nearest;
-      this.logger.info(
-          `Playback heartbeat, source: ${heatbeatType} nearest: ${nearest} diff: ${diff}`,
-      );
-      this.lastSeen[heatbeatType] = Date.now();
-      this.logger.info(`Playback heartbeat, source: ${heatbeatType} updated`);
-      if (diff > this.lastSeenThresholdMs && heatbeatType === 'heartbeat') {
+      if (heatbeatType !== 'heartbeat') {
+          this.lastSeen = Date.now();
+      } else {
+          const diffMs = Date.now() - this.lastSeen;
           this.logger.info(
-              `Playback heartbeat failed, source: ${heatbeatType}, lastSeen: ${nearest} diff: ${diff}`,
+              `Playback heartbeat, diff: ${diffMs}ms`,
           );
-          heartbeatFailed();
+          if (diffMs > this.lastSeenThresholdMs) {
+              this.logger.info(
+                  'Playback heartbeat failed',
+              );
+              heartbeatFailed();
+          }
       }
   }
 
@@ -175,7 +162,7 @@ export class AirPlayDevice {
       );
   }
 
-  private endStreaming(streamingFinished: () => void) {
+  private endStreaming() {
       try {
           if (!this.ffmpeg || !this.atvremote) {
               this.logger.info(
@@ -188,23 +175,11 @@ export class AirPlayDevice {
           );
           this.ffmpeg.stdout.unpipe();
           clearInterval(this.heartbeat);
-          this.lastSeen = {};
 
-          setTimeout(() => {
-              if (!this.ffmpeg) {
-                  return;
-              }
-              this.ffmpeg.kill();
-              this.ffmpeg = null;
-              setTimeout(() => {
-                  if (!this.atvremote) {
-                      return;
-                  }
-                  this.atvremote.kill();
-                  this.atvremote = null;
-                  streamingFinished();
-              }, 3000);
-          }, 2000);
+          this.ffmpeg.kill();
+          this.ffmpeg = null;
+          this.atvremote.kill();
+          this.atvremote = null;
       } catch (err) {
           this.logger.info(`Error while trying to stop: ${err}`);
       }
@@ -216,9 +191,8 @@ export class AirPlayDevice {
           return;
       }
 
-      this.endStreaming(() => {
-          this.logger.info('Streaming finished');
-      });
+      this.endStreaming();
+      this.logger.info('Streaming finished');
   }
 
   public isPlaying(): boolean {

@@ -118,17 +118,14 @@ export class HomepodRadioPlatformAccessory {
       );
 
       this.platform.logger.info('Triggered SET setVolume');
-
-      const maxValue = volumeCharacteristic.props.maxValue;
-
+      const maxValue = volumeCharacteristic.props.maxValue * 0.75;
       volume = volume > maxValue ? maxValue : volume;
-
       this.platform.logger.info(`Volume change to ${volume}`);
 
       if (updateCharacteristic === true) {
           volumeCharacteristic.updateValue(volume);
       }
-      return this.device.setVolume(volume);
+      return await this.device.setVolume(volume);
   }
 
   //   setChangeTrack(
