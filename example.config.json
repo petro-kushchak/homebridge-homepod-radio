@@ -1,9 +1,9 @@
 {
     "platform": "HomepodRadioPlatform",
     "name": "Radio BBC",
-    "model": "Homepod Radio",
-    "trackName": "Radio BBC",
+    "model": "BBC - Radio 1",
+    "trackName": "BBC - Radio 1",
     "serialNumber": "20020105:00",
     "homepodId": "<homepod id>",
-    "radioUrl": "http://online.radio.ua/radio"
+    "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
 }
