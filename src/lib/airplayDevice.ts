@@ -4,6 +4,10 @@
 import * as child from 'child_process';
 import { Logger } from 'homebridge';
 
+import { promisify } from 'util';
+
+const execAsync = promisify(child.exec);
+
 /**
  * AirPlay device
  */
@@ -22,6 +26,23 @@ export class AirPlayDevice {
     private readonly homepodId: string,
     private readonly logger: Logger,
   ) {}
+
+  public async setVolume(volume: number): Promise<boolean> {
+      const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
+      await execAsync(setVolumeCmd);
+      return true;
+  }
+
+  public async getVolume(): Promise<number> {
+      const getVolumeCmd = `atvremote --id ${this.homepodId} volume`;
+      const result = await execAsync(getVolumeCmd);
+      try {
+          return Number.parseFloat(result.stdout);
+      } catch (error) {
+          this.logger.info(`GetVolume error: ${error}`);
+          return 0;
+      }
+  }
 
   public getPlayingTitle(callback: (title: string) => void): void {
       const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
@@ -75,7 +96,7 @@ export class AirPlayDevice {
       heatbeatType: string,
       heartbeatFailed: () => void,
   ): void {
-      this.logger.info(`Playing heartbeat, source: ${heatbeatType}`);
+      this.logger.info(`Playback heartbeat, source: ${heatbeatType}`);
       if (!this.lastSeen[heatbeatType]) {
           this.lastSeen[heatbeatType] = Date.now();
           return;
@@ -84,16 +105,16 @@ export class AirPlayDevice {
       const nearest = Math.max(...lastSeenByType);
       const diff = Date.now() - nearest;
       this.logger.info(
-          `Playing heartbeat, source: ${heatbeatType} nearest: ${nearest} diff: ${diff}`,
+          `Playback heartbeat, source: ${heatbeatType} nearest: ${nearest} diff: ${diff}`,
       );
       if (diff > this.lastSeenThresholdMs) {
           this.logger.info(
-              `Heartbeat, failed source: ${heatbeatType}, lastSeen: ${nearest} diff: ${diff}`,
+              `Playback heartbeat failed, source: ${heatbeatType}, lastSeen: ${nearest} diff: ${diff}`,
           );
           heartbeatFailed();
       } else {
           this.lastSeen[heatbeatType] = Date.now();
-          this.logger.info(`Playing heartbeat, source: ${heatbeatType} updated`);
+          this.logger.info(`Playback heartbeat, source: ${heatbeatType} updated`);
       }
   }
 
@@ -157,11 +178,18 @@ export class AirPlayDevice {
           clearInterval(this.heartbeat);
 
           setTimeout(() => {
+              if (!this.ffmpeg) {
+                  return;
+              }
               this.ffmpeg.kill();
               this.ffmpeg = null;
               setTimeout(() => {
+                  if (!this.atvremote) {
+                      return;
+                  }
                   this.atvremote.kill();
                   this.atvremote = null;
+                  this.lastSeen = {};
                   streamingFinished();
               }, 3000);
           }, 2000);

@@ -84,3 +84,8 @@ Identifiers:
 ## Stream URL format
 The easieast would be to get streaming url from your favorite radio playlist (usually .m3u file)
 Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
+
+
+## TODO list
+1. Volume control
+2. Resume playback on Homebridge reboot?

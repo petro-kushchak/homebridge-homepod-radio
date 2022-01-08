@@ -11,13 +11,13 @@ import {
 
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
 
-import CurrentTrackCharacteristic = require('./currentTrackCharacteristic');
-import ChangeTrackCharacteristic = require('./changeTrackCharacteristic');
+// import CurrentTrackCharacteristic = require('./currentTrackCharacteristic');
+// import ChangeTrackCharacteristic = require('./changeTrackCharacteristic');
 const PLUGIN_NAME = 'homebridge-homepod-radio-platform';
 
 let hap: HAP;
-let CurrentTrackCharacteristicType;
-let ChangeTrackCharacteristicType;
+// let CurrentTrackCharacteristicType;
+// let ChangeTrackCharacteristicType;
 
 /**
  * Platform Accessory
@@ -33,12 +33,13 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly serialNumber: string;
 
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic &
-    typeof CurrentTrackCharacteristicType &
-    typeof ChangeTrackCharacteristicType = this.api.hap.Characteristic;
+  public readonly Characteristic: typeof Characteristic
+  //  &  typeof CurrentTrackCharacteristicType &
+  //   typeof ChangeTrackCharacteristicType
+    = this.api.hap.Characteristic;
 
-  public readonly CurrentTrack;
-  public readonly ChangeTrack;
+  // public readonly CurrentTrack;
+  // public readonly ChangeTrack;
 
   constructor(
     public logger: Logging,
@@ -48,23 +49,23 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       hap = api.hap;
 
       this.homepodId = config.homepodId;
-      this.CurrentTrack = CurrentTrackCharacteristic(api);
-      CurrentTrackCharacteristicType = this.CurrentTrack;
+      // this.CurrentTrack = CurrentTrackCharacteristic(api);
+      // CurrentTrackCharacteristicType = this.CurrentTrack;
 
-      this.ChangeTrack = ChangeTrackCharacteristic(api);
-      ChangeTrackCharacteristicType = this.ChangeTrack;
+      // this.ChangeTrack = ChangeTrackCharacteristic(api);
+      // ChangeTrackCharacteristicType = this.ChangeTrack;
 
-      this.Characteristic = Object.defineProperty(
-          this.api.hap.Characteristic,
-          'CurrentTrack',
-          { value: this.CurrentTrack },
-      );
+      // this.Characteristic = Object.defineProperty(
+      //     this.api.hap.Characteristic,
+      //     'CurrentTrack',
+      //     { value: this.CurrentTrack },
+      // );
 
-      this.Characteristic = Object.defineProperty(
-          this.api.hap.Characteristic,
-          'ChangeTrack',
-          { value: this.ChangeTrack },
-      );
+      // this.Characteristic = Object.defineProperty(
+      //     this.api.hap.Characteristic,
+      //     'ChangeTrack',
+      //     { value: this.ChangeTrack },
+      // );
 
       // extract name from config
       this.name = config.name;
@@ -73,8 +74,6 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       this.radioUrl = config.radioUrl;
       this.trackName = config.trackName || 'Radio BBC';
       this.serialNumber = config.serialNumber || '1.0.0.1';
-
-      // this.setupCustomCharacteristics();
 
       this.api.on('didFinishLaunching', () => {
           this.logger.info('Finished initializing platform:', this.config.platform);

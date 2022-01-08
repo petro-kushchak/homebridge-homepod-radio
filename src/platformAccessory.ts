@@ -5,8 +5,8 @@ import {
     CharacteristicValue,
     CharacteristicGetCallback,
     CharacteristicEventTypes,
-    CharacteristicSetCallback,
 } from 'homebridge';
+import { callbackify } from './lib/homebridge-callbacks';
 import { AirPlayDevice } from './lib/airplayDevice';
 
 import { HomepodRadioPlatform } from './platform';
@@ -66,21 +66,32 @@ export class HomepodRadioPlatformAccessory {
         .getCharacteristic(this.platform.Characteristic.TargetMediaState)
         .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
 
-    this.service.addOptionalCharacteristic(
-        this.platform.Characteristic.CurrentTrack,
-    );
-    this.service
-        .getCharacteristic(this.platform.Characteristic.CurrentTrack)
-        .on(CharacteristicEventTypes.GET, this.getCurrentTrack.bind(this))
-        .updateValue(this.platform.trackName);
+    // this.service.addOptionalCharacteristic(
+    //     this.platform.Characteristic.CurrentTrack,
+    // );
+    // this.service
+    //     .getCharacteristic(this.platform.Characteristic.CurrentTrack)
+    //     .on(CharacteristicEventTypes.GET, this.getCurrentTrack.bind(this))
+    //     .updateValue(this.platform.trackName);
 
-    this.service.addOptionalCharacteristic(
-        this.platform.Characteristic.ChangeTrack,
-    );
+    // this.service.addOptionalCharacteristic(
+    //     this.platform.Characteristic.ChangeTrack,
+    // );
+    // this.service
+    //     .getCharacteristic(this.platform.Characteristic.ChangeTrack)
+    //     .on(CharacteristicEventTypes.SET, this.setChangeTrack.bind(this))
+    //     .updateValue(0);
+
+    if (
+        this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
+      undefined
+    ) {
+        this.service.addCharacteristic(new this.platform.Characteristic.Volume());
+    }
     this.service
-        .getCharacteristic(this.platform.Characteristic.ChangeTrack)
-        .on(CharacteristicEventTypes.SET, this.setChangeTrack.bind(this))
-        .updateValue(0);
+        .getCharacteristic(this.platform.Characteristic.Volume)
+        .on(CharacteristicEventTypes.GET, callbackify(this.getVolume.bind(this)))
+        .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
     setInterval(() => {
@@ -91,22 +102,51 @@ export class HomepodRadioPlatformAccessory {
     }, 3000);
   }
 
-  setChangeTrack(
-      value: CharacteristicValue,
-      callback: CharacteristicSetCallback,
-  ): void {
-      this.platform.logger.info('Triggered SET setChangeTrack:', value);
-      this.service.updateCharacteristic(
-          this.platform.Characteristic.CurrentTrack,
-          this.platform.trackName,
-      );
-      callback(null);
+  public async getVolume(): Promise<number> {
+      this.platform.logger.info('Triggered GET getVolume');
+      const volume = await this.device.getVolume();
+      this.platform.logger.info(`Current volume ${volume}`);
+      return volume;
   }
 
-  getCurrentTrack(callback: CharacteristicGetCallback) {
-      this.platform.logger.info('Triggered GET CurrentTrack');
-      callback(undefined, this.platform.trackName);
+  public async setVolume(
+      volume: number,
+      updateCharacteristic?: boolean,
+  ): Promise<boolean> {
+      const volumeCharacteristic = this.service.getCharacteristic(
+          this.platform.Characteristic.Volume,
+      );
+
+      this.platform.logger.info('Triggered SET setVolume');
+
+      const maxValue = volumeCharacteristic.props.maxValue;
+
+      volume = volume > maxValue ? maxValue : volume;
+
+      this.platform.logger.info(`Volume change to ${volume}`);
+
+      if (updateCharacteristic === true) {
+          volumeCharacteristic.updateValue(volume);
+      }
+      return this.device.setVolume(volume);
   }
+
+  //   setChangeTrack(
+  //       value: CharacteristicValue,
+  //       callback: CharacteristicSetCallback,
+  //   ): void {
+  //       this.platform.logger.info('Triggered SET setChangeTrack:', value);
+  //       this.service.updateCharacteristic(
+  //           this.platform.Characteristic.CurrentTrack,
+  //           this.platform.trackName,
+  //       );
+  //       callback(null);
+  //   }
+
+  //   getCurrentTrack(callback: CharacteristicGetCallback) {
+  //       this.platform.logger.info('Triggered GET CurrentTrack');
+  //       callback(undefined, this.platform.trackName);
+  //   }
 
   getMediaState(): CharacteristicValue {
       if (this.device.isPlaying()) {
