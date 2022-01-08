@@ -31,12 +31,13 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly radioUrl: string;
   public readonly trackName: string;
   public readonly serialNumber: string;
+  // private readonly accessories: HomepodRadioPlatformAccessory[] = [];
 
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic
-  //  &  typeof CurrentTrackCharacteristicType &
-  //   typeof ChangeTrackCharacteristicType
-    = this.api.hap.Characteristic;
+  public readonly Characteristic: typeof Characteristic =
+    //  &  typeof CurrentTrackCharacteristicType &
+    //   typeof ChangeTrackCharacteristicType
+    this.api.hap.Characteristic;
 
   // public readonly CurrentTrack;
   // public readonly ChangeTrack;
@@ -77,11 +78,14 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
 
       this.api.on('didFinishLaunching', () => {
           this.logger.info('Finished initializing platform:', this.config.platform);
-          this.addAccessories();
+          this.addAccessory();
+      });
+      this.api.on('shutdown', () => {
+          this.logger.info('Platform: shutdown...');
       });
   }
 
-  private addAccessories() {
+  private addAccessory() {
       const uuid = hap.uuid.generate('homebridge:homepod:radio:' + this.name);
       const accessory = new this.api.platformAccessory(this.name, uuid);
 

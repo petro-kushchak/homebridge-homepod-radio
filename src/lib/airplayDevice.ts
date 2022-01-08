@@ -70,6 +70,13 @@ export class AirPlayDevice {
               } else if (title === this.defaultPlayingStreamName) {
                   //not clear what happened
                   this.logger.info('Looks like still playing but no hearbeat...');
+                  //need to restart streaming
+                  this.startStreaming(
+                      streamUrl,
+                      streamName,
+                      heartbeat,
+                      heartbeatFailed,
+                  );
               } else {
                   //device is used to play something else, need to change state to "STOPPED"
                   this.endStreaming(() => {
@@ -107,14 +114,13 @@ export class AirPlayDevice {
       this.logger.info(
           `Playback heartbeat, source: ${heatbeatType} nearest: ${nearest} diff: ${diff}`,
       );
-      if (diff > this.lastSeenThresholdMs) {
+      this.lastSeen[heatbeatType] = Date.now();
+      this.logger.info(`Playback heartbeat, source: ${heatbeatType} updated`);
+      if (diff > this.lastSeenThresholdMs && heatbeatType === 'heartbeat') {
           this.logger.info(
               `Playback heartbeat failed, source: ${heatbeatType}, lastSeen: ${nearest} diff: ${diff}`,
           );
           heartbeatFailed();
-      } else {
-          this.lastSeen[heatbeatType] = Date.now();
-          this.logger.info(`Playback heartbeat, source: ${heatbeatType} updated`);
       }
   }
 
@@ -171,11 +177,18 @@ export class AirPlayDevice {
 
   private endStreaming(streamingFinished: () => void) {
       try {
+          if (!this.ffmpeg || !this.atvremote) {
+              this.logger.info(
+                  `End streaming: ffmpeg: ${this.ffmpeg}  atvremote: ${this.atvremote}`,
+              );
+              return;
+          }
           this.logger.info(
               `Killing process: ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
           );
           this.ffmpeg.stdout.unpipe();
           clearInterval(this.heartbeat);
+          this.lastSeen = {};
 
           setTimeout(() => {
               if (!this.ffmpeg) {
@@ -189,7 +202,6 @@ export class AirPlayDevice {
                   }
                   this.atvremote.kill();
                   this.atvremote = null;
-                  this.lastSeen = {};
                   streamingFinished();
               }, 3000);
           }, 2000);

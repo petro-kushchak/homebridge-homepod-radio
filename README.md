@@ -20,7 +20,7 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 - ffmpeg
 - pyatv
 
-For Homepod device you need to specify the IP address of the device. 
+For Homepod device you need to specify the Mac address of the device. 
 
 
 ## Usage Example:
