@@ -30,9 +30,9 @@ For Homepod device you need to specify the IP address of the device.
         {
             "platform": "HomepodRadioPlatform",
             "name": "Homepod Radio",
-            "model": "Radio BBC",
+            "model": "BBC - Radio 1",
             "homepodId": "F422F0103371",
-            "radioUrl": "http://radio.com"
+            "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
         }
     ]
 }
