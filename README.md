@@ -81,3 +81,6 @@ Identifiers:
  - F4:22:F0:10:33:71
  - F422F0103371
 ```
+## Stream URL format
+The easieast would be to get streaming url from your favorite radio playlist (usually .m3u file)
+Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
