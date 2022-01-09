@@ -25,7 +25,9 @@ export class AirPlayDevice {
   constructor(
     private readonly homepodId: string,
     private readonly logger: Logger,
-  ) {}
+    private readonly verboseMode: boolean,
+  ) {
+  }
 
   public async setVolume(volume: number): Promise<boolean> {
       const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
@@ -56,10 +58,10 @@ export class AirPlayDevice {
       const heartbeatFailed = () => {
       //identify readon and restart streaming...
           this.getPlayingTitle((title) => {
-              this.logger.info(
+              this.debug(
                   `Received from device: ${this.homepodId} title: ${title}`,
               );
-              if (title === '' || title === this.defaultPlayingStreamName) {
+              if (title === '' || title.startsWith(this.defaultPlayingStreamName)) {
                   this.logger.info(
                       'Restarting playback...',
                   );
@@ -94,16 +96,16 @@ export class AirPlayDevice {
       heatbeatType: string,
       heartbeatFailed: () => void,
   ): void {
-      this.logger.info(`Playback heartbeat, source: ${heatbeatType}`);
+      this.debug(`Playback heartbeat, source: ${heatbeatType}`);
       if (heatbeatType !== 'heartbeat') {
           this.lastSeen = Date.now();
       } else {
           const diffMs = Date.now() - this.lastSeen;
-          this.logger.info(
+          this.debug(
               `Playback heartbeat, diff: ${diffMs}ms`,
           );
           if (diffMs > this.lastSeenThresholdMs) {
-              this.logger.info(
+              this.debug(
                   'Playback heartbeat failed',
               );
               heartbeatFailed();
@@ -132,24 +134,24 @@ export class AirPlayDevice {
       );
 
       this.ffmpeg.stdout.pipe(this.atvremote.stdin).on('error', (error) => {
-          this.logger.info(`ffmpeg pipe error: ${error}`);
+          this.debug(`ffmpeg pipe error: ${error}`);
       });
 
       this.ffmpeg.stderr.on('data', (data) => {
-          this.logger.info(`ffmpeg error: ${data}`);
+          this.debug(`ffmpeg error: ${data}`);
           heartbeat('ffmpeg', heartbeatFailed);
       });
 
       this.ffmpeg.on('exit', (code, signal) => {
-          this.logger.info(`ffmpeg exit: code ${code} signal ${signal}`);
+          this.debug(`ffmpeg exit: code ${code} signal ${signal}`);
       });
 
       this.atvremote.on('exit', (code, signal) => {
-          this.logger.info(`atvremote exit: code ${code} signal ${signal}`);
+          this.debug(`atvremote exit: code ${code} signal ${signal}`);
       });
 
       this.atvremote.stderr.on('data', (data) => {
-          this.logger.info(`atvremote error: ${data}`);
+          this.debug(`atvremote error: ${data}`);
           heartbeat('atvremote', heartbeatFailed);
       });
 
@@ -157,7 +159,7 @@ export class AirPlayDevice {
           heartbeat('heartbeat', heartbeatFailed);
       }, this.heartbeatTimeout);
 
-      this.logger.info(
+      this.debug(
           `spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
       );
   }
@@ -165,12 +167,12 @@ export class AirPlayDevice {
   private endStreaming() {
       try {
           if (!this.ffmpeg || !this.atvremote) {
-              this.logger.info(
+              this.debug(
                   `End streaming: ffmpeg: ${this.ffmpeg}  atvremote: ${this.atvremote}`,
               );
               return;
           }
-          this.logger.info(
+          this.debug(
               `Killing process: ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
           );
           this.ffmpeg.stdout.unpipe();
@@ -181,13 +183,13 @@ export class AirPlayDevice {
           this.atvremote.kill();
           this.atvremote = null;
       } catch (err) {
-          this.logger.info(`Error while trying to stop: ${err}`);
+          this.debug(`Error while trying to stop: ${err}`);
       }
   }
 
   public stop() {
       if (!this.isPlaying()) {
-          this.logger.info('Trying to stop stopped process!');
+          this.debug('Trying to stop stopped process!');
           return;
       }
 
@@ -198,4 +200,13 @@ export class AirPlayDevice {
   public isPlaying(): boolean {
       return !!this.ffmpeg && !!this.atvremote;
   }
+
+  private debug(message: string, ...parameters:any[]) {
+      if(this.verboseMode) {
+          this.logger.info(message, parameters);
+      } else {
+          this.logger.debug(message, parameters);
+      }
+  }
+
 }

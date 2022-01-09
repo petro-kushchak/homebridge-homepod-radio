@@ -25,7 +25,7 @@ export class HomepodRadioPlatformAccessory {
     private readonly platform: HomepodRadioPlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-      this.device = new AirPlayDevice(this.platform.homepodId, platform.logger);
+      this.device = new AirPlayDevice(this.platform.homepodId, platform.logger, platform.verboseMode);
       this.currentMediaState = this.getMediaState();
 
     this.accessory
@@ -65,22 +65,6 @@ export class HomepodRadioPlatformAccessory {
     this.service
         .getCharacteristic(this.platform.Characteristic.TargetMediaState)
         .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
-
-    // this.service.addOptionalCharacteristic(
-    //     this.platform.Characteristic.CurrentTrack,
-    // );
-    // this.service
-    //     .getCharacteristic(this.platform.Characteristic.CurrentTrack)
-    //     .on(CharacteristicEventTypes.GET, this.getCurrentTrack.bind(this))
-    //     .updateValue(this.platform.trackName);
-
-    // this.service.addOptionalCharacteristic(
-    //     this.platform.Characteristic.ChangeTrack,
-    // );
-    // this.service
-    //     .getCharacteristic(this.platform.Characteristic.ChangeTrack)
-    //     .on(CharacteristicEventTypes.SET, this.setChangeTrack.bind(this))
-    //     .updateValue(0);
 
     if (
         this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
@@ -127,23 +111,6 @@ export class HomepodRadioPlatformAccessory {
       }
       return await this.device.setVolume(volume);
   }
-
-  //   setChangeTrack(
-  //       value: CharacteristicValue,
-  //       callback: CharacteristicSetCallback,
-  //   ): void {
-  //       this.platform.logger.info('Triggered SET setChangeTrack:', value);
-  //       this.service.updateCharacteristic(
-  //           this.platform.Characteristic.CurrentTrack,
-  //           this.platform.trackName,
-  //       );
-  //       callback(null);
-  //   }
-
-  //   getCurrentTrack(callback: CharacteristicGetCallback) {
-  //       this.platform.logger.info('Triggered GET CurrentTrack');
-  //       callback(undefined, this.platform.trackName);
-  //   }
 
   getMediaState(): CharacteristicValue {
       if (this.device.isPlaying()) {
