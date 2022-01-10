@@ -88,14 +88,13 @@ Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-1. Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
+1. Pairing setting for Homepod:
 
+Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
 ```
 atvremote scan
 ```
-
 Should show for your device:
-
 ```
 Services:
  - Protocol: Companion, Port: 49152, Credentials: None, Requires Password: False, Password: None, Pairing: Unsupported
@@ -103,10 +102,10 @@ Services:
  - Protocol: RAOP, Port: 7000, Credentials: None, Requires Password: False, Password: None, Pairing: NotNeeded
 ```
 
-Note: streaming will not work if you get ```Pairing: Disabled```
+Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
 
 ## TODO list
-1. ~~ Volume control (looks like not supported by Home app with iOS 15.2 ) ~~
+1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
 2. Resume playback on Homebridge reboot?
 3. Multiple radios support
 4. Radio streaming to multiple homepods
