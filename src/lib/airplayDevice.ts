@@ -162,6 +162,7 @@ export class AirPlayDevice {
       this.debug(
           `spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
       );
+      this.logger.info(`Started streaming ${streamUrl}`);
   }
 
   private endStreaming() {
