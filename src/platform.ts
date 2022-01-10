@@ -11,7 +11,7 @@ import {
 
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
 
-const PLUGIN_NAME = 'homebridge-homepod-radio-platform';
+const PLUGIN_NAME = 'HomepodRadioPlatform';
 
 let hap: HAP;
 
