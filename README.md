@@ -86,6 +86,29 @@ The easieast would be to get streaming url from your favorite radio playlist (us
 Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
 
 
+## Known issues
+
+1. Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
+
+```
+atvremote scan
+```
+
+Should show for your device:
+
+```
+Services:
+ - Protocol: Companion, Port: 49152, Credentials: None, Requires Password: False, Password: None, Pairing: Unsupported
+ - Protocol: AirPlay, Port: 7000, Credentials: None, Requires Password: False, Password: None, Pairing: NotNeeded
+ - Protocol: RAOP, Port: 7000, Credentials: None, Requires Password: False, Password: None, Pairing: NotNeeded
+```
+
+Note: streaming will not work if you get ```Pairing: Disabled```
+
 ## TODO list
-1. Volume control
+1. ~~ Volume control (looks like not supported by Home app with iOS 15.2 ) ~~
 2. Resume playback on Homebridge reboot?
+3. Multiple radios support
+4. Radio streaming to multiple homepods
+5. Siri shortcuts (text to speech, etc) 
+
