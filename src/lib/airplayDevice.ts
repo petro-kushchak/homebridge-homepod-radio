@@ -22,11 +22,14 @@ export class AirPlayDevice {
   private lastSeen: number;
   private heartbeat: NodeJS.Timeout;
 
+  private readonly debug: (message: string, ...parameters: any[]) => void;
+
   constructor(
     private readonly homepodId: string,
     private readonly logger: Logger,
     private readonly verboseMode: boolean,
   ) {
+      this.debug = this.verboseMode ? this.logger.info.bind(this.logger) : this.logger.debug.bind(this.logger);
   }
 
   public async setVolume(volume: number): Promise<boolean> {
@@ -58,13 +61,9 @@ export class AirPlayDevice {
       const heartbeatFailed = () => {
       //identify readon and restart streaming...
           this.getPlayingTitle((title) => {
-              this.debug(
-                  `Received from device: ${this.homepodId} title: ${title}`,
-              );
+              this.debug(`Received from device: ${this.homepodId} title: ${title}`);
               if (title === '' || title.startsWith(this.defaultPlayingStreamName)) {
-                  this.logger.info(
-                      'Restarting playback...',
-                  );
+                  this.logger.info('Restarting playback...');
                   //need to restart streaming
                   this.startStreaming(
                       streamUrl,
@@ -97,17 +96,17 @@ export class AirPlayDevice {
       heartbeatFailed: () => void,
   ): void {
       this.debug(`Playback heartbeat, source: ${heatbeatType}`);
+      if (!this.isPlaying()) {
+          this.logger.info('Playback heartbeat ignored - streaming stopped');
+          return;
+      }
       if (heatbeatType !== 'heartbeat') {
           this.lastSeen = Date.now();
       } else {
           const diffMs = Date.now() - this.lastSeen;
-          this.debug(
-              `Playback heartbeat, diff: ${diffMs}ms`,
-          );
+          this.debug(`Playback heartbeat, diff: ${diffMs}ms`);
           if (diffMs > this.lastSeenThresholdMs) {
-              this.debug(
-                  'Playback heartbeat failed',
-              );
+              this.debug('Playback heartbeat failed');
               heartbeatFailed();
           }
       }
@@ -201,13 +200,4 @@ export class AirPlayDevice {
   public isPlaying(): boolean {
       return !!this.ffmpeg && !!this.atvremote;
   }
-
-  private debug(message: string, ...parameters:any[]) {
-      if(this.verboseMode) {
-          this.logger.info(message, parameters);
-      } else {
-          this.logger.debug(message, parameters);
-      }
-  }
-
 }

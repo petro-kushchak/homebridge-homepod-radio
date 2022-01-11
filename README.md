@@ -38,7 +38,16 @@ For Homepod device you need to specify the Mac address of the device.
 }
 ```
 
+## HomePod access setup
+
+In Home app settings:
+
+- Tap the Homes and Home Settings button.
+- Tap Home Settings > Allow Speaker & TV Access, then choose "allow everyone"
+- *Important!* Reboot the Homepod
+
 ## ffmpeg lib
+
 - install ffmpeg
 ```
 sudo apt-get install ffmpeg
@@ -88,7 +97,7 @@ Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-1. Pairing setting for Homepod:
+1. Pairing setting for Homepod (fixed by *HomePod access setup* step):
 
 Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
 ```
@@ -110,4 +119,3 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 3. Multiple radios support
 4. Radio streaming to multiple homepods
 5. Siri shortcuts (text to speech, etc) 
-
