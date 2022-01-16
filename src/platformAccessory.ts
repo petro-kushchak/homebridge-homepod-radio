@@ -8,12 +8,17 @@ import {
 import { callbackify } from './lib/homebridge-callbacks';
 import { AirPlayDevice } from './lib/airplayDevice';
 
-import { HomepodRadioPlatform } from './platform';
+import {
+    HomepodRadioPlatform,
+    PlaybackController,
+    PlaybackStreamer,
+    Radio,
+} from './platform';
 
 /**
  * Homepod Radio Platform Accessory.
  */
-export class HomepodRadioPlatformAccessory {
+export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
   private readonly device: AirPlayDevice;
   private service: Service;
 
@@ -22,7 +27,9 @@ export class HomepodRadioPlatformAccessory {
 
   constructor(
     private readonly platform: HomepodRadioPlatform,
+    private readonly radio: Radio,
     private readonly accessory: PlatformAccessory,
+    private readonly playbackController: PlaybackController,
   ) {
       this.device = new AirPlayDevice(
           this.platform.homepodId,
@@ -30,6 +37,7 @@ export class HomepodRadioPlatformAccessory {
           platform.verboseMode,
       );
       this.currentMediaState = this.getMediaState();
+      this.playbackController.addStreamer(this);
 
     this.accessory
         .getService(this.platform.Service.AccessoryInformation)!
@@ -37,10 +45,7 @@ export class HomepodRadioPlatformAccessory {
             this.platform.Characteristic.Manufacturer,
             'Homepod Radio',
         )
-        .setCharacteristic(
-            this.platform.Characteristic.Model,
-            this.platform.model,
-        )
+        .setCharacteristic(this.platform.Characteristic.Model, this.radio.model)
         .setCharacteristic(
             this.platform.Characteristic.SerialNumber,
             this.platform.serialNumber,
@@ -95,10 +100,22 @@ export class HomepodRadioPlatformAccessory {
     }, 3000);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async stopRequested(source: PlaybackStreamer): Promise<void> {
+      this.platform.logger.info(
+          `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,
+      );
+      await this.device.stop();
+  }
+
+  streamerName(): string {
+      return this.radio.name;
+  }
+
   public async getVolume(): Promise<number> {
-      this.platform.logger.info('Triggered GET getVolume');
+      this.platform.logger.info(`[${this.streamerName()}] Triggered GET getVolume`);
       const volume = await this.device.getVolume();
-      this.platform.logger.info(`Current volume ${volume}`);
+      this.platform.logger.info(`[${this.streamerName()}] Current volume ${volume}`);
       return volume;
   }
 
@@ -110,10 +127,10 @@ export class HomepodRadioPlatformAccessory {
           this.platform.Characteristic.Volume,
       );
 
-      this.platform.logger.info('Triggered SET setVolume');
+      this.platform.logger.info(`[${this.streamerName()}] Triggered SET setVolume`);
       const maxValue = volumeCharacteristic.props.maxValue * 0.75;
       volume = volume > maxValue ? maxValue : volume;
-      this.platform.logger.info(`Volume change to ${volume}`);
+      this.platform.logger.info(`[${this.streamerName()}] Volume change to ${volume}`);
 
       if (updateCharacteristic === true) {
           volumeCharacteristic.updateValue(volume);
@@ -135,7 +152,7 @@ export class HomepodRadioPlatformAccessory {
   async getCurrentMediaState(): Promise<CharacteristicValue> {
       this.currentMediaState = this.getMediaState();
       this.platform.logger.info(
-          'Triggered GET CurrentMediaState:',
+          `[${this.streamerName()}] Triggered GET CurrentMediaState:`,
           this.currentMediaState,
       );
       return Promise.resolve(this.currentMediaState);
@@ -146,17 +163,18 @@ export class HomepodRadioPlatformAccessory {
    */
   async setTargetMediaState(value: CharacteristicValue): Promise<void> {
       this.targetMediaState = value;
-      this.platform.logger.info('Triggered SET TargetMediaState:', value);
+      this.platform.logger.info(`[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`);
       if (
           value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
       value === this.platform.Characteristic.CurrentMediaState.STOP
       ) {
           await this.device.stop();
       } else {
+          await this.playbackController.requestStop(this);
           await this.device.play(
-              this.platform.radioUrl,
-              this.platform.trackName,
-              this.platform.volume,
+              this.radio.radioUrl,
+              this.radio.trackName,
+              this.radio.volume,
           );
       }
   }

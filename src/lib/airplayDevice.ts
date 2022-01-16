@@ -57,13 +57,6 @@ export class AirPlayDevice {
       return result.stdout;
   }
 
-  //   public getPlayingTitle(callback: (title: string) => void): void {
-  //       const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
-  //       child.exec(currentTitleCmd, (_error, stdout, _stderr) => {
-  //           callback(stdout);
-  //       });
-  //   }
-
   public async play(
       streamUrl: string,
       streamName: string,

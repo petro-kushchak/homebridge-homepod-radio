@@ -15,22 +15,50 @@ const PLUGIN_NAME = 'HomepodRadioPlatform';
 
 let hap: HAP;
 
+export interface Radio {
+  name: string;
+  model: string;
+  radioUrl: string;
+  trackName: string;
+  volume: number;
+}
+
+export interface PlaybackStreamer {
+  stopRequested(source: PlaybackStreamer): Promise<void>;
+  streamerName(): string;
+}
+
+export class PlaybackController {
+  private readonly streamers: PlaybackStreamer[];
+  public constructor() {
+      this.streamers = [];
+  }
+
+  public addStreamer(streamer: PlaybackStreamer) {
+      this.streamers.push(streamer);
+  }
+
+  public async requestStop(source: PlaybackStreamer): Promise<void> {
+      this.streamers.forEach(async (streamer) => {
+          if (streamer !== source) {
+              await streamer.stopRequested(source);
+          }
+      });
+  }
+}
+
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
 export class HomepodRadioPlatform implements IndependentPlatformPlugin {
-  private readonly name: string;
-  public readonly model: string;
   public readonly homepodId: string;
-  public readonly radioUrl: string;
-  public readonly trackName: string;
   public readonly serialNumber: string;
-  public readonly volume: number;
-
   public readonly verboseMode: boolean;
-  // private readonly accessories: HomepodRadioPlatformAccessory[] = [];
+  private readonly radios: Radio[];
+  private readonly playbacController: PlaybackController =
+    new PlaybackController();
 
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic =
@@ -44,37 +72,78 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       hap = api.hap;
 
       this.homepodId = config.homepodId;
+      this.radios = [];
+      this.loadRadios();
 
-      // extract name from config
-      this.name = config.name;
-      this.model = config.model || 'Radio BBC';
-
-      this.radioUrl = config.radioUrl;
-      this.trackName = config.trackName || 'Radio BBC';
-      this.serialNumber = config.serialNumber || '1.0.0.1';
-
-      this.volume = !!config.volume && (config.volume > 0) && (config.volume < 100)? config.volume: 0;
-
-      this.verboseMode = !!config.verboseMode && config.verboseMode? true: false;
+      this.serialNumber = config.serialNumber || `HPD${this.homepodId}`;
+      this.verboseMode =
+      !!config.verboseMode && config.verboseMode ? true : false;
 
       this.api.on('didFinishLaunching', () => {
           this.logger.info('Finished initializing platform:', this.config.platform);
-          this.addAccessory();
+          this.radios.forEach((radio) => this.addAccessory(radio));
       });
+
       this.api.on('shutdown', () => {
           this.logger.info('Platform: shutdown...');
       });
   }
 
-  private addAccessory() {
-      const uuid = hap.uuid.generate('homebridge:homepod:radio:' + this.name);
-      const accessory = new this.api.platformAccessory(this.name, uuid);
+  private loadRadios() {
+      //backward compatibility - single accessory mode
+      if (!this.config.radios) {
+          const radio = {
+              name: this.config.name || 'HomePod Radio',
+              model: this.config.model || 'Radio BBC',
+              radioUrl: this.config.radioUrl,
+              trackName: this.config.trackName || 'Radio BBC',
+              serialNumber: this.serialNumber,
+              volume:
+          !!this.config.volume &&
+          this.config.volume > 0 &&
+          this.config.volume < 100
+              ? this.config.volume
+              : 0,
+          } as Radio;
+
+          this.radios.push(radio);
+      } else {
+          this.config.radios.forEach((radioConfig) => {
+              const radio = {
+                  name: radioConfig.name,
+                  model: radioConfig.model || 'HomePod Radio',
+                  radioUrl: radioConfig.radioUrl,
+                  trackName: radioConfig.trackName || 'HomePod Radio',
+                  serialNumber: this.serialNumber,
+                  volume:
+            !!radioConfig.volume &&
+            radioConfig.volume > 0 &&
+            radioConfig.volume < 100
+                ? radioConfig.volume
+                : 0,
+              } as Radio;
+
+              this.radios.push(radio);
+          });
+      }
+      const loadedRadios = this.radios.map((r) => r.name);
+      this.logger.info(`Loaded ${loadedRadios.length} radios: ${loadedRadios}`);
+  }
+
+  private addAccessory(radio: Radio) {
+      const uuid = hap.uuid.generate('homebridge:homepod:radio:' + radio.name);
+      const accessory = new this.api.platformAccessory(radio.name, uuid);
 
       // Adding 26 as the category is some special sauce that gets this to work properly.
       // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
       accessory.category = 26;
 
-      new HomepodRadioPlatformAccessory(this, accessory);
+      new HomepodRadioPlatformAccessory(
+          this,
+          radio,
+          accessory,
+          this.playbacController,
+      );
 
       // SmartSpeaker service must be added as an external accessory.
       // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035

@@ -27,6 +27,27 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 For Homepod device you need to specify the Mac address of the device. 
 
 ## Usage Example:
+
+- Multiple radio accessories support:
+
+```
+{
+    "platform": "HomepodRadioPlatform",
+    "serialNumber": "20020105:00",
+    "homepodId": "<homepod id>",
+    "radios": [
+        {
+            "name": "BBC - Radio 1",
+            "trackName": "BBC - Radio 1",
+            "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
+            "volume": 25                
+        }
+    ]
+}
+```
+
+- Single radio accessory (legacy config):
+
 ```
 {
     "platforms": [
@@ -41,6 +62,7 @@ For Homepod device you need to specify the Mac address of the device.
     ]
 }
 ```
+
 
 ## HomePod access setup
 
@@ -121,7 +143,8 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 ## TODO list
 1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
 2. ~~Default volume for radio~~
-4. Resume playback on Homebridge reboot?
-5. Multiple radios support
+3. ~~Multiple radios support~~
+4. Set radio (track) name to homepod
+5. Resume playback on Homebridge reboot
 6. Radio streaming to multiple homepods
-7. Siri shortcuts (text to speech, etc) 
+7. Siri shortcuts (text to speech, etc)
