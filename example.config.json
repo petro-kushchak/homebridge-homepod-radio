@@ -5,5 +5,6 @@
     "trackName": "BBC - Radio 1",
     "serialNumber": "20020105:00",
     "homepodId": "<homepod id>",
-    "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+    "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
+    "volume": 25
 }

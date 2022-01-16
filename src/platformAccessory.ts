@@ -3,7 +3,6 @@ import {
     Service,
     PlatformAccessory,
     CharacteristicValue,
-    CharacteristicGetCallback,
     CharacteristicEventTypes,
 } from 'homebridge';
 import { callbackify } from './lib/homebridge-callbacks';
@@ -25,7 +24,11 @@ export class HomepodRadioPlatformAccessory {
     private readonly platform: HomepodRadioPlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-      this.device = new AirPlayDevice(this.platform.homepodId, platform.logger, platform.verboseMode);
+      this.device = new AirPlayDevice(
+          this.platform.homepodId,
+          platform.logger,
+          platform.verboseMode,
+      );
       this.currentMediaState = this.getMediaState();
 
     this.accessory
@@ -61,10 +64,16 @@ export class HomepodRadioPlatformAccessory {
     // Event handlers for CurrentMediaState and TargetMediaState Characteristics.
     this.service
         .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
-        .on(CharacteristicEventTypes.GET, this.getCurrentMediaState.bind(this));
+        .on(
+            CharacteristicEventTypes.GET,
+            callbackify(this.getCurrentMediaState.bind(this)),
+        );
     this.service
         .getCharacteristic(this.platform.Characteristic.TargetMediaState)
-        .on(CharacteristicEventTypes.SET, this.setTargetMediaState.bind(this));
+        .on(
+            CharacteristicEventTypes.SET,
+            callbackify(this.setTargetMediaState.bind(this)),
+        );
 
     if (
         this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
@@ -123,32 +132,32 @@ export class HomepodRadioPlatformAccessory {
   /**
    * Get the currentMediaState.
    */
-  getCurrentMediaState(callback: CharacteristicGetCallback) {
+  async getCurrentMediaState(): Promise<CharacteristicValue> {
       this.currentMediaState = this.getMediaState();
       this.platform.logger.info(
           'Triggered GET CurrentMediaState:',
           this.currentMediaState,
       );
-      callback(undefined, this.currentMediaState);
+      return Promise.resolve(this.currentMediaState);
   }
 
   /**
    * Set the targetMediaState.
    */
-  setTargetMediaState(
-      value: CharacteristicValue,
-      callback: CharacteristicGetCallback,
-  ) {
+  async setTargetMediaState(value: CharacteristicValue): Promise<void> {
       this.targetMediaState = value;
       this.platform.logger.info('Triggered SET TargetMediaState:', value);
       if (
           value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
       value === this.platform.Characteristic.CurrentMediaState.STOP
       ) {
-          this.device.stop();
+          await this.device.stop();
       } else {
-          this.device.play(this.platform.radioUrl, this.platform.trackName);
+          await this.device.play(
+              this.platform.radioUrl,
+              this.platform.trackName,
+              this.platform.volume,
+          );
       }
-      callback(null);
   }
 }

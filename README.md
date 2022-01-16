@@ -15,13 +15,16 @@ Main idea is to stream to HomePod mini (or AppleTV) with the following command:
 ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```
 
+- automatically stops streaming when homepod is used by another app
+- sometimes audio streaming stops, so plugin automatically restarts it 
+- "volume" setting (if specified) is used to set volume when streaming starts
+
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 - ffmpeg
 - pyatv
 
 For Homepod device you need to specify the Mac address of the device. 
-
 
 ## Usage Example:
 ```
@@ -32,7 +35,8 @@ For Homepod device you need to specify the Mac address of the device.
             "name": "Homepod Radio",
             "model": "BBC - Radio 1",
             "homepodId": "F422F0103371",
-            "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+            "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
+            "volume", 25
         }
     ]
 }
@@ -49,6 +53,7 @@ In Home app settings:
 ## ffmpeg lib
 
 - install ffmpeg
+
 ```
 sudo apt-get install ffmpeg
 ```
@@ -115,7 +120,8 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 
 ## TODO list
 1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
-2. Resume playback on Homebridge reboot?
-3. Multiple radios support
-4. Radio streaming to multiple homepods
-5. Siri shortcuts (text to speech, etc) 
+2. ~~Default volume for radio~~
+4. Resume playback on Homebridge reboot?
+5. Multiple radios support
+6. Radio streaming to multiple homepods
+7. Siri shortcuts (text to speech, etc) 

@@ -15,7 +15,7 @@ const execAsync = promisify(child.exec);
 export class AirPlayDevice {
   private readonly lastSeenThresholdMs = 3000;
   private readonly heartbeatTimeout = 5000;
-  private readonly defaultPlayingStreamName: string = 'Streaming with pyatv';
+  private readonly defaultPlaybackStreamName: string = 'Streaming with pyatv';
 
   private ffmpeg: child.ChildProcess = null;
   private atvremote: child.ChildProcess = null;
@@ -29,7 +29,9 @@ export class AirPlayDevice {
     private readonly logger: Logger,
     private readonly verboseMode: boolean,
   ) {
-      this.debug = this.verboseMode ? this.logger.info.bind(this.logger) : this.logger.debug.bind(this.logger);
+      this.debug = this.verboseMode
+          ? this.logger.info.bind(this.logger)
+          : this.logger.debug.bind(this.logger);
   }
 
   public async setVolume(volume: number): Promise<boolean> {
@@ -49,55 +51,78 @@ export class AirPlayDevice {
       }
   }
 
-  public getPlayingTitle(callback: (title: string) => void): void {
+  public async getPlaybackTitle(): Promise<string> {
       const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
-      child.exec(currentTitleCmd, (_error, stdout, _stderr) => {
-          callback(stdout);
-      });
+      const result = await execAsync(currentTitleCmd);
+      return result.stdout;
   }
 
-  public play(streamUrl: string, streamName: string) {
+  //   public getPlayingTitle(callback: (title: string) => void): void {
+  //       const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
+  //       child.exec(currentTitleCmd, (_error, stdout, _stderr) => {
+  //           callback(stdout);
+  //       });
+  //   }
+
+  public async play(
+      streamUrl: string,
+      streamName: string,
+      volume: number,
+  ): Promise<boolean> {
       const heartbeat = this.handleHearbeat.bind(this);
-      const heartbeatFailed = () => {
-      //identify readon and restart streaming...
-          this.getPlayingTitle((title) => {
-              this.debug(`Received from device: ${this.homepodId} title: ${title}`);
-              if (title === '' || title.startsWith(this.defaultPlayingStreamName)) {
-                  this.logger.info('Restarting playback...');
-                  //need to restart streaming
-                  this.startStreaming(
-                      streamUrl,
-                      streamName,
-                      heartbeat,
-                      heartbeatFailed,
-                  );
-              } else {
-                  //device is used to play something else, need to change state to "STOPPED"
-                  this.endStreaming();
-                  this.logger.info('Streaming finished');
-              }
-          });
+      const heartbeatFailed = async (): Promise<void> => {
+          //identify reason and restart streaming...
+          const title = await this.getPlaybackTitle();
+          this.debug(`Received from device: ${this.homepodId} title: ${title}`);
+          if (title === '' || title.startsWith(this.defaultPlaybackStreamName)) {
+              this.logger.info('Restarting playback...');
+              //need to restart streaming
+              await this.startStreaming(
+                  streamUrl,
+                  streamName,
+                  volume,
+                  heartbeat,
+                  heartbeatFailed,
+              );
+          } else {
+              //device is used to play something else, need to change state to "STOPPED"
+              await this.endStreaming();
+              this.logger.info('Streaming finished');
+          }
       };
 
       if (this.isPlaying()) {
-          this.endStreaming();
+          await this.endStreaming();
           this.logger.info('Streaming finished');
-          this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
+          return await this.startStreaming(
+              streamUrl,
+              streamName,
+              volume,
+              heartbeat,
+              heartbeatFailed,
+          );
       } else {
-          this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
+          return await this.startStreaming(
+              streamUrl,
+              streamName,
+              volume,
+              heartbeat,
+              heartbeatFailed,
+          );
       }
   }
 
   /**
    * Streaming crash monitoring/prevention
    */
-  private handleHearbeat(
+  private async handleHearbeat(
       heatbeatType: string,
-      heartbeatFailed: () => void,
-  ): void {
+      heartbeatFailed: () => Promise<void>,
+  ): Promise<void> {
       this.debug(`Playback heartbeat, source: ${heatbeatType}`);
       if (!this.isPlaying()) {
           this.logger.info('Playback heartbeat ignored - streaming stopped');
+          clearInterval(this.heartbeat);
           return;
       }
       if (heatbeatType !== 'heartbeat') {
@@ -107,17 +132,21 @@ export class AirPlayDevice {
           this.debug(`Playback heartbeat, diff: ${diffMs}ms`);
           if (diffMs > this.lastSeenThresholdMs) {
               this.debug('Playback heartbeat failed');
-              heartbeatFailed();
+              await heartbeatFailed();
           }
       }
   }
 
-  private startStreaming(
+  private async startStreaming(
       streamUrl: string,
       streamName: string,
-      heartbeat: (source: string, heartbeatFailed: () => void) => void,
-      heartbeatFailed: () => void,
-  ) {
+      volume: number,
+      heartbeat: (
+      source: string,
+      heartbeatFailed: () => Promise<void>
+    ) => Promise<void>,
+      heartbeatFailed: () => Promise<void>,
+  ): Promise<boolean> {
       // create pipe for the command:
       //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.homepodId} stream_file=-
 
@@ -133,11 +162,11 @@ export class AirPlayDevice {
       );
 
       this.ffmpeg.stdout.pipe(this.atvremote.stdin).on('error', (error) => {
-          this.debug(`ffmpeg pipe error: ${error}`);
+          this.logger.info(`ffmpeg pipe error: ${error}`);
       });
 
       this.ffmpeg.stderr.on('data', (data) => {
-          this.debug(`ffmpeg error: ${data}`);
+          this.debug(`ffmpeg data: ${data}`);
           heartbeat('ffmpeg', heartbeatFailed);
       });
 
@@ -150,7 +179,7 @@ export class AirPlayDevice {
       });
 
       this.atvremote.stderr.on('data', (data) => {
-          this.debug(`atvremote error: ${data}`);
+          this.debug(`atvremote data: ${data}`);
           heartbeat('atvremote', heartbeatFailed);
       });
 
@@ -162,9 +191,14 @@ export class AirPlayDevice {
           `spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
       );
       this.logger.info(`Started streaming ${streamUrl}`);
+      if (volume > 0) {
+          this.logger.info(`Setting volume to ${volume}`);
+          return await this.setVolume(volume);
+      }
+      return true;
   }
 
-  private endStreaming() {
+  private async endStreaming(): Promise<boolean> {
       try {
           if (!this.ffmpeg || !this.atvremote) {
               this.debug(
@@ -185,16 +219,18 @@ export class AirPlayDevice {
       } catch (err) {
           this.debug(`Error while trying to stop: ${err}`);
       }
+      return Promise.resolve(true);
   }
 
-  public stop() {
+  public async stop(): Promise<boolean> {
       if (!this.isPlaying()) {
           this.debug('Trying to stop stopped process!');
-          return;
+          return true;
       }
 
-      this.endStreaming();
+      await this.endStreaming();
       this.logger.info('Streaming finished');
+      return true;
   }
 
   public isPlaying(): boolean {

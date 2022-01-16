@@ -27,6 +27,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly radioUrl: string;
   public readonly trackName: string;
   public readonly serialNumber: string;
+  public readonly volume: number;
 
   public readonly verboseMode: boolean;
   // private readonly accessories: HomepodRadioPlatformAccessory[] = [];
@@ -51,6 +52,8 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       this.radioUrl = config.radioUrl;
       this.trackName = config.trackName || 'Radio BBC';
       this.serialNumber = config.serialNumber || '1.0.0.1';
+
+      this.volume = !!config.volume && (config.volume > 0) && (config.volume < 100)? config.volume: 0;
 
       this.verboseMode = !!config.verboseMode && config.verboseMode? true: false;
 
