@@ -1,0 +1,51 @@
+{
+  "pluginAlias": "HomepodRadioPlatform",
+  "pluginType": "platform",
+  "headerDisplay": "Radio speakers to HomeKit as separate accessories and each needs to be manually paired",
+  "footerDisplay": "The **ffmpeg** and **pyatv** must be installed on your system for this plugin to work.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "homepodId": {
+        "title": "HomePod Id",
+        "type": "string",
+        "default": "",
+        "required": true
+      },
+      "serialNumber": {
+        "title": "Serial Number",
+        "type": "string",
+        "default": "",
+        "required": false
+      },
+      "radios": {
+        "title": "Radio Speaker",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "title": "Radio",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "placeholder": "Enter radio name...",
+              "required": true
+            },
+            "radioUrl": {
+              "title": "Radio Stream URL",
+              "type": "string",
+              "placeholder": "Enter radio stream url...",
+              "required": true
+            },
+            "volume": {
+              "title": "Radio Startup Volume",
+              "type": "number",
+              "placeholder": 0,
+              "required": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -144,7 +144,8 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
 2. ~~Default volume for radio~~
 3. ~~Multiple radios support~~
-4. Set radio (track) name to homepod
-5. Resume playback on Homebridge reboot
-6. Radio streaming to multiple homepods
-7. Siri shortcuts (text to speech, etc)
+4. ~~Plugin Config Schema support (nice config form with Homebridge UI)~~
+5. Set radio (track) name to homepod
+6. Resume playback on Homebridge reboot
+7. Radio streaming to multiple homepods
+8. Siri shortcuts (text to speech, etc)

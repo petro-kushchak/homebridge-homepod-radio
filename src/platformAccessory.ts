@@ -7,6 +7,7 @@ import {
 } from 'homebridge';
 import { callbackify } from './lib/homebridge-callbacks';
 import { AirPlayDevice } from './lib/airplayDevice';
+import { timeout } from './lib/promices';
 
 import {
     HomepodRadioPlatform,
@@ -112,10 +113,23 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
       return this.radio.name;
   }
 
-  public async getVolume(): Promise<number> {
-      this.platform.logger.info(`[${this.streamerName()}] Triggered GET getVolume`);
-      const volume = await this.device.getVolume();
-      this.platform.logger.info(`[${this.streamerName()}] Current volume ${volume}`);
+  public async getVolume(): Promise<CharacteristicValue> {
+      this.platform.logger.info(
+          `[${this.streamerName()}] Triggered GET getVolume`,
+      );
+
+      const volumeCharacteristic = this.service.getCharacteristic(
+          this.platform.Characteristic.Volume,
+      );
+
+      const volume = await Promise.race([
+          timeout(3000, volumeCharacteristic.value),
+          this.device.getVolume(),
+      ]);
+
+      this.platform.logger.info(
+          `[${this.streamerName()}] Current volume ${volume}`,
+      );
       return volume;
   }
 
@@ -127,10 +141,14 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
           this.platform.Characteristic.Volume,
       );
 
-      this.platform.logger.info(`[${this.streamerName()}] Triggered SET setVolume`);
+      this.platform.logger.info(
+          `[${this.streamerName()}] Triggered SET setVolume`,
+      );
       const maxValue = volumeCharacteristic.props.maxValue * 0.75;
       volume = volume > maxValue ? maxValue : volume;
-      this.platform.logger.info(`[${this.streamerName()}] Volume change to ${volume}`);
+      this.platform.logger.info(
+          `[${this.streamerName()}] Volume change to ${volume}`,
+      );
 
       if (updateCharacteristic === true) {
           volumeCharacteristic.updateValue(volume);
@@ -163,7 +181,9 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
    */
   async setTargetMediaState(value: CharacteristicValue): Promise<void> {
       this.targetMediaState = value;
-      this.platform.logger.info(`[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`);
+      this.platform.logger.info(
+          `[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`,
+      );
       if (
           value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
       value === this.platform.Characteristic.CurrentMediaState.STOP

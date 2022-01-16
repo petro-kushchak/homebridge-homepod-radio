@@ -36,12 +36,14 @@ export class AirPlayDevice {
 
   public async setVolume(volume: number): Promise<boolean> {
       const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
+      this.debug(`Executing "${setVolumeCmd}"`);
       await execAsync(setVolumeCmd);
       return true;
   }
 
   public async getVolume(): Promise<number> {
       const getVolumeCmd = `atvremote --id ${this.homepodId} volume`;
+      this.debug(`Executing "${getVolumeCmd}"`);
       const result = await execAsync(getVolumeCmd);
       try {
           return Number.parseFloat(result.stdout);
@@ -64,7 +66,7 @@ export class AirPlayDevice {
   ): Promise<boolean> {
       const heartbeat = this.handleHearbeat.bind(this);
       const heartbeatFailed = async (): Promise<void> => {
-          //identify reason and restart streaming...
+      //identify reason and restart streaming...
           const title = await this.getPlaybackTitle();
           this.debug(`Received from device: ${this.homepodId} title: ${title}`);
           if (title === '' || title.startsWith(this.defaultPlaybackStreamName)) {
