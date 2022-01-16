@@ -36,7 +36,7 @@ For Homepod device you need to specify the Mac address of the device.
             "model": "BBC - Radio 1",
             "homepodId": "F422F0103371",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume", 25
+            "volume": 25
         }
     ]
 }
