@@ -145,7 +145,7 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 2. ~~Default volume for radio~~
 3. ~~Multiple radios support~~
 4. ~~Plugin Config Schema support (nice config form with Homebridge UI)~~
-5. ~~Max streaming retries is set to 5 (so it gives up in case if radio or HomePod stopped working)
+5. ~~Max streaming retries is set to 5 (so it gives up in case if radio or HomePod stopped working)~~
 6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~ 
 7. Set radio (track) name to homepod
 8. Resume playback on Homebridge reboot
