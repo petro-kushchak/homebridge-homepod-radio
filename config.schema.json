@@ -1,7 +1,7 @@
 {
   "pluginAlias": "HomepodRadioPlatform",
   "pluginType": "platform",
-  "headerDisplay": "Radio speakers to HomeKit as separate accessories and each needs to be manually paired",
+  "headerDisplay": "Radio speakers are exposed to HomeKit as separate accessories and each needs to be manually paired",
   "footerDisplay": "The **ffmpeg** and **pyatv** must be installed on your system for this plugin to work.",
   "schema": {
     "type": "object",
@@ -16,6 +16,19 @@
         "title": "Serial Number",
         "type": "string",
         "default": "",
+        "placeholder": "If not specified - HomePod Id will be used",
+        "required": false
+      },
+      "verboseModel": {
+        "title": "Debug Mode",
+        "type": "boolean",
+        "default": false,
+        "required": false
+      },
+      "volumeControl": {
+        "title": "Enable Volume Control (not supported from iOS 15.2 Home app",
+        "type": "boolean",
+        "default": false,
         "required": false
       },
       "radios": {

@@ -81,16 +81,18 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             callbackify(this.setTargetMediaState.bind(this)),
         );
 
-    if (
-        this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
-      undefined
-    ) {
-        this.service.addCharacteristic(new this.platform.Characteristic.Volume());
+    if (platform.volumeControl) {
+        if (
+            this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
+              undefined
+        ) {
+            this.service.addCharacteristic(new this.platform.Characteristic.Volume());
+        }
+        this.service
+            .getCharacteristic(this.platform.Characteristic.Volume)
+            .on(CharacteristicEventTypes.GET, callbackify(this.getVolume.bind(this)))
+            .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
     }
-    this.service
-        .getCharacteristic(this.platform.Characteristic.Volume)
-        .on(CharacteristicEventTypes.GET, callbackify(this.getVolume.bind(this)))
-        .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
     setInterval(() => {

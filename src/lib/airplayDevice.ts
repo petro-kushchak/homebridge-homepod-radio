@@ -5,6 +5,7 @@ import * as child from 'child_process';
 import { Logger } from 'homebridge';
 
 import { promisify } from 'util';
+import { delay } from './promices';
 
 const execAsync = promisify(child.exec);
 
@@ -13,14 +14,18 @@ const execAsync = promisify(child.exec);
  */
 
 export class AirPlayDevice {
-  private readonly lastSeenThresholdMs = 3000;
-  private readonly heartbeatTimeout = 5000;
-  private readonly defaultPlaybackStreamName: string = 'Streaming with pyatv';
+  private readonly MAX_STREAMING_RETRIES = 5;
+  private readonly STREAMING_RESTART_TIMEOUT = 500;
+  private readonly HEARTBEAT_TIMEOUT = 5000;
+  private readonly LAST_SEEN_THRESHOLD_MS = 3000;
+  private readonly DEFAULT_PLAYBACK_STREAM_NAME: string =
+    'Streaming with pyatv';
 
   private ffmpeg: child.ChildProcess = null;
   private atvremote: child.ChildProcess = null;
   private lastSeen: number;
   private heartbeat: NodeJS.Timeout;
+  private streamingRetries = 0;
 
   private readonly debug: (message: string, ...parameters: any[]) => void;
 
@@ -64,14 +69,26 @@ export class AirPlayDevice {
       streamName: string,
       volume: number,
   ): Promise<boolean> {
+      this.streamingRetries = 0;
       const heartbeat = this.handleHearbeat.bind(this);
       const heartbeatFailed = async (): Promise<void> => {
       //identify reason and restart streaming...
           const title = await this.getPlaybackTitle();
           this.debug(`Received from device: ${this.homepodId} title: ${title}`);
-          if (title === '' || title.startsWith(this.defaultPlaybackStreamName)) {
-              this.logger.info('Restarting playback...');
-              //need to restart streaming
+          let restartStreaming = false;
+          if (title === '' || title.startsWith(this.DEFAULT_PLAYBACK_STREAM_NAME)) {
+              this.logger.info(`Restarting playback... total attempts: ${this.streamingRetries}`);
+              if (this.streamingRetries < this.MAX_STREAMING_RETRIES) {
+                  this.streamingRetries = this.streamingRetries + 1;
+                  restartStreaming = true;
+              } else {
+                  this.logger.info('Restarting playback - too many attempts');
+              }
+          }
+
+          if (restartStreaming) {
+              //need to restart streaming, after some delay
+              await delay(this.STREAMING_RESTART_TIMEOUT * this.streamingRetries, 0);
               await this.startStreaming(
                   streamUrl,
                   streamName,
@@ -122,10 +139,11 @@ export class AirPlayDevice {
       }
       if (heatbeatType !== 'heartbeat') {
           this.lastSeen = Date.now();
+          this.streamingRetries = 0;
       } else {
           const diffMs = Date.now() - this.lastSeen;
           this.debug(`Playback heartbeat, diff: ${diffMs}ms`);
-          if (diffMs > this.lastSeenThresholdMs) {
+          if (diffMs > this.LAST_SEEN_THRESHOLD_MS) {
               this.debug('Playback heartbeat failed');
               await heartbeatFailed();
           }
@@ -147,7 +165,7 @@ export class AirPlayDevice {
 
       this.ffmpeg = child.spawn(
           'ffmpeg',
-          ['-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-'],
+          ['-rtbufsize', ' 15M', '-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-'],
           { detached: true },
       );
       this.atvremote = child.spawn(
@@ -180,7 +198,7 @@ export class AirPlayDevice {
 
       this.heartbeat = setInterval(() => {
           heartbeat('heartbeat', heartbeatFailed);
-      }, this.heartbeatTimeout);
+      }, this.HEARTBEAT_TIMEOUT);
 
       this.debug(
           `spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,

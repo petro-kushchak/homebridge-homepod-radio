@@ -56,6 +56,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
   public readonly homepodId: string;
   public readonly serialNumber: string;
   public readonly verboseMode: boolean;
+  public readonly volumeControl: boolean;
   private readonly radios: Radio[];
   private readonly playbacController: PlaybackController =
     new PlaybackController();
@@ -78,6 +79,8 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       this.serialNumber = config.serialNumber || `HPD${this.homepodId}`;
       this.verboseMode =
       !!config.verboseMode && config.verboseMode ? true : false;
+
+      this.volumeControl = !!config.volumeControl && config.volumeControl ? true : false;
 
       this.api.on('didFinishLaunching', () => {
           this.logger.info('Finished initializing platform:', this.config.platform);
