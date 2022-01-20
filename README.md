@@ -18,6 +18,7 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 - automatically stops streaming when homepod is used by another app
 - sometimes audio streaming stops, so plugin automatically restarts it 
 - "volume" setting (if specified) is used to set volume when streaming starts
+- "verboseMode" - by default set to false, for debug set it to true
 
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
@@ -40,7 +41,8 @@ For Homepod device you need to specify the Mac address of the device.
             "name": "BBC - Radio 1",
             "trackName": "BBC - Radio 1",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume": 25                
+            "volume": 25,      
+            "autoResume": true
         }
     ]
 }
@@ -57,7 +59,8 @@ For Homepod device you need to specify the Mac address of the device.
             "model": "BBC - Radio 1",
             "homepodId": "F422F0103371",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume": 25
+            "volume": 25,
+            "autoResume": true
         }
     ]
 }
@@ -147,7 +150,7 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 4. ~~Plugin Config Schema support (nice config form with Homebridge UI)~~
 5. ~~Max streaming retries is set to 5 (so it gives up in case if radio or HomePod stopped working)~~
 6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~ 
-7. Set radio (track) name to homepod
-8. Resume playback on Homebridge reboot
+7. ~~Resume playback on Homebridge reboot~~
+8. Set radio (track) name to homepod
 9. Radio streaming to multiple homepods
 10. Siri shortcuts (text to speech, etc)

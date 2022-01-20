@@ -8,7 +8,8 @@
       "name": "BBC - Radio 1",
       "trackName": "BBC - Radio 1",
       "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-      "volume": 25
+      "volume": 25,
+      "autoResume": true
     }
   ]
 }

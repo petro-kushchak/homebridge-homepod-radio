@@ -10,8 +10,9 @@ import {
 } from 'homebridge';
 
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
+import { PlaybackController } from './lib/playbackController';
 
-const PLUGIN_NAME = 'HomepodRadioPlatform';
+export const PLUGIN_NAME = 'HomepodRadioPlatform';
 
 let hap: HAP;
 
@@ -21,30 +22,7 @@ export interface Radio {
   radioUrl: string;
   trackName: string;
   volume: number;
-}
-
-export interface PlaybackStreamer {
-  stopRequested(source: PlaybackStreamer): Promise<void>;
-  streamerName(): string;
-}
-
-export class PlaybackController {
-  private readonly streamers: PlaybackStreamer[];
-  public constructor() {
-      this.streamers = [];
-  }
-
-  public addStreamer(streamer: PlaybackStreamer) {
-      this.streamers.push(streamer);
-  }
-
-  public async requestStop(source: PlaybackStreamer): Promise<void> {
-      this.streamers.forEach(async (streamer) => {
-          if (streamer !== source) {
-              await streamer.stopRequested(source);
-          }
-      });
-  }
+  autoResume: boolean;
 }
 
 /**
@@ -80,15 +58,18 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       this.verboseMode =
       !!config.verboseMode && config.verboseMode ? true : false;
 
-      this.volumeControl = !!config.volumeControl && config.volumeControl ? true : false;
+      this.volumeControl =
+      !!config.volumeControl && config.volumeControl ? true : false;
 
       this.api.on('didFinishLaunching', () => {
           this.logger.info('Finished initializing platform:', this.config.platform);
           this.radios.forEach((radio) => this.addAccessory(radio));
+          this.playbacController.platformReady();
       });
 
       this.api.on('shutdown', () => {
           this.logger.info('Platform: shutdown...');
+          this.playbacController.shutdown();
       });
   }
 
@@ -107,6 +88,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
           this.config.volume < 100
               ? this.config.volume
               : 0,
+              autoResume: false,
           } as Radio;
 
           this.radios.push(radio);
@@ -124,6 +106,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
             radioConfig.volume < 100
                 ? radioConfig.volume
                 : 0,
+                  autoResume: radioConfig.autoResume || false,
               } as Radio;
 
               this.radios.push(radio);

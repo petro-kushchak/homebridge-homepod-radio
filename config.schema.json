@@ -55,6 +55,11 @@
               "type": "number",
               "placeholder": 0,
               "required": false
+            },
+            "autoResume": {
+              "title": "Resume radio after reboot",
+              "type": "boolean",
+              "required": false
             }
           }
         }

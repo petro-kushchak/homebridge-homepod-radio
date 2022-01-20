@@ -9,18 +9,24 @@ import { callbackify } from './lib/homebridge-callbacks';
 import { AirPlayDevice } from './lib/airplayDevice';
 import { timeout } from './lib/promices';
 
-import {
-    HomepodRadioPlatform,
-    PlaybackController,
-    PlaybackStreamer,
-    Radio,
-} from './platform';
+import { HomepodRadioPlatform, Radio, PLUGIN_NAME } from './platform';
+import { Storage } from './lib/storage';
+
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
+
+import * as path from 'path';
+import * as os from 'os';
+
+interface AccessoryState extends Record<string, number> {
+  playbackState: number;
+}
 
 /**
  * Homepod Radio Platform Accessory.
  */
 export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
   private readonly device: AirPlayDevice;
+  private readonly storage: Storage;
   private service: Service;
 
   private currentMediaState: CharacteristicValue;
@@ -37,6 +43,16 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
           platform.logger,
           platform.verboseMode,
       );
+      const accessoryFileName = `${PLUGIN_NAME}-${this.accessory.UUID}.status.json`;
+      const accessoryPath = path.join(
+          os.homedir(),
+          '.homebridge',
+          accessoryFileName,
+      );
+      this.platform.logger.info(
+          `[${this.streamerName()}] Storage path: ${accessoryPath}`,
+      );
+      this.storage = new Storage(accessoryPath);
       this.currentMediaState = this.getMediaState();
       this.playbackController.addStreamer(this);
 
@@ -84,18 +100,26 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     if (platform.volumeControl) {
         if (
             this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
-              undefined
+        undefined
         ) {
-            this.service.addCharacteristic(new this.platform.Characteristic.Volume());
+            this.service.addCharacteristic(
+                new this.platform.Characteristic.Volume(),
+            );
         }
         this.service
             .getCharacteristic(this.platform.Characteristic.Volume)
-            .on(CharacteristicEventTypes.GET, callbackify(this.getVolume.bind(this)))
-            .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
+            .on(
+                CharacteristicEventTypes.GET,
+                callbackify(this.getVolume.bind(this)),
+            )
+            .on(
+                CharacteristicEventTypes.SET,
+                callbackify(this.setVolume.bind(this)),
+            );
     }
 
     // This will do its best to keep the actual outputs status up to date with Homekit.
-    setInterval(() => {
+    setInterval(async () => {
         this.currentMediaState = this.getMediaState();
         this.service
             .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
@@ -103,7 +127,35 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     }, 3000);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async platformLaunched(): Promise<void> {
+      if (!this.radio.autoResume) {
+          this.platform.logger.info(
+              `[${this.streamerName()}] Skipped reading saved state`,
+          );
+          return;
+      }
+      const state = (await this.storage.read()) as AccessoryState;
+      this.platform.logger.info(`[${this.streamerName()}] Saved state: ${JSON.stringify(state)}`);
+      await this.setTargetMediaState(
+          state.playbackState,
+      );
+  }
+
+  async shutdownRequested(): Promise<void> {
+      if (!this.radio.autoResume) {
+          this.platform.logger.info(
+              `[${this.streamerName()}] Skipped storing state`,
+          );
+          return;
+      }
+      const state = {
+          playbackState:
+        this.currentMediaState,
+      };
+      await this.storage.write(state);
+      this.platform.logger.info(`[${this.streamerName()}] saved state: ${JSON.stringify(state)}`);
+  }
+
   async stopRequested(source: PlaybackStreamer): Promise<void> {
       this.platform.logger.info(
           `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,
