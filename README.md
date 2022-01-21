@@ -29,7 +29,7 @@ For Homepod device you need to specify the Mac address of the device.
 
 ## Usage Example:
 
-- Multiple radio accessories support (each radio speaker must be added to home separately with homebridge pin pairing):
+- Multiple radio accessories support (**each radio speaker must be added to home separately with homebridge pin pairing**):
 
 ```
 {
