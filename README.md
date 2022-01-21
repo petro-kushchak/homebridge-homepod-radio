@@ -29,7 +29,7 @@ For Homepod device you need to specify the Mac address of the device.
 
 ## Usage Example:
 
-- Multiple radio accessories support:
+- Multiple radio accessories support (each radio speaker must be added to home separately with homebridge pin pairing):
 
 ```
 {
@@ -66,7 +66,6 @@ For Homepod device you need to specify the Mac address of the device.
 }
 ```
 
-
 ## HomePod access setup
 
 In Home app settings:
@@ -75,7 +74,17 @@ In Home app settings:
 - Tap Home Settings > Allow Speaker & TV Access, then choose "allow everyone"
 - *Important!* Reboot the Homepod
 
-## ffmpeg lib
+## Siri support (works on iPhone/iPad)
+
+- Create shortcut with name (for example) "Start Radio"
+- Select "Control home" action, check corresponding speaker and in "Media" section select "Resume Audio")
+![Screenshot](images/bbc-radio-shortcut.png)
+- Say "Hey Siri, start radio" on iPhone/iPad (on HomePod mini Siri does not run it properly)
+
+
+## Dependencies
+
+### ffmpeg lib
 
 - install ffmpeg
 
@@ -83,7 +92,7 @@ In Home app settings:
 sudo apt-get install ffmpeg
 ```
 
-## PyATV lib
+### PyATV lib
 
 For streaming to HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
 
@@ -104,7 +113,9 @@ pip3 install pyatv
 sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 ```
 
-## Identify Homepod mini ID:
+## Setup steps
+
+### Identify Homepod mini ID:
 - run command:
 ```
 atvremote scan
@@ -120,7 +131,8 @@ Identifiers:
  - F4:22:F0:10:33:71
  - F422F0103371
 ```
-## Stream URL format
+
+### Stream URL format
 The easieast would be to get streaming url from your favorite radio playlist (usually .m3u file)
 Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
 
