@@ -11,6 +11,7 @@ import {
 
 import { HomepodRadioPlatformAccessory } from './platformAccessory';
 import { PlaybackController } from './lib/playbackController';
+import { delay } from './lib/promices';
 
 export const PLUGIN_NAME = 'HomepodRadioPlatform';
 
@@ -61,9 +62,10 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       this.volumeControl =
       !!config.volumeControl && config.volumeControl ? true : false;
 
-      this.api.on('didFinishLaunching', () => {
+      this.api.on('didFinishLaunching', async () => {
           this.logger.info('Finished initializing platform:', this.config.platform);
           this.radios.forEach((radio) => this.addAccessory(radio));
+          await delay(1000, 0);
           this.playbacController.platformReady();
       });
 

@@ -42,6 +42,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
           this.platform.homepodId,
           platform.logger,
           platform.verboseMode,
+          this.streamerName(),
       );
       const accessoryFileName = `${PLUGIN_NAME}-${this.accessory.UUID}.status.json`;
       const accessoryPath = path.join(
@@ -130,15 +131,17 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
   async platformLaunched(): Promise<void> {
       if (!this.radio.autoResume) {
           this.platform.logger.info(
-              `[${this.streamerName()}] Skipped reading saved state`,
+              `[${this.streamerName()}] Skipped reading state`,
           );
           return;
       }
       const state = (await this.storage.read()) as AccessoryState;
-      this.platform.logger.info(`[${this.streamerName()}] Saved state: ${JSON.stringify(state)}`);
-      await this.setTargetMediaState(
-          state.playbackState,
-      );
+      this.platform.logger.info(`[${this.streamerName()}] state: ${JSON.stringify(state)}`);
+      if (state) {
+          await this.setTargetMediaState(
+              state.playbackState,
+          );
+      }
   }
 
   async shutdownRequested(): Promise<void> {
@@ -153,7 +156,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         this.currentMediaState,
       };
       await this.storage.write(state);
-      this.platform.logger.info(`[${this.streamerName()}] saved state: ${JSON.stringify(state)}`);
+      this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
   }
 
   async stopRequested(source: PlaybackStreamer): Promise<void> {
