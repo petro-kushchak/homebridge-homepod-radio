@@ -85,6 +85,8 @@ export class AirPlayDevice {
               } else {
                   this.logger.info(`[${this.streamerName}] Restarting playback - too many attempts`);
               }
+          } else {
+              this.logger.info(`[${this.streamerName}] Device is playing "${title}" - will cancel streaming`);
           }
 
           if (restartStreaming) {
@@ -100,13 +102,13 @@ export class AirPlayDevice {
           } else {
               //device is used to play something else, need to change state to "STOPPED"
               await this.endStreaming();
-              this.logger.info(`[${this.streamerName}] Streaming finished`);
+              this.logger.info(`[${this.streamerName}] Streaming finished - restart canceled`);
           }
       };
 
       if (this.isPlaying()) {
           await this.endStreaming();
-          this.logger.info(`[${this.streamerName}] Streaming finished`);
+          this.logger.info(`[${this.streamerName}] Previous streaming finished`);
           return await this.startStreaming(
               streamUrl,
               streamName,
@@ -134,7 +136,7 @@ export class AirPlayDevice {
   ): Promise<void> {
       this.debug(`[${this.streamerName}] Playback heartbeat, source: ${heatbeatType}`);
       if (!this.isPlaying()) {
-          this.logger.info(`[${this.streamerName}] Playback heartbeat ignored - streaming stopped`);
+          this.logger.info(`[${this.streamerName}] Playback heartbeat ignored (${heatbeatType}) - streaming stopped`);
           clearInterval(this.heartbeat);
           return;
       }
@@ -241,7 +243,7 @@ export class AirPlayDevice {
       }
 
       await this.endStreaming();
-      this.logger.info(`[${this.streamerName}] Streaming finished`);
+      this.logger.info(`[${this.streamerName}] Streaming finished - stop requested`);
       return true;
   }
 
