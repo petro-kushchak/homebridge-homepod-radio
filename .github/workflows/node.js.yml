@@ -11,20 +11,14 @@ on:
 
 jobs:
   build:
-
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
-        os: [ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2.5.1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 12
       - name: npm install and build
         run: |
           npm ci
@@ -51,4 +45,4 @@ jobs:
       - run: npm --no-git-tag-version version prerelease --preid=beta
       - run: npm publish --access=public --tag=beta
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
