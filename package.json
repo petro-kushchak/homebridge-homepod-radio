@@ -40,5 +40,8 @@
   },
   "dependencies": {
     "child_process": "^1.0.2"
+  },
+  "publishConfig": {
+    "@petro-kushchak:registry": "https://registry.npmjs.org/"
   }
 }
