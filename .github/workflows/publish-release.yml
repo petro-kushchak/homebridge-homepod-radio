@@ -14,9 +14,10 @@ jobs:
         uses: actions/setup-node@v2.5.1
         with:
           node-version: 12
-      - name: npm install and build
+      - name: npm install, test and build
         run: |
           npm ci
+          npm test
           npm run build --if-present
         env:
           CI: true
