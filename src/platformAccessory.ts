@@ -1,21 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as path from 'path';
+import * as os from 'os';
+
 import {
     Service,
     PlatformAccessory,
     CharacteristicValue,
     CharacteristicEventTypes,
 } from 'homebridge';
-import { callbackify } from './lib/homebridge-callbacks';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { timeout } from './lib/promices';
 
-import { HomepodRadioPlatform, Radio, PLUGIN_NAME } from './platform';
+import { callbackify } from './lib/homebridgeCallbacks';
+import { AirPlayDevice } from './lib/airplayDevice';
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
+import { timeout } from './lib/promices';
 import { Storage } from './lib/storage';
 
-import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
+import { HomepodRadioPlatform, PLUGIN_NAME } from './platform';
+import { Radio } from './platformConfig';
 
-import * as path from 'path';
-import * as os from 'os';
 
 interface AccessoryState extends Record<string, number> {
   playbackState: number;
@@ -39,9 +41,9 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private readonly playbackController: PlaybackController,
   ) {
       this.device = new AirPlayDevice(
-          this.platform.homepodId,
+          this.platform.platformConfig.homepodId,
           platform.logger,
-          platform.verboseMode,
+          platform.platformConfig.verboseMode,
           this.streamerName(),
       );
       const accessoryFileName = `${PLUGIN_NAME}-${this.accessory.UUID}.status.json`;
@@ -66,7 +68,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         .setCharacteristic(this.platform.Characteristic.Model, this.radio.model)
         .setCharacteristic(
             this.platform.Characteristic.SerialNumber,
-            this.platform.serialNumber,
+            this.platform.platformConfig.serialNumber,
         )
         .setCharacteristic(
             this.platform.Characteristic.Name,
@@ -98,7 +100,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             callbackify(this.setTargetMediaState.bind(this)),
         );
 
-    if (platform.volumeControl) {
+    if (platform.platformConfig.volumeControl) {
         if (
             this.service.getCharacteristic(this.platform.Characteristic.Volume) ===
         undefined
@@ -136,11 +138,11 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
           return;
       }
       const state = (await this.storage.read()) as AccessoryState;
-      this.platform.logger.info(`[${this.streamerName()}] state: ${JSON.stringify(state)}`);
+      this.platform.logger.info(
+          `[${this.streamerName()}] state: ${JSON.stringify(state)}`,
+      );
       if (state) {
-          await this.setTargetMediaState(
-              state.playbackState,
-          );
+          await this.setTargetMediaState(state.playbackState);
       }
   }
 
@@ -152,11 +154,12 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
           return;
       }
       const state = {
-          playbackState:
-        this.currentMediaState,
+          playbackState: this.currentMediaState,
       };
       await this.storage.write(state);
-      this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
+      this.platform.logger.info(
+          `[${this.streamerName()}] stored state: ${JSON.stringify(state)}`,
+      );
   }
 
   async stopRequested(source: PlaybackStreamer): Promise<void> {
