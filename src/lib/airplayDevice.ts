@@ -137,6 +137,7 @@ export class AirPlayDevice {
       this.debug(`[${this.streamerName}] Playback heartbeat, source: ${heatbeatType}`);
       if (!this.isPlaying()) {
           this.logger.info(`[${this.streamerName}] Playback heartbeat ignored (${heatbeatType}) - streaming stopped`);
+          this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - streaming stopped`);
           clearInterval(this.heartbeat);
           return;
       }
@@ -168,7 +169,7 @@ export class AirPlayDevice {
 
       this.ffmpeg = child.spawn(
           'ffmpeg',
-          ['-rtbufsize', ' 15M', '-i', streamUrl, '-metadata', `title="${streamName}"`, '-f', 'mp3', '-'],
+          ['-rtbufsize', ' 15M', '-i', streamUrl, '-f', 'mp3', '-'],
       );
       this.atvremote = child.spawn(
           'atvremote',
@@ -201,6 +202,8 @@ export class AirPlayDevice {
           heartbeat('heartbeat', heartbeatFailed);
       }, this.HEARTBEAT_TIMEOUT);
 
+      this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
+
       this.debug(
           `[${this.streamerName}] spawn ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
       );
@@ -224,14 +227,14 @@ export class AirPlayDevice {
               `[${this.streamerName}] Killing process: ffmpeg: ${this.ffmpeg.pid}  atvremote: ${this.atvremote.pid}`,
           );
           this.ffmpeg.stdout.unpipe();
+
+          this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - stop requested`);
           clearInterval(this.heartbeat);
 
           process.kill(this.ffmpeg.pid);
-          //this.ffmpeg.kill();
           this.ffmpeg = null;
 
           process.kill(this.atvremote.pid);
-          //   this.atvremote.kill();
           this.atvremote = null;
       } catch (err) {
           this.debug(`[${this.streamerName}] Error while trying to stop: ${err}`);
