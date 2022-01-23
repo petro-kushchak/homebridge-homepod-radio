@@ -226,7 +226,8 @@ export class AirPlayDevice {
           this.ffmpeg.stdout.unpipe();
           clearInterval(this.heartbeat);
 
-          this.ffmpeg.kill();
+          process.kill(this.ffmpeg.pid);
+          //this.ffmpeg.kill();
           this.ffmpeg = null;
 
           process.kill(this.atvremote.pid);
