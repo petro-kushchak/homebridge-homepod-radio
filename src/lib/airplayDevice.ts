@@ -228,7 +228,9 @@ export class AirPlayDevice {
 
           this.ffmpeg.kill();
           this.ffmpeg = null;
-          this.atvremote.kill();
+
+          process.kill(this.atvremote.pid);
+          //   this.atvremote.kill();
           this.atvremote = null;
       } catch (err) {
           this.debug(`[${this.streamerName}] Error while trying to stop: ${err}`);
