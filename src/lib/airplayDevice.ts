@@ -139,6 +139,7 @@ export class AirPlayDevice {
           this.logger.info(`[${this.streamerName}] Playback heartbeat ignored (${heatbeatType}) - streaming stopped`);
           this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - streaming stopped`);
           clearInterval(this.heartbeat);
+          this.heartbeat = null;
           return;
       }
       if (heatbeatType !== 'heartbeat') {
@@ -198,9 +199,16 @@ export class AirPlayDevice {
           heartbeat('atvremote', heartbeatFailed);
       });
 
+      if(this.heartbeat) {
+          this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - previous timer`);
+          clearInterval(this.heartbeat);
+          this.heartbeat = null;
+      }
+
       this.heartbeat = setInterval(() => {
           heartbeat('heartbeat', heartbeatFailed);
       }, this.HEARTBEAT_TIMEOUT);
+
 
       this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
 
@@ -230,6 +238,7 @@ export class AirPlayDevice {
 
           this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - stop requested`);
           clearInterval(this.heartbeat);
+          this.heartbeat = null;
 
           process.kill(this.ffmpeg.pid);
           this.ffmpeg = null;
