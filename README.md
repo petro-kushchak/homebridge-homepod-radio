@@ -36,6 +36,8 @@ For Homepod device you need to specify the Mac address of the device.
     "platform": "HomepodRadioPlatform",
     "serialNumber": "20020105:00",
     "homepodId": "<homepod id>",
+    "httpPort": 7654,
+    "mediaPath": "/media/homepod",
     "radios": [
         {
             "name": "BBC - Radio 1",
@@ -60,11 +62,21 @@ For Homepod device you need to specify the Mac address of the device.
             "homepodId": "F422F0103371",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
             "volume": 25,
-            "autoResume": true
+            "autoResume": true,
+            "httpPort": 7654,
+            "mediaPath": "/media/homepod",
         }
     ]
 }
 ```
+
+- Trigger local mp3/wav file playback on Homepod from "mediaPath" directory on Homebridge server http://<homebridge-server-name>:7654/play/music.mp3
+Example:
+
+```
+http://homebridge.local:4567/play/hello.mp3
+```
+
 
 ## HomePod access setup
 

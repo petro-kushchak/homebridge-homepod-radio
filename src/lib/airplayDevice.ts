@@ -41,7 +41,13 @@ export class AirPlayDevice {
   }
 
   private async killProcess(procId: number): Promise<void> {
-      await execAsync(`kill -9 ${procId}`);
+      const cmd = `kill -9 ${procId}`;
+      const result = await execAsync(cmd);
+      this.debug(
+          `[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(
+              result,
+          )}`,
+      );
   }
 
   public async setVolume(volume: number): Promise<boolean> {
@@ -69,7 +75,17 @@ export class AirPlayDevice {
       return result.stdout.replace(/\r?\n|\r/g, ' ');
   }
 
-  public async play(
+  async playFile(filePath: string): Promise<void> {
+      const playFileCmd = `atvremote --id ${this.homepodId} stream_file=${filePath}`;
+      const result = await execAsync(playFileCmd);
+      this.debug(
+          `[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(
+              result,
+          )}`,
+      );
+  }
+
+  public async playStream(
       streamUrl: string,
       streamName: string,
       volume: number,
@@ -189,6 +205,7 @@ export class AirPlayDevice {
   ): Promise<boolean> {
       // create pipe for the command:
       //  ffmpeg -i ${streamUrl} -f mp3 - | atvremote --id ${this.homepodId} stream_file=-
+      //  const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
 
       this.ffmpeg = child.spawn('ffmpeg', [
           '-rtbufsize',
