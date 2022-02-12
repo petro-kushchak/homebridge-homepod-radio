@@ -70,7 +70,7 @@ For Homepod device you need to specify the Mac address of the device.
 }
 ```
 
-- Trigger local mp3/wav file playback on Homepod from "mediaPath" directory on Homebridge server http://<homebridge-server-name>:7654/play/music.mp3
+- Trigger local mp3/wav file playback on Homepod from "mediaPath" directory on Homebridge server http://homebridge-server-name:7654/play/music.mp3
 Example:
 
 ```
