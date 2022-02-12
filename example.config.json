@@ -2,6 +2,8 @@
   "platform": "HomepodRadioPlatform",
   "serialNumber": "20020105:00",
   "homepodId": "<homepod id>",
+  "httpPort": 7654,
+  "mediaPath": "/media/homepod",
   "volumeControl": false,
   "radios": [
     {

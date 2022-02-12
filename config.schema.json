@@ -19,6 +19,20 @@
         "placeholder": "If not specified - HomePod Id will be used",
         "required": false
       },
+      "mediaPath": {
+        "title": "Path to MP3 files",
+        "type": "string",
+        "default": "",
+        "placeholder": "If not specified - will search in user home dir",
+        "required": false
+      },
+      "httpPort": {
+        "title": "Port for HTTP requests",
+        "type": "number",
+        "default": "7654",
+        "placeholder": "If set to 0 - HTTP requests are ignored",
+        "required": false
+      },
       "verboseModel": {
         "title": "Debug Mode",
         "type": "boolean",
@@ -26,7 +40,7 @@
         "required": false
       },
       "volumeControl": {
-        "title": "Enable Volume Control (not supported from iOS 15.2 Home app",
+        "title": "Enable Volume Control (not supported from iOS 15.2 Home app)",
         "type": "boolean",
         "default": false,
         "required": false

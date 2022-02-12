@@ -15,6 +15,8 @@ export class HomepodRadioPlatformConfig {
   public readonly verboseMode: boolean;
   public readonly volumeControl: boolean;
   public readonly radios: Radio[];
+  public readonly mediaPath: string;
+  public readonly httpPort: number;
 
   constructor(private config: PlatformConfig) {
       this.radios = [];
@@ -25,6 +27,9 @@ export class HomepodRadioPlatformConfig {
       this.serialNumber = config.serialNumber || `HPD${this.homepodId}`;
       this.verboseMode =
       !!config.verboseMode && config.verboseMode ? true : false;
+
+      this.httpPort = this.config.httpPort || 4567;
+      this.mediaPath = this.config.mediaPath || '';
 
       this.volumeControl =
       !!config.volumeControl && config.volumeControl ? true : false;
