@@ -63,7 +63,7 @@ For Homepod device you need to specify the Mac address of the device.
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
             "volume": 25,
             "autoResume": true,
-            "httpPort": 4567,
+            "httpPort": 7654,
             "mediaPath": "/media/homepod",
         }
     ]
