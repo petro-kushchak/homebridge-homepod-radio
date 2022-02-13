@@ -74,9 +74,9 @@ For Homepod device you need to specify the Mac address of the device.
 
 1. Download your files to Homebridge server. For example download hello.wav 
 ```
-- mkdir -r /home/pi/media
-<downlaod files to /home/pi/media>
-- ls /home/pi/media
+$ mkdir -r /home/pi/media
+$ <downlaod files to /home/pi/media>
+$ ls /home/pi/media
 -rw-r--r-- 1 pi   pi     94622 Jan 10 16:46 hello.wav
 ```
 2. Configure plugin to play files from /home/pi/media, set mediaPath property:
