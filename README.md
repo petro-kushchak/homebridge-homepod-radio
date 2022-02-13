@@ -70,12 +70,29 @@ For Homepod device you need to specify the Mac address of the device.
 }
 ```
 
-- Trigger local mp3/wav file playback on Homepod from "mediaPath" directory on Homebridge server http://homebridge-server-name:7654/play/music.mp3
-Example:
+## Play mp3/wav file from Home automation
 
+1. Download your files to Homebridge server. For example download hello.wav 
 ```
-http://homebridge.local:4567/play/hello.mp3
+- mkdir -r /home/pi/media
+<downlaod files to /home/pi/media>
+- ls /home/pi/media
+-rw-r--r-- 1 pi   pi     94622 Jan 10 16:46 hello.wav
 ```
+2. Configure plugin to play files from /home/pi/media, set mediaPath property:
+```
+  "mediaPath": "/home/pi/media",
+```
+3. Restart Homebridge
+4. Configure automation to play file
+4.1 Select/Create automation in Home app
+4.2 Tap "Select Accessories and Scenes..."
+4.3 At the botton tap "Convert to Shortcut"
+4.4 Create shortcut:
+![Screenshot](images/play-file-shortcut.png)
+4.5 Test shortcut
+
+Note: you should put homebridge server name or IP (default for Homebridge server is homebridge.local) 
 
 
 ## HomePod access setup
