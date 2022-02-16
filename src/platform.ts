@@ -98,6 +98,6 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       // SmartSpeaker service must be added as an external accessory.
       // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
       // There a no collision issues when calling this multiple times on accessories that already exist.
-      this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
+      this.api.publishExternalAccessories(uuid, [accessory]);
   }
 }
