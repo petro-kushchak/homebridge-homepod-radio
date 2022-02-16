@@ -178,7 +178,7 @@ Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-1. Pairing setting for Homepod (fixed by *HomePod access setup* step):
+### 1. Pairing setting for Homepod (fixed by *HomePod access setup* step):
 
 Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
 ```
@@ -193,6 +193,18 @@ Services:
 ```
 
 Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
+
+### 2. Homepod playback errors
+
+Sometimes (quite rarely) playback fails and in the logs there are errors like:
+```
+  pyatv.exceptions.HttpError: RTSP/1.0 method SETUP failed with code 500: Internal Server Error
+```
+
+Typically this error dissapears after Homepod restart.
+
+### 3. Streaming to stereo pair
+Looks like this is not supported at the moment by pyatv
 
 ## TODO list
 1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
