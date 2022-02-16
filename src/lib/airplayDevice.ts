@@ -78,11 +78,8 @@ export class AirPlayDevice {
   async playFile(filePath: string): Promise<void> {
       const playFileCmd = `atvremote --id ${this.homepodId} stream_file=${filePath}`;
       const result = await execAsync(playFileCmd);
-      this.debug(
-          `[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(
-              result,
-          )}`,
-      );
+      this.debug(`[${this.streamerName}] Executed "${playFileCmd}" result: ${JSON.stringify(result)}`);
+      this.logger.info(`[${this.streamerName}] Finished playing ${filePath}`);
   }
 
   public async playStream(
