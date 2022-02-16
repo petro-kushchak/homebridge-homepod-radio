@@ -72,6 +72,8 @@ For Homepod device you need to specify the Mac address of the device.
 
 ## Play mp3/wav file from Home automation
 
+*Note:* this feature does not add additional speaker accessories
+
 - Download your files to Homebridge server. For example download hello.wav 
 ```
 $ mkdir -r /home/pi/media
@@ -93,6 +95,14 @@ $ ls /home/pi/media
    - Test shortcut
 
 *Note:* you should put homebridge server name or IP (default for Homebridge server is homebridge.local) 
+
+Example:
+- Homebridge server is running on host "homebridge.local"
+- hello.mp3 file is on the same server on /var/www/media
+- Plugin's "httpPort" is set to 4567
+- Plugin's "mediaPath" is set to /var/www/media
+
+Then you can trigger playback of hello.mp3 even from browser by navigating to: http://homebridge.local:4567/play/hello.mp3
 
 
 ## HomePod access setup
@@ -190,8 +200,11 @@ Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: 
 3. ~~Multiple radios support~~
 4. ~~Plugin Config Schema support (nice config form with Homebridge UI)~~
 5. ~~Max streaming retries is set to 5 (so it gives up in case if radio or HomePod stopped working)~~
-6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~ 
+6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~
 7. ~~Resume playback on Homebridge reboot~~
-8. Set radio (track) name to homepod
-9. Radio streaming to multiple homepods
-10. Siri shortcuts (text to speech, etc)
+8. ~~Play audio file on homepod~~
+9. Loop audio file playback
+10. Play audio file on home using url
+11. Set radio (track) name to homepod
+12. Radio streaming to multiple homepods
+13. Siri shortcuts (text to speech, etc)
