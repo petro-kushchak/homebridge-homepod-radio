@@ -15,7 +15,7 @@ Main idea is to stream to HomePod mini (or AppleTV) with the following command:
 ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```
 
-- automatically stops streaming when homepod is used by another app
+- automatically stops streaming when HomePod is used by another app
 - sometimes audio streaming stops, so plugin automatically restarts it 
 - "volume" setting (if specified) is used to set volume when streaming starts
 - "verboseMode" - by default set to false, for debug set it to true
@@ -25,7 +25,7 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 - ffmpeg
 - pyatv
 
-For Homepod device you need to specify the Mac address of the device. 
+For HomePod device you need to specify the Mac address of the device. 
 
 ## Usage Example:
 
@@ -57,7 +57,7 @@ For Homepod device you need to specify the Mac address of the device.
     "platforms": [
         {
             "platform": "HomepodRadioPlatform",
-            "name": "Homepod Radio",
+            "name": "HomePod Radio",
             "model": "BBC - Radio 1",
             "homepodId": "F422F0103371",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
@@ -111,7 +111,7 @@ In Home app settings:
 
 - Tap the Homes and Home Settings button.
 - Tap Home Settings > Allow Speaker & TV Access, then choose "allow everyone"
-- *Important!* Reboot the Homepod
+- *Important!* Reboot the HomePod
 
 ## Siri support (works on iPhone/iPad)
 
@@ -154,7 +154,7 @@ sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 
 ## Setup steps
 
-### Identify Homepod mini ID:
+### Identify HomePod mini ID:
 - run command:
 ```
 atvremote scan
@@ -178,9 +178,9 @@ Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-### 1. Pairing setting for Homepod (fixed by *HomePod access setup* step):
+### 1. Pairing setting for HomePod (fixed by *HomePod access setup* step):
 
-Make sure your homepod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
+Make sure your HomePod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
 ```
 atvremote scan
 ```
@@ -194,14 +194,14 @@ Services:
 
 Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
 
-### 2. Homepod playback errors
+### 2. HomePod playback errors
 
 Sometimes (quite rarely) playback fails and in the logs there are errors like:
 ```
   pyatv.exceptions.HttpError: RTSP/1.0 method SETUP failed with code 500: Internal Server Error
 ```
 
-Typically this error dissapears after Homepod restart.
+Typically this error dissapears after HomePod restart.
 
 ### 3. Streaming to stereo pair
 Looks like this is not supported at the moment by pyatv
@@ -216,7 +216,7 @@ Looks like this is not supported at the moment by pyatv
 7. ~~Resume playback on Homebridge reboot~~
 8. ~~Play audio file on homepod~~
 9. Loop audio file playback
-10. Play audio file on home using url
-11. Set radio (track) name to homepod
-12. Radio streaming to multiple homepods
+10. Play audio file on HomePod using url
+11. Set radio (track) name to HomePod
+12. Radio streaming to multiple HomePods
 13. Siri shortcuts (text to speech, etc)
