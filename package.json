@@ -1,7 +1,7 @@
 {
   "displayName": "Homepod mini radio support",
   "name": "@petro-kushchak/homebridge-homepod-radio",
-  "version": "1.1.41",
+  "version": "1.1.42-13",
   "description": "Homebridge accessory for streaming radio to Homepod mini",
   "license": "MIT",
   "repository": {
@@ -19,7 +19,10 @@
     "build": "rimraf ./dist && tsc && npm run copy",
     "copy": "cp bin/* dist",
     "test": "jest --forceExit --detectOpenHandles",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "npm run lint && npm run build",
+    "atvremote": "nopenv python_modules/bin/atvremote",
+    "npip": "npip",
+    "install": "npm run npip -- install pyatv --no-cache-dir"
   },
   "keywords": [
     "homebridge-plugin",
@@ -45,9 +48,14 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
-    "child_process": "^1.0.2"
+    "child_process": "^1.0.2",
+    "ffmpeg-for-homebridge": "^0.0.9",
+    "nopy": "^0.2.7"
   },
   "publishConfig": {
     "@petro-kushchak:registry": "https://registry.npmjs.org/"
+  },
+  "python": {
+    "execPath": "python3"
   }
 }

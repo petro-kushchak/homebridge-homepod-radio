@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as child from 'child_process';
+import * as path from 'path';
 import { Logger } from 'homebridge';
 
 import { promisify } from 'util';
@@ -28,6 +29,7 @@ export class AirPlayDevice {
   private streamingRetries = 0;
 
   private readonly debug: (message: string, ...parameters: any[]) => void;
+  private readonly pluginPath: string;
 
   constructor(
     private readonly homepodId: string,
@@ -38,6 +40,7 @@ export class AirPlayDevice {
       this.debug = this.verboseMode
           ? this.logger.info.bind(this.logger)
           : this.logger.debug.bind(this.logger);
+      this.pluginPath = path.resolve(path.dirname(__filename), '..', '..');
   }
 
   private async killProcess(procId: number): Promise<void> {
@@ -51,16 +54,20 @@ export class AirPlayDevice {
   }
 
   public async setVolume(volume: number): Promise<boolean> {
-      const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
+      const setVolumeCmd = `npm run -s atvremote --id ${this.homepodId} set_volume=${volume}`;
       this.debug(`[${this.streamerName}] Executing "${setVolumeCmd}"`);
-      await execAsync(setVolumeCmd);
+      await execAsync(setVolumeCmd, {
+          cwd: this.pluginPath,
+      });
       return true;
   }
 
   public async getVolume(): Promise<number> {
-      const getVolumeCmd = `atvremote --id ${this.homepodId} volume`;
+      const getVolumeCmd = `npm run -s atvremote --id ${this.homepodId} volume`;
       this.debug(`[${this.streamerName}] Executing "${getVolumeCmd}"`);
-      const result = await execAsync(getVolumeCmd);
+      const result = await execAsync(getVolumeCmd, {
+          cwd: this.pluginPath,
+      });
       try {
           return Number.parseFloat(result.stdout);
       } catch (error) {
@@ -70,15 +77,31 @@ export class AirPlayDevice {
   }
 
   public async getPlaybackTitle(): Promise<string> {
-      const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
-      const result = await execAsync(currentTitleCmd);
+      const currentTitleCmd = `npm run -s atvremote --id ${this.homepodId} title`;
+      const result = await execAsync(currentTitleCmd, {
+          cwd: this.pluginPath,
+      });
       return result.stdout.replace(/\r?\n|\r/g, ' ');
   }
 
-  async playFile(filePath: string): Promise<void> {
-      const playFileCmd = `atvremote --id ${this.homepodId} stream_file=${filePath}`;
-      const result = await execAsync(playFileCmd);
-      this.debug(`[${this.streamerName}] Executed "${playFileCmd}" result: ${JSON.stringify(result)}`);
+  public async playUrl(url: string): Promise<void> {
+      const cmd = `npm run -s atvremote --id ${this.homepodId} stream_file=${url}`;
+      this.logger.info(`[${this.streamerName}] Execute ${cmd}`);
+      const result = await execAsync(cmd, {
+          cwd: this.pluginPath,
+      });
+  }
+
+  public async playFile(filePath: string): Promise<void> {
+      const playFileCmd = `npm run -s atvremote --id ${this.homepodId} stream_file=${filePath}`;
+      const result = await execAsync(playFileCmd, {
+          cwd: this.pluginPath,
+      });
+      this.debug(
+          `[${
+              this.streamerName
+          }] Executed "${playFileCmd}" result: ${JSON.stringify(result)}`,
+      );
       this.logger.info(`[${this.streamerName}] Finished playing ${filePath}`);
   }
 
@@ -213,11 +236,11 @@ export class AirPlayDevice {
           'mp3',
           '-',
       ]);
-      this.atvremote = child.spawn('atvremote', [
-          '--id',
-          this.homepodId,
-          'stream_file=-',
-      ]);
+      this.atvremote = child.spawn(
+          'npm',
+          ['run', '-s', 'atvremote', '--id', this.homepodId, 'stream_file=-'],
+          { cwd: this.pluginPath },
+      );
 
       this.ffmpeg.stdout.pipe(this.atvremote.stdin).on('error', (error) => {
           this.logger.info(`[${this.streamerName}] ffmpeg pipe error: ${error}`);
