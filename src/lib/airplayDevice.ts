@@ -85,7 +85,7 @@ export class AirPlayDevice {
   }
 
   public async playUrl(url: string): Promise<void> {
-      const cmd = `npm run -s atvremote --id ${this.homepodId} stream_file=${url}`;
+      const cmd = `npm run stream -- -i ${this.homepodId} -t URL -a ${this.streamerName}`;
       this.logger.info(`[${this.streamerName}] Execute ${cmd}`);
       const result = await execAsync(cmd, {
           cwd: this.pluginPath,
