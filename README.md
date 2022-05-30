@@ -152,6 +152,12 @@ pip3 install pyatv
 sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 ```
 
+### Docker image with preinstalled dependencies (ubuntu)
+
+Docker image build based on oznu/homebridge:ubuntu (with ffmpeg&Homebridge preinstalled)
+
+Mode info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
+
 ## Setup steps
 
 ### Identify HomePod mini ID:
