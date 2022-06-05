@@ -15,6 +15,7 @@ const fileExists = async (path) =>
 
 export enum WebActionType {
   PlayFile,
+  PlayUrl,
   Unsupported,
 }
 
@@ -64,6 +65,7 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
               data: 'Unsupported request',
           };
       }
+
       if (parts[1] === 'play') {
       // play mp3/wav from mediaPath by name
       // uri example: /play/<mp3/wav-file>
@@ -75,6 +77,13 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
           return {
               action: WebActionType.PlayFile,
               data: filePath,
+          };
+      } else if (parts[1] === 'playUrl') {
+      // play url
+      // uri example: /playUrl/<base64url>
+          return {
+              action: WebActionType.PlayUrl,
+              data: Buffer.from(parts[2], 'base64').toString('binary'),
           };
       }
       return {
@@ -109,6 +118,16 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
               };
           }
 
+          case WebActionType.PlayUrl: {
+              const url = webAction.data;
+              const message = `Started playing url: ${url}`;
+              await this.playbackController.requestStop(this);
+              await this.device.playUrl(url);
+              return {
+                  error: false,
+                  message: message,
+              };
+          }
           case WebActionType.Unsupported:
           default:
               return {

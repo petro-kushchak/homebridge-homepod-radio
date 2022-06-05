@@ -1,15 +1,13 @@
-"""Example of streaming a file and printing status updates.
-python stream.py 10.0.0.4 file.mp3
-"""
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 from curses import meta
 from io import BufferedReader, BufferedReader
-from nis import cat
-from typing import NamedTuple, Optional, Union
 
 import asyncio
 import sys
 import os
 import logging
+import signal
 
 import argparse
 import pyatv
@@ -21,8 +19,7 @@ from pyatv.scripts import (
 
 from mediafile import MediaFile
 
-media = MediaFile(os.path.dirname(__file__) + 'dummy.mp3')
-
+media = MediaFile(os.path.dirname(__file__) + '/dummy.mp3')
 
 old__open_file = pyatv.support.metadata._open_file
 def new_open_file(file: BufferedReader) -> MediaFile:
@@ -32,25 +29,15 @@ pyatv.support.metadata._open_file=new_open_file
 LOOP = asyncio.get_event_loop()
 _LOGGER = logging.getLogger(__name__)
 
-class BufferedReaderListener (BufferedReader):
-    def __init__(self, reader: BufferedReader) -> None:
-        super().__init__(reader.raw, 2048)
-        self.reader = reader
 
-    def peek(self, __size: int = ...) -> bytes: 
-        return self.reader.peek(__size)
+class GracefulTermination:
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
 
-    def read1(self, __size: int = ...) -> bytes: 
-        return self.reader.read1(__size)
-
-    def read(self, __size: int = ...) -> bytes: 
-        data = self.reader.read(__size)
-        try:
-            line = data.decode('utf-8')
-            _LOGGER.info(f"DATA: {line}")
-        except:
-            pass
-        return data
+  def exit_gracefully(self, *args):
+    _LOGGER.info("Terminating process...")
+    sys.exit()
 
 
 class PushUpdatePrinter(PushListener):
@@ -106,7 +93,8 @@ async def stream_with_push_updates(
     
     try:
         _LOGGER.info("* Starting to stream stdin",)
-        await atv.stream.stream_file(BufferedReaderListener(sys.stdin.buffer))
+        term = GracefulTermination()
+        await atv.stream.stream_file(sys.stdin.buffer)
         await asyncio.sleep(1)
     finally:
         atv.close()
@@ -201,7 +189,6 @@ def main():
     """Application start here."""
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(appstart(loop))
-
 
 if __name__ == "__main__":
     sys.exit(main())
