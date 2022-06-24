@@ -33,7 +33,6 @@ old__open_file = pyatv.support.metadata._open_file
 def new_open_file(file: BufferedReader) -> MediaFile:
     return media
 
-
 pyatv.support.metadata._open_file = new_open_file
 
 LOOP = asyncio.get_event_loop()

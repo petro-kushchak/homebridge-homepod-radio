@@ -19,6 +19,7 @@
     "build": "rimraf ./dist && tsc && npm run copy",
     "copy": "mkdir dist/bin && cp bin/* dist/bin",
     "test": "jest --forceExit --detectOpenHandles",
+    "e2e": "npm run build && npm run dist/test_e2e.js",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
