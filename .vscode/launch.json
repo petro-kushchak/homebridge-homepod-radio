@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${PYTHONPATH}:/opt/homebrew/lib/python3.8/site-packages"
+      },
+      "args" : [
+        "--id", "F434F0108877", 
+        "--title", "test_title", 
+        "--album", "test_album", 
+        "--stream_url", "https://online.radiojazz.ua/RadioJazz_Cover", 
+        "--stream_timeout", "10",
+        "--stream_metadata", "https://o.tavrmedia.ua/jazz3cover",
+        "--stream_artwork", "https://play.tavr.media/static/image/header_menu/RadioJAZZ_COVER_228x228.png",
+        "--verbose"
+      ]
+    }
+  ]
+}

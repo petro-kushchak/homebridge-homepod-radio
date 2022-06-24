@@ -4,5 +4,11 @@
     "source.fixAll.eslint": true
   },
   "editor.rulers": [ 140 ],
-  "eslint.enable": true
+  "eslint.enable": true,
+  "python.autoComplete.extraPaths":[
+    "/opt/homebrew/lib/python3.8/site-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "/opt/homebrew/lib/python3.8/site-packages"
+  ]
 }

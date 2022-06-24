@@ -16,7 +16,8 @@
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
-    "build": "rimraf ./dist && tsc",
+    "build": "rimraf ./dist && tsc && npm run copy",
+    "copy": "mkdir dist/bin && cp bin/* dist/bin",
     "test": "jest --forceExit --detectOpenHandles",
     "prepublishOnly": "npm run lint && npm run build"
   },
