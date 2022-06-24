@@ -47,7 +47,7 @@ export class HomepodRadioPlatformConfig {
                 metadataUrl: this.config.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
                 artworkUrl:
                     this.config.artworkUrl ||
-                    'https://play.tavr.media/static/image/header_menu/RadioJAZZ_COVER_228x228.png',
+                    '',
             } as Radio;
 
             this.radios.push(radio);
@@ -67,7 +67,7 @@ export class HomepodRadioPlatformConfig {
                     metadataUrl: radioConfig.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
                     artworkUrl:
                         radioConfig.artworkUrl ||
-                        'https://play.tavr.media/static/image/header_menu/RadioJAZZ_COVER_228x228.png',
+                        '',
                 } as Radio;
 
                 this.radios.push(radio);

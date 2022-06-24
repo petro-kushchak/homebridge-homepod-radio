@@ -85,7 +85,7 @@ class DeviceUpdatePrinter(DeviceListener):
 
 
 async def stream_with_push_updates(
-    id: str, stream_url: str, stream_metadata: str, stream_artwork, loop: asyncio.AbstractEventLoop
+    id: str, stream_url: str, stream_metadata_url: str, stream_artwork_url, loop: asyncio.AbstractEventLoop
 ):
     """Find a device and print what is playing."""
     _LOGGER.debug("* Discovering device on network...")
@@ -120,7 +120,7 @@ async def stream_with_push_updates(
     try:
         _LOGGER.info("* Starting to stream stdin",)
         await asyncio.gather(
-            update_stream_metadata(stream_metadata, stream_artwork, raop_stream),
+            update_stream_metadata(stream_metadata_url, stream_artwork_url, raop_stream),
             atv.stream.stream_file(BufferedReaderListener(ffmpeg_proc.stdout)))
         await asyncio.sleep(1)
     finally:

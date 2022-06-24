@@ -60,6 +60,18 @@
               "title": "Resume radio after reboot",
               "type": "boolean",
               "required": false
+            },
+            "metadataUrl": {
+              "title": "Radio Metadata URL",
+              "type": "string",
+              "placeholder": "Enter radio metadata url...",
+              "required": false
+            },
+            "artworkUrl": {
+              "title": "Radio Artwork URL",
+              "type": "string",
+              "placeholder": "Enter radio Artwork url...",
+              "required": false
             }
           }
         }
