@@ -17,6 +17,8 @@ export class HomepodRadioPlatformConfig {
     public readonly verboseMode: boolean;
     public readonly volumeControl: boolean;
     public readonly radios: Radio[];
+    public readonly mediaPath: string;
+    public readonly httpPort: number;
 
     constructor(private config: PlatformConfig) {
         this.radios = [];
@@ -26,6 +28,9 @@ export class HomepodRadioPlatformConfig {
         this.homepodId = config.homepodId;
         this.serialNumber = config.serialNumber || `HPD${this.homepodId}`;
         this.verboseMode = !!config.verboseMode && config.verboseMode ? true : false;
+
+        this.httpPort = this.config.httpPort || 4567;
+        this.mediaPath = this.config.mediaPath || '';
 
         this.volumeControl = !!config.volumeControl && config.volumeControl ? true : false;
 
@@ -45,9 +50,7 @@ export class HomepodRadioPlatformConfig {
                     !!this.config.volume && this.config.volume > 0 && this.config.volume < 100 ? this.config.volume : 0,
                 autoResume: false,
                 metadataUrl: this.config.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
-                artworkUrl:
-                    this.config.artworkUrl ||
-                    '',
+                artworkUrl: this.config.artworkUrl || '',
             } as Radio;
 
             this.radios.push(radio);
@@ -65,9 +68,7 @@ export class HomepodRadioPlatformConfig {
                             : 0,
                     autoResume: radioConfig.autoResume || false,
                     metadataUrl: radioConfig.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
-                    artworkUrl:
-                        radioConfig.artworkUrl ||
-                        '',
+                    artworkUrl: radioConfig.artworkUrl || '',
                 } as Radio;
 
                 this.radios.push(radio);

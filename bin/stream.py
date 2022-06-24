@@ -357,7 +357,6 @@ async def appstart(loop):
 
     return 1
 
-
 def main():
     """Application start here."""
     loop = asyncio.get_event_loop()
