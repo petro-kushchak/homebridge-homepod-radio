@@ -1,6 +1,5 @@
-"""Example of streaming a file and printing status updates.
-python stream.py 10.0.0.4 file.mp3
-"""
+#!/usr/bin/python
+
 from io import BufferedReader, BufferedReader
 from datetime import datetime
 import subprocess as sp
