@@ -1,12 +1,22 @@
 import { AirPlayDevice } from '../lib/airplayDevice';
 
-const homepodId = '123';
+const homepodId = 'F434F0108877';
 const logger = {
-    info: (...args) => {console.log(args);},
-    debug: (...args) => {console.log(args);},
-    warn:(...args) => {console.log(args);},
-    error: (...args) => {console.log(args);},
-    log: (...args) => {console.log(args);},
+    info: (...args) => {
+        console.log(args.join(' '));
+    },
+    debug: (...args) => {
+        console.log(args.join(' '));
+    },
+    warn: (...args) => {
+        console.log(args.join(' '));
+    },
+    error: (...args) => {
+        console.log(args.join(' '));
+    },
+    log: (...args) => {
+        console.log(args.join(' '));
+    },
 };
 
 const deviceE2E = async () => {
@@ -22,9 +32,7 @@ const deviceE2E = async () => {
     await device.playStream('https://online.radiojazz.ua/RadioJazz_Cover', 'E2E', 0);
 };
 
-
 // Create a new async function (a new scope) and immediately call it!
 (async () => {
     await deviceE2E();
-  })();
-  
+})();

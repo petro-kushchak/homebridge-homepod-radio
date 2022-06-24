@@ -1,4 +1,4 @@
-#!/usr/bin/python
+###!/usr/bin/python3
 
 from io import BufferedReader, BufferedReader
 from datetime import datetime

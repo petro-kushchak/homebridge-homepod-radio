@@ -41,11 +41,11 @@ export class AirPlayDevice {
         this.pluginPath = path.resolve(path.dirname(__filename), '..', '..');
     }
 
-    private async killProcess(procId: number): Promise<void> {
-        const cmd = `kill -9 ${procId}`;
-        const result = await execAsync(cmd);
-        this.debug(`[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(result)}`);
-    }
+    // private async killProcess(procId: number): Promise<void> {
+    //     const cmd = `kill -9 ${procId}`;
+    //     const result = await execAsync(cmd);
+    //     this.debug(`[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(result)}`);
+    // }
 
     public async setVolume(volume: number): Promise<boolean> {
         const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
@@ -96,20 +96,20 @@ export class AirPlayDevice {
             //identify reason and restart streaming...
             const title = await this.getPlaybackTitle();
             this.debug(`[${this.streamerName}] Received from device: ${this.homepodId} title: ${title}`);
-            let restartStreaming = false;
-            if (title === '' || title.startsWith(this.DEFAULT_PLAYBACK_STREAM_NAME)) {
-                this.logger.info(
-                    `[${this.streamerName}] Restarting playback... total attempts: ${this.streamingRetries}`,
-                );
-                if (this.streamingRetries < this.MAX_STREAMING_RETRIES) {
-                    this.streamingRetries = this.streamingRetries + 1;
-                    restartStreaming = true;
-                } else {
-                    this.logger.info(`[${this.streamerName}] Restarting playback - too many attempts`);
-                }
-            } else {
-                this.logger.info(`[${this.streamerName}] Device is playing "${title}" - will cancel streaming`);
-            }
+            const restartStreaming = false;
+            // if (title === '' || title.startsWith(this.DEFAULT_PLAYBACK_STREAM_NAME)) {
+            //     this.logger.info(
+            //         `[${this.streamerName}] Restarting playback... total attempts: ${this.streamingRetries}`,
+            //     );
+            //     if (this.streamingRetries < this.MAX_STREAMING_RETRIES) {
+            //         this.streamingRetries = this.streamingRetries + 1;
+            //         restartStreaming = true;
+            //     } else {
+            //         this.logger.info(`[${this.streamerName}] Restarting playback - too many attempts`);
+            //     }
+            // } else {
+            //     this.logger.info(`[${this.streamerName}] Device is playing "${title}" - will cancel streaming`);
+            // }
 
             if (restartStreaming) {
                 //need to restart streaming, after some delay
@@ -167,8 +167,9 @@ export class AirPlayDevice {
         const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
 
         this.streaming = child.spawn(
-            scriptPath,
+            'python3',
             [
+                scriptPath,
                 '--id',
                 this.homepodId,
                 '--title',
@@ -184,7 +185,7 @@ export class AirPlayDevice {
                 '--stream_artwork',
                 this.streamArtworkUrl,
             ],
-            { cwd: this.pluginPath },
+            { cwd: this.pluginPath, env: { ...process.env } },
         );
 
         this.streaming.stdout.on('data', (data) => {
@@ -234,7 +235,7 @@ export class AirPlayDevice {
             clearInterval(this.heartbeat);
             this.heartbeat = null;
 
-            await this.killProcess(this.streaming.pid);
+            // await this.killProcess(this.streaming.pid);
             this.streaming = null;
         } catch (err) {
             this.debug(`[${this.streamerName}] Error while trying to stop: ${err}`);
