@@ -244,6 +244,7 @@ export class AirPlayDevice {
             this.streaming = null;
         } catch (err) {
             this.logger.error(`[${this.streamerName}] Error while trying to stop: ${err}`);
+            this.streaming = null;
         }
         return Promise.resolve(true);
     }
