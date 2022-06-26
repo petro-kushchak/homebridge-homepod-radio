@@ -44,11 +44,11 @@ export class AirPlayDevice {
         this.pluginPath = path.resolve(path.dirname(__filename), '..', '..');
     }
 
-    // private async killProcess(procId: number): Promise<void> {
-    //     const cmd = `kill -9 ${procId}`;
-    //     const result = await execAsync(cmd);
-    //     this.debug(`[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(result)}`);
-    // }
+    private async killProcess(procId: number): Promise<void> {
+        const cmd = `kill -9 ${procId}`;
+        const result = await execAsync(cmd);
+        this.debug(`[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(result)}`);
+    }
 
     public async setVolume(volume: number): Promise<boolean> {
         const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
@@ -187,6 +187,7 @@ export class AirPlayDevice {
                 this.streamMetadataUrl,
                 '--stream_artwork',
                 this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
+                '--verbose',
             ],
             { cwd: this.pluginPath, env: { ...process.env } },
         );
@@ -196,8 +197,9 @@ export class AirPlayDevice {
             heartbeat('streaming', heartbeatFailed);
         });
 
-        this.streaming.on('exit', (code, signal) => {
-            this.debug(`[${this.streamerName}] streaming exit: code ${code} signal ${signal}`);
+        this.streaming.on('exit', async (code, signal) => {
+            this.logger.info(`[${this.streamerName}] streaming exit: code ${code} signal ${signal}`);
+            await this.endStreaming();
         });
 
         this.streaming.stderr.on('data', (data) => {
@@ -238,10 +240,10 @@ export class AirPlayDevice {
             clearInterval(this.heartbeat);
             this.heartbeat = null;
 
-            // await this.killProcess(this.streaming.pid);
+            await this.killProcess(this.streaming.pid);
             this.streaming = null;
         } catch (err) {
-            this.debug(`[${this.streamerName}] Error while trying to stop: ${err}`);
+            this.logger.error(`[${this.streamerName}] Error while trying to stop: ${err}`);
         }
         return Promise.resolve(true);
     }

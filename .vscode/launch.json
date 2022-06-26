@@ -19,7 +19,7 @@
         "--stream_metadata", "https://o.tavrmedia.ua/jazz3cover",
         "--stream_artwork", "https://play.tavr.media/static/image/header_menu/RadioJAZZ_COVER_228x228.png",
         "--verbose"
-      ]
+      ],
     }
   ]
 }

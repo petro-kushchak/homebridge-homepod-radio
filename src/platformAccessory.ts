@@ -104,6 +104,10 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     }
 
     async shutdownRequested(): Promise<void> {
+        await this.storeState();
+    }
+
+    private async storeState() {
         if (!this.radio.autoResume) {
             this.platform.logger.info(`[${this.streamerName()}] Skipped storing state`);
             return;
@@ -120,6 +124,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,
         );
         await this.device.stop();
+        await this.storeState();
     }
 
     streamerName(): string {

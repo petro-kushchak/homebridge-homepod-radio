@@ -1,4 +1,5 @@
 import { AirPlayDevice } from '../lib/airplayDevice';
+import { delay } from '../lib/promices';
 
 const homepodId = 'F434F0108877';
 const logger = {
@@ -30,6 +31,11 @@ const deviceE2E = async () => {
     );
 
     await device.playStream('https://online.radiojazz.ua/RadioJazz_Cover', 'E2E', 0);
+    await delay(5000, 0);
+    console.log(`IS_PLAYING: ${device.isPlaying()}`);
+    await device.stop();
+    console.log(`IS_PLAYING: ${device.isPlaying()}`);
+
 };
 
 // Create a new async function (a new scope) and immediately call it!
