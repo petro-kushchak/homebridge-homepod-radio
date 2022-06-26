@@ -36,6 +36,8 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
           this.logger,
           this.config.verboseMode,
           this.streamerName(),
+          '',
+          '',
       );
   }
 

@@ -21,6 +21,9 @@ export class AirPlayDevice {
     private readonly LAST_SEEN_THRESHOLD_MS = 3000;
     private readonly DEFAULT_PLAYBACK_STREAM_NAME: string = 'Streaming with pyatv';
 
+    private readonly DEFAULT_ARTWORK_URL =
+        'https://www.apple.com/v/apple-music/q/images/shared/og__ckjrh2mu8b2a_image.png';
+
     private streaming: child.ChildProcess = null;
     private lastSeen: number;
     private heartbeat: NodeJS.Timeout;
@@ -183,7 +186,7 @@ export class AirPlayDevice {
                 '--stream_metadata',
                 this.streamMetadataUrl,
                 '--stream_artwork',
-                this.streamArtworkUrl,
+                this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
             ],
             { cwd: this.pluginPath, env: { ...process.env } },
         );
