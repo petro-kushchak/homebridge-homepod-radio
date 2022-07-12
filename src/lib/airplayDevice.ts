@@ -100,20 +100,6 @@ export class AirPlayDevice {
             const title = await this.getPlaybackTitle();
             this.debug(`[${this.streamerName}] Received from device: ${this.homepodId} title: ${title}`);
             const restartStreaming = false;
-            // if (title === '' || title.startsWith(this.DEFAULT_PLAYBACK_STREAM_NAME)) {
-            //     this.logger.info(
-            //         `[${this.streamerName}] Restarting playback... total attempts: ${this.streamingRetries}`,
-            //     );
-            //     if (this.streamingRetries < this.MAX_STREAMING_RETRIES) {
-            //         this.streamingRetries = this.streamingRetries + 1;
-            //         restartStreaming = true;
-            //     } else {
-            //         this.logger.info(`[${this.streamerName}] Restarting playback - too many attempts`);
-            //     }
-            // } else {
-            //     this.logger.info(`[${this.streamerName}] Device is playing "${title}" - will cancel streaming`);
-            // }
-
             if (restartStreaming) {
                 //need to restart streaming, after some delay
                 await delay(this.STREAMING_RESTART_TIMEOUT * this.streamingRetries, 0);

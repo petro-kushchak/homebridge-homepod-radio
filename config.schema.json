@@ -33,7 +33,7 @@
         "placeholder": "If set to 0 - HTTP requests are ignored",
         "required": false
       },
-      "verboseModel": {
+      "verboseMode": {
         "title": "Debug Mode",
         "type": "boolean",
         "default": false,
