@@ -18,7 +18,7 @@ export class AirPlayDevice {
     private readonly MAX_STREAMING_RETRIES = 5;
     private readonly STREAMING_RESTART_TIMEOUT = 500;
     private readonly HEARTBEAT_TIMEOUT = 5000;
-    private readonly LAST_SEEN_THRESHOLD_MS = 3000;
+    private readonly LAST_SEEN_THRESHOLD_MS = 10000;
     private readonly DEFAULT_PLAYBACK_STREAM_NAME: string = 'Streaming with pyatv';
 
     private readonly DEFAULT_ARTWORK_URL =
