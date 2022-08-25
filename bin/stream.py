@@ -1,4 +1,4 @@
-###!/usr/bin/python3
+# !/usr/bin/python3
 
 from io import BufferedReader, BufferedReader
 from datetime import datetime
@@ -31,6 +31,7 @@ old__open_file = pyatv.support.metadata._open_file
 
 def new_open_file(file: BufferedReader) -> MediaFile:
     return media
+
 
 pyatv.support.metadata._open_file = new_open_file
 
@@ -85,7 +86,7 @@ class DeviceUpdatePrinter(DeviceListener):
 
 
 async def stream_with_push_updates(
-    id: str, stream_url: str, stream_metadata_url: str, stream_artwork_url, loop: asyncio.AbstractEventLoop
+    id: str, default_title: str, default_album: str, stream_url: str, stream_metadata_url: str, stream_artwork_url, loop: asyncio.AbstractEventLoop
 ):
     """Find a device and print what is playing."""
     _LOGGER.debug("* Discovering device on network...")
@@ -120,7 +121,8 @@ async def stream_with_push_updates(
     try:
         _LOGGER.info("* Starting to stream stdin",)
         await asyncio.gather(
-            update_stream_metadata(stream_metadata_url, stream_artwork_url, raop_stream),
+            update_stream_metadata(
+                default_title, default_album, stream_metadata_url, stream_artwork_url, raop_stream),
             atv.stream.stream_file(BufferedReaderListener(ffmpeg_proc.stdout)))
         await asyncio.sleep(1)
     finally:
@@ -155,8 +157,8 @@ async def monitor_stream(stream_timeout: int):
         await asyncio.sleep(1)
 
 
-async def update_stream_metadata(metadata_url: str, stream_artwork: str, raop: RaopStream):
-    if metadata_url is None:
+async def update_stream_metadata(default_title: str, default_album: str, metadata_url: str, stream_artwork: str, raop: RaopStream):
+    if not metadata_url:
         _LOGGER.warn(f"No metadata url provided")
         return
 
@@ -169,25 +171,38 @@ async def update_stream_metadata(metadata_url: str, stream_artwork: str, raop: R
     while True:
         artwork_url = None
         if metadata_url:
-            response = await loop.run_in_executor(None, urllib.request.urlopen, metadata_url)
-            string = response.read().decode('utf-8')
-            data = json.loads(string)
-            _LOGGER.debug(f"METADATA: {data[0]}")
-            current_song = data[0]
-            if 'song' in current_song:
-                if media.title != current_song['song']:
-                    media.title = current_song['song']
-                    metadata_updated = False
-            if 'singer' in current_song:
-                media.album = current_song['singer']
+            try:
+                response = await loop.run_in_executor(None, urllib.request.urlopen, metadata_url)
+                if response.getcode() >= 400:
+                    artwork_url = stream_artwork
+                    media.title = default_title
+                    media.title = default_album
+                    metadata_updated = True
+                else:
+                    string = response.read().decode('utf-8')
+                    data = json.loads(string)
+                    _LOGGER.debug(f"METADATA: {data[0]}")
+                    current_song = data[0]
+                    if 'song' in current_song:
+                        if media.title != current_song['song']:
+                            media.title = current_song['song']
+                            metadata_updated = False
+                    if 'singer' in current_song:
+                        media.album = current_song['singer']
 
-            if 'cover' in current_song:
-                artwork_url = current_song['cover']
+                    if 'cover' in current_song:
+                        artwork_url = current_song['cover']
+            except Exception as ex:
+                _LOGGER.error(f"METADATA error: {ex}")
+                artwork_url = stream_artwork
+                media.title = default_title
+                media.title = default_album
+                metadata_updated = False
 
         if not metadata_updated:
-            raop_client: RaopClient = raop if isinstance(
-                raop, RaopClient) else raop.playback_manager.raop
-            if  raop_client._is_playing:
+            raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
+
+            if raop_client._is_playing:
                 _LOGGER.debug(f"METADATA updated media: {media}")
                 await raop_client.rtsp.set_metadata(
                     raop_client.context.rtsp_session,
@@ -328,7 +343,7 @@ async def cli_handler(loop):
     media.album = args.album
     await asyncio.gather(
         monitor_stream(int(args.stream_timeout)),
-        stream_with_push_updates(args.id, args.stream_url, args.stream_metadata, args.stream_artwork, loop))
+        stream_with_push_updates(args.id, args.title, args.album, args.stream_url, args.stream_metadata, args.stream_artwork, loop))
 
 
 async def appstart(loop):
@@ -356,6 +371,7 @@ async def appstart(loop):
         pass
 
     return 1
+
 
 def main():
     """Application start here."""

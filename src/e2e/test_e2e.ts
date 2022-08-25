@@ -27,7 +27,7 @@ const deviceE2E = async () => {
         true,
         'E2E',
         'https://o.tavrmedia.ua/jazz3cover',
-        'https://play.tavr.media/static/image/header_menu/RadioJAZZ_COVER_228x228.png',
+        'https://www.apple.com/v/apple-music/q/images/shared/og__ckjrh2mu8b2a_image.png',
     );
 
     await device.playStream('https://online.radiojazz.ua/RadioJazz_Cover', 'E2E', 0);
