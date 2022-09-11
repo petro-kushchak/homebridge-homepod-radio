@@ -9,6 +9,7 @@ export interface Radio {
     autoResume: boolean;
     metadataUrl: string;
     artworkUrl: string;
+    onSwitch: boolean;
 }
 
 export class HomepodRadioPlatformConfig {
@@ -51,6 +52,7 @@ export class HomepodRadioPlatformConfig {
                 autoResume: false,
                 metadataUrl: this.config.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
                 artworkUrl: this.config.artworkUrl || '',
+                onSwitch: this.config.enableSwitch || false,
             } as Radio;
 
             this.radios.push(radio);
@@ -69,6 +71,7 @@ export class HomepodRadioPlatformConfig {
                     autoResume: radioConfig.autoResume || false,
                     metadataUrl: radioConfig.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
                     artworkUrl: radioConfig.artworkUrl || '',
+                    onSwitch: radioConfig.enableSwitch || false,
                 } as Radio;
 
                 this.radios.push(radio);

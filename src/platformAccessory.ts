@@ -24,6 +24,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private readonly device: AirPlayDevice;
     private readonly storage: Storage;
     private service: Service;
+    private switchService: Service;
 
     private currentMediaState: CharacteristicValue;
     private targetMediaState: CharacteristicValue;
@@ -72,6 +73,13 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             .getCharacteristic(this.platform.Characteristic.TargetMediaState)
             .on(CharacteristicEventTypes.SET, callbackify(this.setTargetMediaState.bind(this)));
 
+        this.service
+            .getCharacteristic(this.platform.Characteristic.On)
+            .on(CharacteristicEventTypes.GET, callbackify(this.getSpeakerOn.bind(this)));
+        this.service
+            .getCharacteristic(this.platform.Characteristic.TargetMediaState)
+            .on(CharacteristicEventTypes.SET, callbackify(this.setSpeakerOn.bind(this)));
+
         if (platform.platformConfig.volumeControl) {
             if (this.service.getCharacteristic(this.platform.Characteristic.Volume) === undefined) {
                 this.service.addCharacteristic(new this.platform.Characteristic.Volume());
@@ -82,6 +90,10 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
                 .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
         }
 
+        if (radio.onSwitch) {
+            this.enableSwitchService();
+        }
+
         // This will do its best to keep the actual outputs status up to date with Homekit.
         setInterval(async () => {
             this.currentMediaState = this.getMediaState();
@@ -89,6 +101,20 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
                 .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
                 .updateValue(this.currentMediaState);
         }, 3000);
+    }
+
+    private enableSwitchService(): void {
+        this.switchService =
+            this.accessory.getService(this.platform.Service.Switch) ||
+            this.accessory.addService(this.platform.Service.Switch);
+
+        this.switchService
+            .getCharacteristic(this.platform.Characteristic.On)
+            .on(CharacteristicEventTypes.GET, callbackify(this.getSpeakerOn.bind(this)));
+
+        this.switchService
+            .getCharacteristic(this.platform.Characteristic.TargetMediaState)
+            .on(CharacteristicEventTypes.SET, callbackify(this.setSpeakerOn.bind(this)));
     }
 
     async platformLaunched(): Promise<void> {
@@ -161,6 +187,26 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             return this.platform.Characteristic.CurrentMediaState.PLAY;
         } else {
             return this.platform.Characteristic.CurrentMediaState.STOP;
+        }
+    }
+
+    /**
+     * Get the getSpeakerOn.
+     */
+    async getSpeakerOn(): Promise<CharacteristicValue> {
+        return Promise.resolve(this.device.isPlaying());
+    }
+
+    /**
+     * Set the setSpeakerOn.
+     */
+    async setSpeakerOn(value: CharacteristicValue): Promise<void> {
+        this.platform.logger.info(`[${this.streamerName()}] Triggered SET Speaker ON: ${value}`);
+        if (value) {
+            await this.device.stop();
+        } else {
+            await this.playbackController.requestStop(this);
+            await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
         }
     }
 

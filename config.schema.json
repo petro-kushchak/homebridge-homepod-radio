@@ -1,95 +1,101 @@
 {
-  "pluginAlias": "HomepodRadioPlatform",
-  "pluginType": "platform",
-  "headerDisplay": "Radio speakers are exposed to HomeKit as separate accessories and each needs to be manually paired",
-  "footerDisplay": "The **ffmpeg** and **pyatv** must be installed on your system for this plugin to work.",
-  "schema": {
-    "type": "object",
-    "properties": {
-      "homepodId": {
-        "title": "HomePod Id",
-        "type": "string",
-        "default": "",
-        "required": true
-      },
-      "serialNumber": {
-        "title": "Serial Number",
-        "type": "string",
-        "default": "",
-        "placeholder": "If not specified - HomePod Id will be used",
-        "required": false
-      },
-      "mediaPath": {
-        "title": "Path to MP3 files",
-        "type": "string",
-        "default": "",
-        "placeholder": "If not specified - will search in user home dir",
-        "required": false
-      },
-      "httpPort": {
-        "title": "Port for HTTP requests",
-        "type": "number",
-        "default": "7654",
-        "placeholder": "If set to 0 - HTTP requests are ignored",
-        "required": false
-      },
-      "verboseMode": {
-        "title": "Debug Mode",
-        "type": "boolean",
-        "default": false,
-        "required": false
-      },
-      "volumeControl": {
-        "title": "Enable Volume Control (not supported from iOS 15.2 Home app)",
-        "type": "boolean",
-        "default": false,
-        "required": false
-      },
-      "radios": {
-        "title": "Radio Speaker",
-        "type": "array",
-        "items": {
-          "type": "object",
-          "title": "Radio",
-          "properties": {
-            "name": {
-              "title": "Name",
-              "type": "string",
-              "placeholder": "Enter radio name...",
-              "required": true
+    "pluginAlias": "HomepodRadioPlatform",
+    "pluginType": "platform",
+    "headerDisplay": "Radio speakers are exposed to HomeKit as separate accessories and each needs to be manually paired",
+    "footerDisplay": "The **ffmpeg** and **pyatv** must be installed on your system for this plugin to work.",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "homepodId": {
+                "title": "HomePod Id",
+                "type": "string",
+                "default": "",
+                "required": true
             },
-            "radioUrl": {
-              "title": "Radio Stream URL",
-              "type": "string",
-              "placeholder": "Enter radio stream url...",
-              "required": true
+            "serialNumber": {
+                "title": "Serial Number",
+                "type": "string",
+                "default": "",
+                "placeholder": "If not specified - HomePod Id will be used",
+                "required": false
             },
-            "volume": {
-              "title": "Radio Startup Volume",
-              "type": "number",
-              "placeholder": 0,
-              "required": false
+            "mediaPath": {
+                "title": "Path to MP3 files",
+                "type": "string",
+                "default": "",
+                "placeholder": "If not specified - will search in user home dir",
+                "required": false
             },
-            "autoResume": {
-              "title": "Resume radio after reboot",
-              "type": "boolean",
-              "required": false
+            "httpPort": {
+                "title": "Port for HTTP requests",
+                "type": "number",
+                "default": "7654",
+                "placeholder": "If set to 0 - HTTP requests are ignored",
+                "required": false
             },
-            "metadataUrl": {
-              "title": "Radio Metadata URL",
-              "type": "string",
-              "placeholder": "Enter radio metadata url...",
-              "required": false
+            "verboseMode": {
+                "title": "Debug Mode",
+                "type": "boolean",
+                "default": false,
+                "required": false
             },
-            "artworkUrl": {
-              "title": "Radio Artwork URL",
-              "type": "string",
-              "placeholder": "Enter radio Artwork url...",
-              "required": false
+            "volumeControl": {
+                "title": "Enable Volume Control (not supported from iOS 15.2 Home app)",
+                "type": "boolean",
+                "default": false,
+                "required": false
+            },
+            "radios": {
+                "title": "Radio Speaker",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "title": "Radio",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "type": "string",
+                            "placeholder": "Enter radio name...",
+                            "required": true
+                        },
+                        "radioUrl": {
+                            "title": "Radio Stream URL",
+                            "type": "string",
+                            "placeholder": "Enter radio stream url...",
+                            "required": true
+                        },
+                        "volume": {
+                            "title": "Radio Startup Volume",
+                            "type": "number",
+                            "placeholder": 0,
+                            "required": false
+                        },
+                        "onSwitch": {
+                            "title": "Add switch accessory",
+                            "type": "boolean",
+                            "placeholder": false,
+                            "required": false
+                        },
+                        "autoResume": {
+                            "title": "Resume radio after reboot",
+                            "type": "boolean",
+                            "required": false
+                        },
+                        "metadataUrl": {
+                            "title": "Radio Metadata URL",
+                            "type": "string",
+                            "placeholder": "Enter radio metadata url...",
+                            "required": false
+                        },
+                        "artworkUrl": {
+                            "title": "Radio Artwork URL",
+                            "type": "string",
+                            "placeholder": "Enter radio Artwork url...",
+                            "required": false
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-  }
 }
