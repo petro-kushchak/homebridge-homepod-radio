@@ -10,8 +10,9 @@ import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { timeout } from './lib/promices';
 import { Storage } from './lib/storage';
 
-import { HomepodRadioPlatform, PLUGIN_NAME } from './platform';
+import { HomepodRadioPlatform } from './platform';
 import { Radio } from './platformConfig';
+import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants';
 
 interface AccessoryState extends Record<string, number> {
     playbackState: number;
@@ -52,7 +53,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
         this.accessory
             .getService(this.platform.Service.AccessoryInformation)!
-            .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Homepod Radio')
+            .setCharacteristic(this.platform.Characteristic.Manufacturer, PLUGIN_MANUFACTURER)
             .setCharacteristic(this.platform.Characteristic.Model, this.radio.model)
             .setCharacteristic(this.platform.Characteristic.SerialNumber, this.platform.platformConfig.serialNumber)
             .setCharacteristic(this.platform.Characteristic.Name, this.accessory.displayName);
@@ -74,9 +75,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             .on(CharacteristicEventTypes.SET, callbackify(this.setTargetMediaState.bind(this)));
 
         this.service
-            .getCharacteristic(this.platform.Characteristic.On)
-            .on(CharacteristicEventTypes.GET, callbackify(this.getSpeakerOn.bind(this)));
-        this.service
             .getCharacteristic(this.platform.Characteristic.TargetMediaState)
             .on(CharacteristicEventTypes.SET, callbackify(this.setSpeakerOn.bind(this)));
 
@@ -91,7 +89,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         }
 
         if (radio.onSwitch) {
-            this.enableSwitchService();
+            //this.enableSwitchService();
         }
 
         // This will do its best to keep the actual outputs status up to date with Homekit.
@@ -101,20 +99,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
                 .getCharacteristic(this.platform.Characteristic.CurrentMediaState)
                 .updateValue(this.currentMediaState);
         }, 3000);
-    }
-
-    private enableSwitchService(): void {
-        this.switchService =
-            this.accessory.getService(this.platform.Service.Switch) ||
-            this.accessory.addService(this.platform.Service.Switch);
-
-        this.switchService
-            .getCharacteristic(this.platform.Characteristic.On)
-            .on(CharacteristicEventTypes.GET, callbackify(this.getSpeakerOn.bind(this)));
-
-        this.switchService
-            .getCharacteristic(this.platform.Characteristic.TargetMediaState)
-            .on(CharacteristicEventTypes.SET, callbackify(this.setSpeakerOn.bind(this)));
     }
 
     async platformLaunched(): Promise<void> {
@@ -157,6 +141,19 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         return this.radio.name;
     }
 
+    isPlaying(): boolean {
+        return this.device.isPlaying();
+    }
+
+    async startPlaying(): Promise<void> {
+        await this.playbackController.requestStop(this);
+        await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
+    }
+
+    async stopPlaying(): Promise<void> {
+        await this.device.stop();
+    }
+
     public async getVolume(): Promise<CharacteristicValue> {
         this.platform.logger.info(`[${this.streamerName()}] Triggered GET getVolume`);
 
@@ -190,23 +187,16 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         }
     }
 
-    /**
-     * Get the getSpeakerOn.
-     */
-    async getSpeakerOn(): Promise<CharacteristicValue> {
-        return Promise.resolve(this.device.isPlaying());
-    }
 
     /**
      * Set the setSpeakerOn.
      */
     async setSpeakerOn(value: CharacteristicValue): Promise<void> {
         this.platform.logger.info(`[${this.streamerName()}] Triggered SET Speaker ON: ${value}`);
-        if (value) {
+        if (!value) {
             await this.device.stop();
         } else {
-            await this.playbackController.requestStop(this);
-            await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
+            await this.startPlaying();
         }
     }
 
@@ -229,10 +219,9 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
             value === this.platform.Characteristic.CurrentMediaState.STOP
         ) {
-            await this.device.stop();
+            await this.stopPlaying();
         } else {
-            await this.playbackController.requestStop(this);
-            await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
+            await this.startPlaying();
         }
     }
 }

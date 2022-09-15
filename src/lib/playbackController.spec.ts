@@ -2,6 +2,18 @@
 import { PlaybackController, PlaybackStreamer } from './playbackController';
 
 class PlaybackStreamerStub implements PlaybackStreamer {
+    isPlaying(): boolean {
+        return false;
+    }
+
+    async startPlaying(): Promise<void> {
+        Promise.resolve();
+    }
+
+    async stopPlaying(): Promise<void> {
+        Promise.resolve();
+    }
+
   public stopRequestedRaised = false;
   public shutdownRequestedRaised = false;
   public platformLaunchedRaised = false;

@@ -1,4 +1,5 @@
 import { PlatformConfig } from 'homebridge';
+import { PLUGIN_MODEL } from './platformConstants';
 
 export interface Radio {
     name: string;
@@ -43,16 +44,16 @@ export class HomepodRadioPlatformConfig {
         if (!this.config.radios) {
             const radio = {
                 name: this.config.name || 'HomePod Radio',
-                model: this.config.model || 'Radio BBC',
+                model: this.config.model || PLUGIN_MODEL,
                 radioUrl: this.config.radioUrl,
                 trackName: this.config.trackName || 'Radio BBC',
                 serialNumber: this.serialNumber,
                 volume:
                     !!this.config.volume && this.config.volume > 0 && this.config.volume < 100 ? this.config.volume : 0,
                 autoResume: false,
-                metadataUrl: this.config.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
+                metadataUrl: this.config.metadataUrl || '',
                 artworkUrl: this.config.artworkUrl || '',
-                onSwitch: this.config.enableSwitch || false,
+                onSwitch: this.config.onSwitch || false,
             } as Radio;
 
             this.radios.push(radio);
@@ -60,7 +61,7 @@ export class HomepodRadioPlatformConfig {
             this.config.radios.forEach((radioConfig) => {
                 const radio = {
                     name: radioConfig.name,
-                    model: radioConfig.model || 'HomePod Radio',
+                    model: radioConfig.model || PLUGIN_MODEL,
                     radioUrl: radioConfig.radioUrl,
                     trackName: radioConfig.trackName || 'HomePod Radio',
                     serialNumber: this.serialNumber,
@@ -69,9 +70,9 @@ export class HomepodRadioPlatformConfig {
                             ? radioConfig.volume
                             : 0,
                     autoResume: radioConfig.autoResume || false,
-                    metadataUrl: radioConfig.metadataUrl || '', ////https://o.tavrmedia.ua/jazz3cover
+                    metadataUrl: radioConfig.metadataUrl || '',
                     artworkUrl: radioConfig.artworkUrl || '',
-                    onSwitch: radioConfig.enableSwitch || false,
+                    onSwitch: radioConfig.onSwitch || false,
                 } as Radio;
 
                 this.radios.push(radio);

@@ -1,11 +1,10 @@
 import { API } from 'homebridge';
 import { HomepodRadioPlatform } from './platform';
-
-const PLATFORM_NAME = 'HomepodRadioPlatform';
+import { PLATFORM_NAME, PLUGIN_NAME } from './platformConstants';
 
 /*
  * Initializer function called when the plugin is loaded.
  */
 export = (api: API) => {
-    api.registerPlatform(PLATFORM_NAME, HomepodRadioPlatform);
+    api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, HomepodRadioPlatform);
 };
