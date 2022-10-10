@@ -10,111 +10,124 @@ import { AutomationReturn } from './lib/httpService';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatformConfig } from './platformConfig';
 
-const fileExists = async (path) =>
-    !!(await fs.promises.stat(path).catch((e) => false));
+const fileExists = async (path) => !!(await fs.promises.stat(path).catch((e) => false));
 
 export enum WebActionType {
-  PlayFile,
-  Unsupported,
+    PlayFile,
+    Unsupported,
 }
 
 export interface WebAction {
-  data: string;
-  action: WebActionType;
+    data: string;
+    action: WebActionType;
 }
 
 export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
-  private readonly device: AirPlayDevice;
-  constructor(
-    private readonly config: HomepodRadioPlatformConfig,
-    private readonly playbackController: PlaybackController,
-    private readonly logger: Logger,
-  ) {
-      this.playbackController.addStreamer(this);
-      this.device = new AirPlayDevice(
-          this.config.homepodId,
-          this.logger,
-          this.config.verboseMode,
-          this.streamerName(),
-      );
-  }
+    private readonly device: AirPlayDevice;
+    constructor(
+        private readonly config: HomepodRadioPlatformConfig,
+        private readonly playbackController: PlaybackController,
+        private readonly logger: Logger,
+    ) {
+        this.playbackController.addStreamer(this);
+        this.device = new AirPlayDevice(
+            this.config.homepodId,
+            this.logger,
+            this.config.verboseMode,
+            this.streamerName(),
+            '',
+            null,
+        );
+    }
 
-  async stopRequested(source: PlaybackStreamer): Promise<void> {
-      return Promise.resolve();
-  }
+    isPlaying(): boolean {
+        return false;
+    }
 
-  async shutdownRequested(): Promise<void> {
-      return Promise.resolve();
-  }
+    async startPlaying(): Promise<void> {
+        return Promise.resolve();
+    }
 
-  async platformLaunched(): Promise<void> {
-      return Promise.resolve();
-  }
+    async stopPlaying(): Promise<void> {
+        return Promise.resolve();
+    }
 
-  streamerName(): string {
-      return 'PlatformWebActions';
-  }
+    async stopRequested(source: PlaybackStreamer): Promise<void> {
+        return Promise.resolve();
+    }
 
-  public parseAction(actionUri: string): WebAction {
-      const parts = actionUri.split('/');
+    async shutdownRequested(): Promise<void> {
+        return Promise.resolve();
+    }
 
-      if (parts.length < 2) {
-          return {
-              action: WebActionType.Unsupported,
-              data: 'Unsupported request',
-          };
-      }
-      if (parts[1] === 'play') {
-      // play mp3/wav from mediaPath by name
-      // uri example: /play/<mp3/wav-file>
-          const fileName = parts[2];
+    async platformLaunched(): Promise<void> {
+        return Promise.resolve();
+    }
 
-          const mediaPath = this.config.mediaPath || os.homedir();
-          const filePath = path.join(mediaPath, fileName);
+    streamerName(): string {
+        return 'PlatformWebActions';
+    }
 
-          return {
-              action: WebActionType.PlayFile,
-              data: filePath,
-          };
-      }
-      return {
-          action: WebActionType.Unsupported,
-          data: 'Unsupported request',
-      };
-  }
+    public parseAction(actionUri: string): WebAction {
+        const parts = actionUri.split('/');
 
-  public async handleAction(actionUrl: string): Promise<AutomationReturn> {
-      this.logger.info('Received request: %s', actionUrl);
-      const webAction = this.parseAction(actionUrl);
+        if (parts.length < 2) {
+            return {
+                action: WebActionType.Unsupported,
+                data: 'Unsupported request',
+            };
+        }
+        if (parts[1] === 'play') {
+            // play mp3/wav from mediaPath by name
+            // uri example: /play/<mp3/wav-file>
+            const fileName = parts[2];
 
-      switch (webAction.action) {
-          case WebActionType.PlayFile: {
-              const filePath = webAction.data;
-              const correctFile = await fileExists(filePath);
+            const mediaPath = this.config.mediaPath || os.homedir();
+            const filePath = path.join(mediaPath, fileName);
 
-              if (!correctFile) {
-                  return {
-                      error: false,
-                      message: `File does not exist: ${filePath}`,
-                  };
-              }
+            return {
+                action: WebActionType.PlayFile,
+                data: filePath,
+            };
+        }
+        return {
+            action: WebActionType.Unsupported,
+            data: 'Unsupported request',
+        };
+    }
 
-              const message = `Started playing file: ${filePath}`;
-              this.logger.info(message);
-              await this.playbackController.requestStop(this);
-              await this.device.playFile(filePath);
-              return {
-                  error: false,
-                  message: message,
-              };
-          }
+    public async handleAction(actionUrl: string): Promise<AutomationReturn> {
+        this.logger.info('Received request: %s', actionUrl);
+        const webAction = this.parseAction(actionUrl);
 
-          case WebActionType.Unsupported:
-          default:
-              return {
-                  error: true,
-                  message: webAction.data,
-              };
-      }
-  }
+        switch (webAction.action) {
+            case WebActionType.PlayFile: {
+                const filePath = webAction.data;
+                const correctFile = await fileExists(filePath);
+
+                if (!correctFile) {
+                    return {
+                        error: false,
+                        message: `File does not exist: ${filePath}`,
+                    };
+                }
+
+                const message = `Started playing file: ${filePath}`;
+                this.logger.info(message);
+                await this.playbackController.requestStop(this);
+                await this.device.playFile(filePath);
+                return {
+                    error: false,
+                    message: message,
+                };
+            }
+
+            case WebActionType.Unsupported:
+            default:
+                return {
+                    error: true,
+                    message: webAction.data,
+                };
+        }
+    }
 }

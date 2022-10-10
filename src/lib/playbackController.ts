@@ -3,6 +3,9 @@ export interface PlaybackStreamer {
     shutdownRequested(): Promise<void>;
     platformLaunched(): Promise<void>;
     streamerName(): string;
+    isPlaying(): boolean;
+    startPlaying(): Promise<void>;
+    stopPlaying(): Promise<void>;
   }
 
 export class PlaybackController {
