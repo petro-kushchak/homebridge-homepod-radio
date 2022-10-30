@@ -46,7 +46,7 @@ export class HomepodRadioPlatformConfig {
                 name: this.config.name || 'HomePod Radio',
                 model: this.config.model || PLUGIN_MODEL,
                 radioUrl: this.config.radioUrl,
-                trackName: this.config.trackName || 'Radio BBC',
+                trackName: this.config.trackName || this.config.name,
                 serialNumber: this.serialNumber,
                 volume:
                     !!this.config.volume && this.config.volume > 0 && this.config.volume < 100 ? this.config.volume : 0,
@@ -63,7 +63,7 @@ export class HomepodRadioPlatformConfig {
                     name: radioConfig.name,
                     model: radioConfig.model || PLUGIN_MODEL,
                     radioUrl: radioConfig.radioUrl,
-                    trackName: radioConfig.trackName || 'HomePod Radio',
+                    trackName: radioConfig.trackName || radioConfig.name,
                     serialNumber: this.serialNumber,
                     volume:
                         !!radioConfig.volume && radioConfig.volume > 0 && radioConfig.volume < 100
