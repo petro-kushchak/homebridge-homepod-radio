@@ -170,7 +170,7 @@ export class AirPlayDevice {
                 '--stream_timeout',
                 '10',
                 '--stream_metadata',
-                this.streamMetadataUrl,
+                this.streamMetadataUrl? this.streamMetadataUrl: '-1',
                 '--stream_artwork',
                 this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
                 '--verbose',
