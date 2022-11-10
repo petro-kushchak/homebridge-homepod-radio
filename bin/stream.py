@@ -157,13 +157,17 @@ async def stream_with_push_updates(
         atv.close()
 
 def fetch_raop_from_atv(atv: AppleTV) -> RaopStream:
-    if not hasattr(atv.stream, "_interfaces"):
-        return None
-    interfaces = list(atv.stream._interfaces.keys())
-    raop_interface = [
-        interface for interface in interfaces if interface == Protocol.RAOP]
-    if len(raop_interface) > 0:
-        return atv.stream._interfaces[raop_interface[0]]
+    try:
+        if not hasattr(atv.stream, "_interfaces"):
+            return None
+        interfaces = list(atv.stream._interfaces.keys())
+        raop_interface = [
+            interface for interface in interfaces if interface == Protocol.RAOP]
+        if len(raop_interface) > 0:
+            return atv.stream._interfaces[raop_interface[0]]
+    except Exception as ex:
+        _LOGGER.error(f"ATV RAOP error: {ex}")
+        
     return None
 
 
@@ -177,25 +181,34 @@ async def monitor_stream(atv: AppleTV, stream_timeout: int):
 
         last_seen_sec = (datetime.now() - LAST_SEEN_STREAM).seconds
         _LOGGER.debug(
-            f"STREAM_LAST_SEEN: {last_seen_sec}sec time:{LAST_SEEN_STREAM}")
+            f"STREAM_LAST_SEEN: {last_seen_sec}sec time:{LAST_SEEN_STREAM} timeout:{stream_timeout}")
         if last_seen_sec > stream_timeout and not STREAM_FINISHED:
             raise "timeout"
         
         #update playback progress
-        if atv is not None:
-            raop = fetch_raop_from_atv(atv)
-            raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
-            if (raop_client is not None) and raop_client._is_playing:
-                start = raop_client.context.start_ts
-                now = raop_client.context.rtptime
-                end = start + raop_client.context.sample_rate * 100
-                _LOGGER.debug(f"PLAYBACK: UPDATING DURATION...")
-                await raop_client.rtsp.set_parameter("progress", f"{int(now / 2)}/{now}/{end}")
-        else:
-            _LOGGER.debug(f"PLAYBACK: UPDATE DURATION SKIPPED")
+        await update_playback_progress(atv)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
+async def update_playback_progress(atv: AppleTV):
+    if atv is None:
+        _LOGGER.debug(f"PLAYBACK: UPDATE DURATION SKIPPED")
+        return
+
+    raop = fetch_raop_from_atv(atv)
+    if raop is None:
+        _LOGGER.debug(f"PLAYBACK: UPDATE DURATION SKIPPED - stream is blocked")
+        return
+    raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
+    if (raop_client is not None) and raop_client._is_playing:
+        start = raop_client.context.start_ts
+        now = raop_client.context.rtptime
+        end = start + raop_client.context.sample_rate * 100
+        _LOGGER.debug(f"PLAYBACK: UPDATING DURATION...")
+        try:
+            await raop_client.rtsp.set_parameter("progress", f"{int(now / 2)}/{now}/{end}")
+        except Exception as ex:
+            _LOGGER.error(f"PLAYBACK: UPDATE DURATION error: {ex}")
 
 async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream):
     _LOGGER.info(f"METADATA update : {metadata.toJSON()}")
