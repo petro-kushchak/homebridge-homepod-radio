@@ -42,7 +42,7 @@ LAST_SEEN_STREAM = datetime.now()
 STREAM_FINISHED = False
 
 
-def is_valid_url(url):
+def is_valid_url(url) -> bool:
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
@@ -204,13 +204,13 @@ async def update_playback_progress(atv: AppleTV):
         start = raop_client.context.start_ts
         now = raop_client.context.rtptime
         end = start + raop_client.context.sample_rate * 100
-        _LOGGER.debug(f"PLAYBACK: UPDATING DURATION...")
+        _LOGGER.debug(f"PLAYBACK: UPDATING DURATION: {int(now / 2)}/{now}/{end}")
         try:
             await raop_client.rtsp.set_parameter("progress", f"{int(now / 2)}/{now}/{end}")
         except Exception as ex:
             _LOGGER.error(f"PLAYBACK: UPDATE DURATION error: {ex}")
 
-async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream):
+async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream) -> None:
     _LOGGER.info(f"METADATA update : {metadata.toJSON()}")
     if not is_valid_url(metadata.metadata_url):
         _LOGGER.warning(f"METADATA invalid metadata url provided")
@@ -225,69 +225,96 @@ async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream):
     media.title = metadata.album
     metadata_updated = False
     while True:
-        artwork_url = None
-        if is_valid_url(metadata.metadata_url):
-            try:
-                response = await loop.run_in_executor(None, urllib.request.urlopen, metadata.metadata_url)
-                if response.getcode() >= 400:
-                    _LOGGER.warning(f"METADATA: error getting metadata, code: {response.getcode()}")
-                    artwork_url = metadata.artwork_url
-                    media.title = metadata.title
-                    media.title = metadata.album
-                    metadata_updated = True
-                else:
-                    string = response.read().decode('utf-8')
-                    data = json.loads(string)
-                    _LOGGER.debug(f"METADATA: {data[0]}")
-                    current_song = data[0]
-                    if 'song' in current_song:
-                        if media.title != current_song['song']:
-                            media.title = current_song['song']
-                            metadata_updated = False
-                    if 'singer' in current_song:
-                        media.album = current_song['singer']
+        (title, album, artwork_url, success) = await fetch_stream_metadata(loop, metadata)
 
-                    if 'cover' in current_song:
-                        artwork_url = current_song['cover']
-            except Exception as ex:
-                _LOGGER.error(f"METADATA error: {ex}")
-                traceback.print_exception(*sys.exc_info())
-                artwork_url = metadata.artwork_url
-                media.title = metadata.title
-                media.title = metadata.album
+        _LOGGER.info(f"METADATA fetch: ({title}, {album}, {artwork_url}, {success})")
+        if success:
+            if title != media.title:
+                media.title = title
+                metadata_updated = False
+            if album != media.album:
+                media.album = album
                 metadata_updated = False
 
         if not metadata_updated:
-            _LOGGER.info(f"METADATA not updated media")
+            _LOGGER.info(f"METADATA need to update metadata")
             raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
 
             if raop_client is None:
-                _LOGGER.info(f"METADATA not updated media: RAOP client not ready")
+                _LOGGER.info(f"METADATA not updated metadata: RAOP client not ready")
                 await asyncio.sleep(15)
                 continue
 
-            if raop_client._is_playing:
-                _LOGGER.info(f"METADATA updating media title:'{media.title}' title:'{media.album}'")
-                await raop_client.rtsp.set_metadata(
-                    raop_client.context.rtsp_session,
-                    raop_client.context.rtpseq,
-                    raop_client.context.rtptime,
-                    media,
-                )
-                artwork_url = metadata.artwork_url if not artwork_url else artwork_url
-                _LOGGER.info(f"METADATA updating artwork: {artwork_url}")
-                await update_stream_artwork(loop, artwork_url, raop_client)
-                metadata_updated = True
+            if not raop_client._is_playing:
+                _LOGGER.info(f"METADATA not updated metadata: client not playing")
+                continue
+
+            metadata_updated = await update_stream_media(raop_client)
+
+            _LOGGER.info(f"METADATA updating artwork: {artwork_url}")
+            metadata_updated = metadata_updated and await update_stream_artwork(loop, artwork_url, raop_client)
         else:
-            _LOGGER.info(f"METADATA update skipped")
+            _LOGGER.info(f"METADATA update skipped: no changes")
         
         await asyncio.sleep(15)
 
+async def fetch_stream_metadata(loop, metadata: StreamMetadata) -> (str, str, str, bool):
+    title = metadata.title
+    album = metadata.album
+    artwork_url = metadata.artwork_url
+    success = False
+    
+    if not is_valid_url(metadata.metadata_url):
+        return (title, album, artwork_url, success)
 
-async def update_stream_artwork(loop, artwork_url, raop_client):
+    try:
+        response = await loop.run_in_executor(None, urllib.request.urlopen, metadata.metadata_url)
+        if response.getcode() >= 400:
+            _LOGGER.warning(f"METADATA: error getting metadata, code: {response.getcode()}")
+            return (title, album, artwork_url, success)
+        string = response.read().decode('utf-8')
+        data = json.loads(string)
+        _LOGGER.debug(f"METADATA: {data[0]}")
+
+        current_song = data[0]
+
+        if 'song' in current_song:
+            title = current_song['song']
+            success = True
+
+        if 'singer' in current_song:
+            album = current_song['singer']
+            success = True
+
+        if 'cover' in current_song:
+            artwork_url = current_song['cover']
+            success = True
+
+        return (title, album, artwork_url, success)
+    except Exception as ex:
+        _LOGGER.error(f"METADATA error: {ex}")
+        traceback.print_exception(*sys.exc_info())
+        return (title, album, artwork_url, success)
+
+async def update_stream_media(raop_client: RaopClient) -> bool:
+    try:
+        _LOGGER.info(f"METADATA updating media title:'{media.title}' album:'{media.album}'")
+        await raop_client.rtsp.set_metadata(
+            raop_client.context.rtsp_session,
+            raop_client.context.rtpseq,
+            raop_client.context.rtptime,
+            media,
+        )
+        return True
+    except Exception as ex:
+        _LOGGER.error(f"METADATA COVER SET_PARAMETER error: {ex}")
+        return False
+    
+
+async def update_stream_artwork(loop, artwork_url: str, raop_client: RaopClient) -> bool:
     if not artwork_url:
         _LOGGER.info(f"METADATA update artwork skipped: empty artwork")
-        return
+        return False
 
     artwork_response = await loop.run_in_executor(None, urllib.request.urlopen, artwork_url)
     artwork = artwork_response.read()
@@ -299,7 +326,7 @@ async def update_stream_artwork(loop, artwork_url, raop_client):
 
     if artwork_type is None:
         _LOGGER.info(f"METADATA unsupported cover type: {artwork_url}")
-        return
+        return False
 
     try:
         await raop_client.rtsp.exchange(
@@ -313,11 +340,13 @@ async def update_stream_artwork(loop, artwork_url, raop_client):
             body=artwork
         )
         _LOGGER.info(f"METADATA updated artwork from url: {artwork_url}")
+        return True
     except Exception as ex:
         _LOGGER.error(f"METADATA COVER SET_PARAMETER error: {ex}")
+        return False
 
 
-async def cli_handler(loop):
+async def cli_handler(loop) -> None:
     """Application starts here."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -420,7 +449,7 @@ async def cli_handler(loop):
     await stream_with_push_updates(args.id, stream_metadata, loop)
 
 
-async def appstart(loop):
+async def appstart(loop) -> None:
     """Start the asyncio event loop and runs the application."""
     # Helper method so that the coroutine exits cleanly if an exception
     # happens (which would leave resources dangling)
@@ -447,7 +476,7 @@ async def appstart(loop):
     return 1
 
 
-def main():
+def main() -> None:
     """Application start here."""
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(appstart(loop))
