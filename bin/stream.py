@@ -316,8 +316,14 @@ async def update_stream_artwork(loop, artwork_url: str, raop_client: RaopClient)
         _LOGGER.info(f"METADATA update artwork skipped: empty artwork")
         return False
 
-    artwork_response = await loop.run_in_executor(None, urllib.request.urlopen, artwork_url)
-    artwork = artwork_response.read()
+    artwork = None
+    try:
+        artwork_response = await loop.run_in_executor(None, urllib.request.urlopen, artwork_url)
+        artwork = artwork_response.read()
+    except Exception as ex:
+        _LOGGER.error(f"METADATA READ ARTWORK error: {ex}")
+        return False
+
     artwork_type = None
     if artwork_url.endswith('.jpg') or artwork_url.endswith('.jpeg'):
         artwork_type = "image/jpeg"
