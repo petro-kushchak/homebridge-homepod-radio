@@ -30,7 +30,7 @@ const deviceE2E = async () => {
         'https://www.apple.com/v/apple-music/q/images/shared/og__ckjrh2mu8b2a_image.png',
     );
 
-    await device.playStream('https://online.radiojazz.ua/RadioJazz_Cover', 'E2E', 0);
+    await device.playStream('https://online.radiojazz.ua/RadioJazz_Cover', 'E2E');
     await delay(5000, 0);
     console.log(`IS_PLAYING: ${device.isPlaying()}`);
     await device.stop();
