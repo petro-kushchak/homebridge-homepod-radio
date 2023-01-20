@@ -4,13 +4,11 @@
     "homepodId": "<homepod id>",
     "httpPort": 7654,
     "mediaPath": "/media/homepod",
-    "volumeControl": false,
     "radios": [
         {
             "name": "BBC - Radio 1",
             "trackName": "BBC - Radio 1",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume": 25,
             "autoResume": true,
             "artworkUrl": "https://ichef.bbci.co.uk/images/ic/1920x1080/p05d68tx.jpg",
             "onSwitch": true

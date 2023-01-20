@@ -15,11 +15,9 @@ const execAsync = promisify(child.exec);
  */
 
 export class AirPlayDevice {
-    private readonly MAX_STREAMING_RETRIES = 5;
     private readonly STREAMING_RESTART_TIMEOUT = 500;
     private readonly HEARTBEAT_TIMEOUT = 5000;
     private readonly LAST_SEEN_THRESHOLD_MS = 10000;
-    private readonly DEFAULT_PLAYBACK_STREAM_NAME: string = 'Streaming with pyatv';
 
     private readonly DEFAULT_ARTWORK_URL =
         'https://www.apple.com/v/apple-music/q/images/shared/og__ckjrh2mu8b2a_image.png';
@@ -50,37 +48,10 @@ export class AirPlayDevice {
         this.debug(`[${this.streamerName}] Executing "${result}" result: ${JSON.stringify(result)}`);
     }
 
-    public async setVolume(volume: number): Promise<boolean> {
-        const setVolumeCmd = `atvremote --id ${this.homepodId} set_volume=${volume}`;
-        this.debug(`[${this.streamerName}] Executing "${setVolumeCmd}"`);
-        await execAsync(setVolumeCmd);
-        return true;
-    }
-
-    public async getVolume(): Promise<number> {
-        const getVolumeCmd = `atvremote --id ${this.homepodId} volume`;
-        this.debug(`[${this.streamerName}] Executing "${getVolumeCmd}"`);
-        const result = await execAsync(getVolumeCmd);
-        try {
-            return Number.parseFloat(result.stdout);
-        } catch (error) {
-            this.logger.info(`[${this.streamerName}] GetVolume error: ${error}`);
-            return 0;
-        }
-    }
-
     public async getPlaybackTitle(): Promise<string> {
         const currentTitleCmd = `atvremote --id ${this.homepodId} title`;
         const result = await execAsync(currentTitleCmd);
         return result.stdout.replace(/\r?\n|\r/g, ' ');
-    }
-
-    public async playUrl(url: string): Promise<void> {
-        const cmd = `stream -- -i ${this.homepodId} -t URL -a ${this.streamerName}`;
-        this.logger.info(`[${this.streamerName}] Execute ${cmd}`);
-        const result = await execAsync(cmd, {
-            cwd: this.pluginPath,
-        });
     }
 
     public async playFile(filePath: string): Promise<void> {
@@ -92,7 +63,7 @@ export class AirPlayDevice {
         this.logger.info(`[${this.streamerName}] Finished playing ${filePath}`);
     }
 
-    public async playStream(streamUrl: string, streamName: string, volume: number): Promise<boolean> {
+    public async playStream(streamUrl: string, streamName: string): Promise<boolean> {
         this.streamingRetries = 0;
         const heartbeat = this.handleHearbeat.bind(this);
         const heartbeatFailed = async (): Promise<void> => {
@@ -103,7 +74,7 @@ export class AirPlayDevice {
             if (restartStreaming) {
                 //need to restart streaming, after some delay
                 await delay(this.STREAMING_RESTART_TIMEOUT * this.streamingRetries, 0);
-                await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+                await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
             } else {
                 //device is used to play something else, need to change state to "STOPPED"
                 await this.endStreaming();
@@ -114,9 +85,9 @@ export class AirPlayDevice {
         if (this.isPlaying()) {
             await this.endStreaming();
             this.logger.info(`[${this.streamerName}] Previous streaming finished`);
-            return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+            return await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
         } else {
-            return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+            return await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
         }
     }
 
@@ -148,7 +119,6 @@ export class AirPlayDevice {
     private async startStreaming(
         streamUrl: string,
         streamName: string,
-        volume: number,
         heartbeat: (source: string, heartbeatFailed: () => Promise<void>) => Promise<void>,
         heartbeatFailed: () => Promise<void>,
     ): Promise<boolean> {
@@ -207,10 +177,6 @@ export class AirPlayDevice {
 
         this.debug(`[${this.streamerName}] spawn streaming: ${this.streaming.pid}`);
         this.logger.info(`[${this.streamerName}] Started streaming ${streamUrl}`);
-        if (volume > 0) {
-            this.logger.info(`[${this.streamerName}] Setting volume to ${volume}`);
-            return await this.setVolume(volume);
-        }
         return true;
     }
 

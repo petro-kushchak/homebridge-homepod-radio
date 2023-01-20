@@ -6,7 +6,6 @@ export interface Radio {
     model: string;
     radioUrl: string;
     trackName: string;
-    volume: number;
     autoResume: boolean;
     metadataUrl: string;
     artworkUrl: string;
@@ -17,7 +16,6 @@ export class HomepodRadioPlatformConfig {
     public readonly homepodId: string;
     public readonly serialNumber: string;
     public readonly verboseMode: boolean;
-    public readonly volumeControl: boolean;
     public readonly radios: Radio[];
     public readonly mediaPath: string;
     public readonly httpPort: number;
@@ -34,8 +32,6 @@ export class HomepodRadioPlatformConfig {
         this.httpPort = this.config.httpPort || 4567;
         this.mediaPath = this.config.mediaPath || '';
 
-        this.volumeControl = !!config.volumeControl && config.volumeControl ? true : false;
-
         this.loadRadios();
     }
 
@@ -48,8 +44,6 @@ export class HomepodRadioPlatformConfig {
                 radioUrl: this.config.radioUrl,
                 trackName: this.config.trackName || this.config.name,
                 serialNumber: this.serialNumber,
-                volume:
-                    !!this.config.volume && this.config.volume > 0 && this.config.volume < 100 ? this.config.volume : 0,
                 autoResume: false,
                 metadataUrl: this.config.metadataUrl || '',
                 artworkUrl: this.config.artworkUrl || '',
@@ -65,10 +59,6 @@ export class HomepodRadioPlatformConfig {
                     radioUrl: radioConfig.radioUrl,
                     trackName: radioConfig.trackName || radioConfig.name,
                     serialNumber: this.serialNumber,
-                    volume:
-                        !!radioConfig.volume && radioConfig.volume > 0 && radioConfig.volume < 100
-                            ? radioConfig.volume
-                            : 0,
                     autoResume: radioConfig.autoResume || false,
                     metadataUrl: radioConfig.metadataUrl || '',
                     artworkUrl: radioConfig.artworkUrl || '',

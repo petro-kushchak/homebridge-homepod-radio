@@ -39,12 +39,6 @@
                 "default": false,
                 "required": false
             },
-            "volumeControl": {
-                "title": "Enable Volume Control (not supported from iOS 15.2 Home app)",
-                "type": "boolean",
-                "default": false,
-                "required": false
-            },
             "radios": {
                 "title": "Radio Speaker",
                 "type": "array",
@@ -63,12 +57,6 @@
                             "type": "string",
                             "placeholder": "Enter radio stream url...",
                             "required": true
-                        },
-                        "volume": {
-                            "title": "Radio Startup Volume",
-                            "type": "number",
-                            "placeholder": 0,
-                            "required": false
                         },
                         "onSwitch": {
                             "title": "Add switch accessory",

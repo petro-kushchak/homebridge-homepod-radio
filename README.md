@@ -17,7 +17,6 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 
 - automatically stops streaming when HomePod is used by another app
 - sometimes audio streaming stops, so plugin automatically restarts it 
-- "volume" setting (if specified) is used to set volume when streaming starts
 - "verboseMode" - by default set to false, for debug set it to true
 
 ## Requirements 
@@ -43,32 +42,14 @@ For HomePod device you need to specify the Mac address of the device.
             "name": "BBC - Radio 1",
             "trackName": "BBC - Radio 1",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume": 25,      
-            "autoResume": true
-        }
-    ]
-}
-```
-
-- Single radio accessory (legacy config):
-
-```
-{
-    "platforms": [
-        {
-            "platform": "HomepodRadioPlatform",
-            "name": "HomePod Radio",
-            "model": "BBC - Radio 1",
-            "homepodId": "F422F0103371",
-            "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "volume": 25,
             "autoResume": true,
-            "httpPort": 7654,
-            "mediaPath": "/media/homepod",
+            "artworkUrl": "https://ichef.bbci.co.uk/images/ic/1920x1080/p05d68tx.jpg",
+            "onSwitch": true
         }
     ]
 }
 ```
+
 
 ## Play mp3/wav file from Home automation
 
@@ -221,8 +202,9 @@ Looks like this is not supported at the moment by pyatv
 6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~
 7. ~~Resume playback on Homebridge reboot~~
 8. ~~Play audio file on homepod~~
-9. Loop audio file playback
-10. Play audio file on HomePod using url
-11. Set radio (track) name to HomePod
-12. Radio streaming to multiple HomePods
-13. Siri shortcuts (text to speech, etc)
+9. ~~Set radio track name to HomePod~~
+10. ~~Set radio artwork to HomePod~~
+11. Loop audio file playback
+12. Play audio file on HomePod using url
+13. Radio streaming to multiple HomePods
+14. Siri shortcuts (text to speech, etc)

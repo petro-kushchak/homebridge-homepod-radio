@@ -7,7 +7,6 @@ import { Service, PlatformAccessory, CharacteristicValue, CharacteristicEventTyp
 import { callbackify } from './lib/homebridgeCallbacks';
 import { AirPlayDevice } from './lib/airplayDevice';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
-import { timeout } from './lib/promices';
 import { Storage } from './lib/storage';
 
 import { HomepodRadioPlatform } from './platform';
@@ -25,7 +24,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private readonly device: AirPlayDevice;
     private readonly storage: Storage;
     private service: Service;
-    private switchService: Service;
 
     private currentMediaState: CharacteristicValue;
     private targetMediaState: CharacteristicValue;
@@ -77,20 +75,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         this.service
             .getCharacteristic(this.platform.Characteristic.TargetMediaState)
             .on(CharacteristicEventTypes.SET, callbackify(this.setSpeakerOn.bind(this)));
-
-        if (platform.platformConfig.volumeControl) {
-            if (this.service.getCharacteristic(this.platform.Characteristic.Volume) === undefined) {
-                this.service.addCharacteristic(new this.platform.Characteristic.Volume());
-            }
-            this.service
-                .getCharacteristic(this.platform.Characteristic.Volume)
-                .on(CharacteristicEventTypes.GET, callbackify(this.getVolume.bind(this)))
-                .on(CharacteristicEventTypes.SET, callbackify(this.setVolume.bind(this)));
-        }
-
-        if (radio.onSwitch) {
-            //this.enableSwitchService();
-        }
 
         // This will do its best to keep the actual outputs status up to date with Homekit.
         setInterval(async () => {
@@ -147,36 +131,11 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     async startPlaying(): Promise<void> {
         await this.playbackController.requestStop(this);
-        await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
+        await this.device.playStream(this.radio.radioUrl, this.radio.trackName);
     }
 
     async stopPlaying(): Promise<void> {
         await this.device.stop();
-    }
-
-    public async getVolume(): Promise<CharacteristicValue> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET getVolume`);
-
-        const volumeCharacteristic = this.service.getCharacteristic(this.platform.Characteristic.Volume);
-
-        const volume = await Promise.race([timeout(3000, volumeCharacteristic.value), this.device.getVolume()]);
-
-        this.platform.logger.info(`[${this.streamerName()}] Current volume ${volume}`);
-        return volume;
-    }
-
-    public async setVolume(volume: number, updateCharacteristic?: boolean): Promise<boolean> {
-        const volumeCharacteristic = this.service.getCharacteristic(this.platform.Characteristic.Volume);
-
-        this.platform.logger.info(`[${this.streamerName()}] Triggered SET setVolume`);
-        const maxValue = volumeCharacteristic.props.maxValue * 0.75;
-        volume = volume > maxValue ? maxValue : volume;
-        this.platform.logger.info(`[${this.streamerName()}] Volume change to ${volume}`);
-
-        if (updateCharacteristic === true) {
-            volumeCharacteristic.updateValue(volume);
-        }
-        return await this.device.setVolume(volume);
     }
 
     getMediaState(): CharacteristicValue {
