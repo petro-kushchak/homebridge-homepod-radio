@@ -7,28 +7,34 @@
 
 # HomePod mini radio support
 
-Homebridge accessory for streaming radio to Homepod mini
+Homebridge accessory for streaming radio to the Homepod mini
 
 ## Streaming radio to HomePod (mini)
-Main idea is to stream to HomePod mini (or AppleTV) with the following command:
+
+Main idea is to stream to the HomePod mini (or Apple TV) with the following command:
 ```
 ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```
 
 - automatically stops streaming when HomePod is used by another app
 - sometimes audio streaming stops, so plugin automatically restarts it 
-- "verboseMode" - by default set to false, for debug set it to true
+
+> **_Note:_**  After plugin v2.0 - streaming and retry logic moved to stream.py script
 
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 - ffmpeg
 - pyatv
 
-For HomePod device you need to specify the Mac address of the device. 
+For the HomePod you need to specify device Mac address. 
 
 ## Usage Example:
 
-- Multiple radio accessories support (**each radio speaker must be added to home separately with homebridge pin pairing**):
+### Multiple radio accessories support
+
+> **_Note:_** each radio speaker must be added to home separately with homebridge pin pairing
+
+Config example:
 
 ```
 {
@@ -40,20 +46,45 @@ For HomePod device you need to specify the Mac address of the device.
     "radios": [
         {
             "name": "BBC - Radio 1",
-            "trackName": "BBC - Radio 1",
             "radioUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one",
-            "autoResume": true,
             "artworkUrl": "https://ichef.bbci.co.uk/images/ic/1920x1080/p05d68tx.jpg",
+            "autoResume": true,
             "onSwitch": true
         }
     ]
 }
 ```
 
+### Radio metadata support
+
+Some radios provide metadata about currently played tracks. Plugin support optional `metadataUrl` parameter and tries to fetch JSON in format (example URL: https://o.tavrmedia.ua/rokscla):
+```
+[
+      {
+            "stime": "15:29:21",
+            "time": "15:29",
+            "singer": "Billy Joel",
+            "song": "Honesty",
+            "cover": "https://www.radioroks.ua/static/img/content/cover/0/38/500x500.jpg"
+      },
+      {
+            "stime": "15:25:38",
+            "time": "15:25",
+            "singer": "Fleetwood Mac",
+            "song": "Everywhere",
+            "cover": ""
+      },
+      ...
+  ]
+```
+
+Then plugin:
+1. updates radio stream with fetched `singer`/`song` data
+2. updates radio artwork with image downloaded using `cover`
 
 ## Play mp3/wav file from Home automation
 
-*Note:* this feature does not add additional speaker accessories
+> **_Note:_**  this feature does not add additional speaker/switch accessories (see TODO)
 
 - Download your files to Homebridge server. For example download hello.wav 
 ```
@@ -75,7 +106,7 @@ $ ls /home/pi/media
 ![Screenshot](images/play-file-shortcut.jpeg)
    - Test shortcut
 
-*Note:* you should put homebridge server name or IP (default for Homebridge server is homebridge.local) 
+> **_Note:_**  you should use homebridge server name or IP (default for Homebridge server is homebridge.local)
 
 Example:
 - Homebridge server is running on host "homebridge.local"
@@ -83,12 +114,12 @@ Example:
 - Plugin's "httpPort" is set to 4567
 - Plugin's "mediaPath" is set to /var/www/media
 
-Then you can trigger playback of hello.mp3 even from browser by navigating to: http://homebridge.local:4567/play/hello.mp3
+Then you can trigger playback of `hello.mp3` even from browser by navigating to: http://homebridge.local:4567/play/hello.mp3
 
 
 ## HomePod access setup
 
-In Home app settings:
+In the Home app settings:
 
 - Tap the Homes and Home Settings button.
 - Tap Home Settings > Allow Speaker & TV Access, then choose "allow everyone"
@@ -114,7 +145,7 @@ sudo apt-get install ffmpeg
 
 ### PyATV lib
 
-For streaming to HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
+For streaming to the HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
 
 - install python3  
 ```
@@ -165,7 +196,7 @@ Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-### 1. Pairing setting for HomePod (fixed by *HomePod access setup* step):
+### 1. Pairing setting for the HomePod (fixed by *HomePod access setup* step):
 
 Make sure your HomePod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
 ```
@@ -179,7 +210,7 @@ Services:
  - Protocol: RAOP, Port: 7000, Credentials: None, Requires Password: False, Password: None, Pairing: NotNeeded
 ```
 
-Note: streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
+> **_Note:_**  streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
 
 ### 2. HomePod playback errors
 
@@ -193,18 +224,10 @@ Typically this error dissapears after HomePod restart.
 ### 3. Streaming to stereo pair
 Looks like this is not supported at the moment by pyatv
 
+### 4. Speaker accessory controls
+With iOS 15 Homekit does not support `volume control` and `start/stop` for speaker accessory (at least for speakers exposed by Homebridge). So I'd suggest to enable switch accessory for each radio
+
 ## TODO list
-1. ~~Volume control (looks like not supported by Home app with iOS 15.2 )~~
-2. ~~Default volume for radio~~
-3. ~~Multiple radios support~~
-4. ~~Plugin Config Schema support (nice config form with Homebridge UI)~~
-5. ~~Max streaming retries is set to 5 (so it gives up in case if radio or HomePod stopped working)~~
-6. ~~Streaming buffer size set to 15Mb for slow streams/devices)~~
-7. ~~Resume playback on Homebridge reboot~~
-8. ~~Play audio file on homepod~~
-9. ~~Set radio track name to HomePod~~
-10. ~~Set radio artwork to HomePod~~
-11. Loop audio file playback
-12. Play audio file on HomePod using url
-13. Radio streaming to multiple HomePods
-14. Siri shortcuts (text to speech, etc)
+1. Switch accessory for the audio file playback (with loop support)
+2. Play audio file on the HomePod with provided url
+3. Radio streaming to the multiple HomePods

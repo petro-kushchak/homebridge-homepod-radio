@@ -61,7 +61,7 @@
                         "onSwitch": {
                             "title": "Add switch accessory",
                             "type": "boolean",
-                            "placeholder": false,
+                            "placeholder": true,
                             "required": false
                         },
                         "autoResume": {
