@@ -63,6 +63,49 @@ export class AirPlayDevice {
         this.logger.info(`[${this.streamerName}] Finished playing ${filePath}`);
     }
 
+    public async playFile2(filePath: string, volume: number): Promise<boolean> {
+        // create pipe for the command:
+        const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
+
+        this.streaming = child.spawn(
+            'python3',
+            [
+                scriptPath,
+                '--id',
+                this.homepodId,
+                '--title',
+                this.streamerName,
+                '--album',
+                this.streamerName,
+                '-f',
+                filePath,
+                '--verbose',
+                '--volume',
+                '' + volume,
+            ],
+            { cwd: this.pluginPath, env: { ...process.env } },
+        );
+
+        this.streaming.stdout.on('data', (data) => {
+            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+        });
+
+        this.streaming.on('exit', async (code, signal) => {
+            this.logger.info(`[${this.streamerName}] streaming exit: code ${code} signal ${signal}`);
+            await this.endStreaming();
+        });
+
+        this.streaming.stderr.on('data', (data) => {
+            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+        });
+
+        this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
+
+        this.debug(`[${this.streamerName}] spawn streaming: ${this.streaming.pid}`);
+        this.logger.info(`[${this.streamerName}] Started file streaming ${filePath}`);
+        return true;
+    }
+
     public async playStream(streamUrl: string, streamName: string): Promise<boolean> {
         this.streamingRetries = 0;
         const heartbeat = this.handleHearbeat.bind(this);

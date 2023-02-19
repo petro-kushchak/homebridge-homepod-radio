@@ -26,13 +26,15 @@ from pyatv.scripts import (
     log_current_version,
 )
 
-#fake media file for title/album
+# fake media file for title/album
 from mediafile import MediaFile
 media = MediaFile(os.path.dirname(__file__) + '/dummy.mp3')
 old__open_file = pyatv.support.metadata._open_file
 
+
 def new_open_file(file: BufferedReader) -> MediaFile:
     return media
+
 
 pyatv.support.metadata._open_file = new_open_file
 
@@ -49,6 +51,7 @@ def is_valid_url(url) -> bool:
     except:
         return False
 
+
 class StreamMetadata:
     title: str
     album: str
@@ -56,17 +59,28 @@ class StreamMetadata:
     metadata_url: str
     artwork_url: str
     stream_timeout: int
+    stream_volume: int
 
-    def __init__(self, title: str, album: str, stream_url: str, metadata_url: str, artwork_url: str, stream_timeout: int) -> None:
+    def __init__(self,
+                 title: str,
+                 album: str,
+                 stream_url: str,
+                 metadata_url: str,
+                 artwork_url: str,
+                 stream_timeout: int,
+                 volume: int
+                 ) -> None:
         self.title = title
         self.album = album
         self.stream_url = stream_url
         self.metadata_url = metadata_url
         self.artwork_url = artwork_url
         self.stream_timeout = stream_timeout
-    
+        self.stream_volume = volume
+
     def toJSON(self) -> str:
         return json.dumps(self.__dict__)
+
 
 class BufferedReaderListener (BufferedReader):
     def __init__(self, reader: BufferedReader) -> None:
@@ -112,50 +126,6 @@ class DeviceUpdatePrinter(DeviceListener):
         _LOGGER.info("Connection was closed properly")
 
 
-async def stream_with_push_updates(
-    id: str, metadata: StreamMetadata, loop: asyncio.AbstractEventLoop
-):
-    """Find a device and print what is playing."""
-    _LOGGER.debug("* Discovering device on network...")
-    global STREAM_FINISHED
-    atvs = await pyatv.scan(loop, identifier=id, timeout=5)
-
-    if not atvs:
-        _LOGGER.error("* No Device found")
-        STREAM_FINISHED = True
-        return
-
-    conf = atvs[0]
-
-    _LOGGER.info(f"* Connecting to {conf.address}")
-    atv = await pyatv.connect(conf, loop)
-
-    push_listener = PushUpdatePrinter()
-    device_listener = DeviceUpdatePrinter()
-
-    atv.listener = device_listener
-    atv.push_updater.listener = push_listener
-    atv.push_updater.start()
-
-    ffmpeg_cmd = ['ffmpeg',
-                  '-rtbufsize', '25M',
-                  '-i', metadata.stream_url,
-                  '-f', 'mp3',
-                  '-']
-    ffmpeg_proc = sp.Popen(ffmpeg_cmd, stdout=sp.PIPE)
-    raop_stream = fetch_raop_from_atv(atv)
-
-    try:
-        _LOGGER.info("* Starting to stream stdin",)
-        await asyncio.gather(
-            monitor_stream(atv, int(metadata.stream_timeout)),
-            update_stream_metadata(metadata, raop_stream),
-            atv.stream.stream_file(BufferedReaderListener(ffmpeg_proc.stdout)))
-        await asyncio.sleep(1)
-    finally:
-        STREAM_FINISHED = True
-        atv.close()
-
 def fetch_raop_from_atv(atv: AppleTV) -> RaopStream:
     try:
         if not hasattr(atv.stream, "_interfaces"):
@@ -167,7 +137,7 @@ def fetch_raop_from_atv(atv: AppleTV) -> RaopStream:
             return atv.stream._interfaces[raop_interface[0]]
     except Exception as ex:
         _LOGGER.error(f"ATV RAOP error: {ex}")
-        
+
     return None
 
 
@@ -184,11 +154,12 @@ async def monitor_stream(atv: AppleTV, stream_timeout: int):
             f"STREAM_LAST_SEEN: {last_seen_sec}sec time:{LAST_SEEN_STREAM} timeout:{stream_timeout}")
         if last_seen_sec > stream_timeout and not STREAM_FINISHED:
             raise "timeout"
-        
-        #update playback progress
+
+        # update playback progress
         await update_playback_progress(atv)
 
         await asyncio.sleep(2)
+
 
 async def update_playback_progress(atv: AppleTV):
     if atv is None:
@@ -199,16 +170,19 @@ async def update_playback_progress(atv: AppleTV):
     if raop is None:
         _LOGGER.debug(f"PLAYBACK: UPDATE DURATION SKIPPED - stream is blocked")
         return
-    raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
+    raop_client: RaopClient = raop if isinstance(
+        raop, RaopClient) else raop.playback_manager.raop
     if (raop_client is not None) and raop_client._is_playing:
         start = raop_client.context.start_ts
         now = raop_client.context.rtptime
         end = start + raop_client.context.sample_rate * 100
-        _LOGGER.debug(f"PLAYBACK: UPDATING DURATION: {int(now / 2)}/{now}/{end}")
+        _LOGGER.debug(
+            f"PLAYBACK: UPDATING DURATION: {int(now / 2)}/{now}/{end}")
         try:
             await raop_client.rtsp.set_parameter("progress", f"{int(now / 2)}/{now}/{end}")
         except Exception as ex:
             _LOGGER.error(f"PLAYBACK: UPDATE DURATION error: {ex}")
+
 
 async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream) -> None:
     _LOGGER.info(f"METADATA update : {metadata.toJSON()}")
@@ -227,7 +201,8 @@ async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream) -> 
     while True:
         (title, album, artwork_url, success) = await fetch_stream_metadata(loop, metadata)
 
-        _LOGGER.info(f"METADATA fetch: ({title}, {album}, {artwork_url}, {success})")
+        _LOGGER.info(
+            f"METADATA fetch: ({title}, {album}, {artwork_url}, {success})")
         if success:
             if title != media.title:
                 media.title = title
@@ -238,15 +213,18 @@ async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream) -> 
 
         if not metadata_updated:
             _LOGGER.info(f"METADATA need to update metadata")
-            raop_client: RaopClient = raop if isinstance(raop, RaopClient) else raop.playback_manager.raop
+            raop_client: RaopClient = raop if isinstance(
+                raop, RaopClient) else raop.playback_manager.raop
 
             if raop_client is None:
-                _LOGGER.info(f"METADATA not updated metadata: RAOP client not ready")
+                _LOGGER.info(
+                    f"METADATA not updated metadata: RAOP client not ready")
                 await asyncio.sleep(15)
                 continue
 
             if not raop_client._is_playing:
-                _LOGGER.info(f"METADATA not updated metadata: client not playing")
+                _LOGGER.info(
+                    f"METADATA not updated metadata: client not playing")
                 continue
 
             metadata_updated = await update_stream_media(raop_client)
@@ -255,22 +233,24 @@ async def update_stream_metadata(metadata: StreamMetadata, raop: RaopStream) -> 
             metadata_updated = metadata_updated and await update_stream_artwork(loop, artwork_url, raop_client)
         else:
             _LOGGER.info(f"METADATA update skipped: no changes")
-        
+
         await asyncio.sleep(15)
+
 
 async def fetch_stream_metadata(loop, metadata: StreamMetadata) -> (str, str, str, bool):
     title = metadata.title
     album = metadata.album
     artwork_url = metadata.artwork_url
     success = False
-    
+
     if not is_valid_url(metadata.metadata_url):
         return (title, album, artwork_url, success)
 
     try:
         response = await loop.run_in_executor(None, urllib.request.urlopen, metadata.metadata_url)
         if response.getcode() >= 400:
-            _LOGGER.warning(f"METADATA: error getting metadata, code: {response.getcode()}")
+            _LOGGER.warning(
+                f"METADATA: error getting metadata, code: {response.getcode()}")
             return (title, album, artwork_url, success)
         string = response.read().decode('utf-8')
         data = json.loads(string)
@@ -296,9 +276,11 @@ async def fetch_stream_metadata(loop, metadata: StreamMetadata) -> (str, str, st
         traceback.print_exception(*sys.exc_info())
         return (title, album, artwork_url, success)
 
+
 async def update_stream_media(raop_client: RaopClient) -> bool:
     try:
-        _LOGGER.info(f"METADATA updating media title:'{media.title}' album:'{media.album}'")
+        _LOGGER.info(
+            f"METADATA updating media title:'{media.title}' album:'{media.album}'")
         await raop_client.rtsp.set_metadata(
             raop_client.context.rtsp_session,
             raop_client.context.rtpseq,
@@ -309,7 +291,7 @@ async def update_stream_media(raop_client: RaopClient) -> bool:
     except Exception as ex:
         _LOGGER.error(f"METADATA COVER SET_PARAMETER error: {ex}")
         return False
-    
+
 
 async def update_stream_artwork(loop, artwork_url: str, raop_client: RaopClient) -> bool:
     if not artwork_url:
@@ -388,7 +370,7 @@ async def cli_handler(loop) -> None:
         help="stream url",
         dest="stream_url",
         default=None,
-        required=True
+        required=False
     )
 
     parser.add_argument(
@@ -410,11 +392,29 @@ async def cli_handler(loop) -> None:
     )
 
     parser.add_argument(
+        "-f",
+        "--file",
+        help="file to stream",
+        dest="file_path",
+        default=None,
+        required=False
+    )
+
+    parser.add_argument(
         "-w",
         "--stream_artwork",
         help="stream artwork",
         dest="stream_artwork",
         default=5,
+        required=False
+    )
+
+    parser.add_argument(
+        "-l",
+        "--volume",
+        help="stream volume",
+        dest="volume",
+        default=None,
         required=False
     )
 
@@ -442,17 +442,101 @@ async def cli_handler(loop) -> None:
 
     log_current_version()
 
-    stream_metadata = StreamMetadata(args.title, 
-        args.album, 
-        args.stream_url,
-        args.stream_metadata,
-        args.stream_artwork,
-        args.stream_timeout)
-
+    stream_metadata = StreamMetadata(args.title,
+                                     args.album,
+                                     args.stream_url,
+                                     args.stream_metadata,
+                                     args.stream_artwork,
+                                     args.stream_timeout,
+                                     int(args.volume) if args.volume else 0)
 
     media.title = args.title
     media.album = args.album
-    await stream_with_push_updates(args.id, stream_metadata, loop)
+    if args.file_path is None:
+        await start_streaming_url(args.id, stream_metadata, loop)
+    else:
+        await start_streaming_file(args.id, args.file_path, int(args.volume) if args.volume else 0, loop)
+
+
+async def prepare_atv(id: str, loop: asyncio.AbstractEventLoop) -> AppleTV:
+    """Find a device and print what is playing."""
+    _LOGGER.debug("* Discovering device on network...")
+    global STREAM_FINISHED
+    atvs = await pyatv.scan(loop, identifier=id, timeout=5)
+
+    if not atvs:
+        _LOGGER.error("* No Device found")
+        STREAM_FINISHED = True
+        return
+
+    conf = atvs[0]
+
+    _LOGGER.info(f"* Connecting to {conf.address}")
+    atv = await pyatv.connect(conf, loop)
+
+    push_listener = PushUpdatePrinter()
+    device_listener = DeviceUpdatePrinter()
+
+    atv.listener = device_listener
+    atv.push_updater.listener = push_listener
+    atv.push_updater.start()
+    return atv
+
+
+async def do_streaming_file(
+        atv: AppleTV,
+        file_path: str,
+        volume: int,
+        retry_count: int):
+    try:
+        if volume > 0:
+            await atv.audio.set_volume(volume)
+        await atv.stream.stream_file(file_path)
+        await asyncio.sleep(1)
+    except Exception as ex:
+        _LOGGER.error(f"ATV file streaming error: {ex}")
+        if retry_count < 3:
+            await do_streaming_file(atv, file_path, volume, retry_count + 1)
+
+
+async def start_streaming_file(
+    id: str, file_path: str, volume: int, loop: asyncio.AbstractEventLoop
+):
+
+    atv = await prepare_atv(id, loop)
+    try:
+        _LOGGER.info(f"* Starting to stream {file_path} ",)
+        await do_streaming_file(atv, file_path, volume, 0)
+    finally:
+        atv.close()
+
+
+async def start_streaming_url(
+    id: str, metadata: StreamMetadata, loop: asyncio.AbstractEventLoop
+):
+    atv = await prepare_atv(id, loop)
+
+    ffmpeg_cmd = ['ffmpeg',
+                  '-rtbufsize', '25M',
+                  '-i', metadata.stream_url,
+                  '-f', 'mp3',
+                  '-']
+    ffmpeg_proc = sp.Popen(ffmpeg_cmd, stdout=sp.PIPE)
+    raop_stream = fetch_raop_from_atv(atv)
+
+    try:
+        _LOGGER.info("* Starting to stream stdin",)
+        if metadata.stream_volume > 0:
+            await atv.audio.set_volume(metadata.stream_volume)
+
+        await asyncio.gather(
+            monitor_stream(atv, int(metadata.stream_timeout)),
+            update_stream_metadata(metadata, raop_stream),
+            atv.stream.stream_file(BufferedReaderListener(ffmpeg_proc.stdout)))
+        await asyncio.sleep(1)
+    finally:
+        STREAM_FINISHED = True
+        atv.close()
 
 
 async def appstart(loop) -> None:

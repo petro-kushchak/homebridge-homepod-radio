@@ -10,13 +10,14 @@ import {
 } from 'homebridge';
 
 import { HomepodRadioPlatformAccessory } from './platformRadioAccessory';
-import { HomepodRadioPlatformConfig, Radio } from './platformConfig';
+import { FileSwitch, HomepodRadioPlatformConfig, Radio } from './platformConfig';
 import { HomepodRadioPlatformWebActions } from './platformWebActions';
 import { PlaybackController } from './lib/playbackController';
 import { delay } from './lib/promices';
 import { HttpService } from './lib/httpService';
-import { HomepodRadioSwitch } from './platformSwitchAccessory';
+import { HomepodRadioSwitch } from './platformRadioSwitchAccessory';
 import { PLUGIN_NAME } from './platformConstants';
+import { HomepodFileSwitch } from './platformFileSwitchAccessory';
 
 let hap: HAP;
 
@@ -52,7 +53,8 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
 
         this.api.on('didFinishLaunching', async () => {
             this.logger.info('Finished initializing platform:', this.config.platform);
-            this.platformConfig.radios.forEach((radio) => this.addAccessory(radio));
+            this.platformConfig.radios.forEach((radio) => this.addRadioAccessory(radio));
+            this.platformConfig.files.forEach((fileSwitch) => this.addFileSwitchAccessory(fileSwitch));
             await delay(1000, 0);
             this.playbackController.platformReady();
 
@@ -70,7 +72,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
         });
     }
 
-    private addAccessory(radio: Radio) {
+    private addRadioAccessory(radio: Radio) {
         const uuid = hap.uuid.generate('homebridge:homepod:radio:' + radio.name);
         const accessory = new this.api.platformAccessory(radio.name, uuid);
 
@@ -90,5 +92,21 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
             new HomepodRadioSwitch(this, radioAccessory, switchAccessory);
             this.api.publishExternalAccessories(PLUGIN_NAME, [switchAccessory]);
         }
+    }
+
+    private addFileSwitchAccessory(fileSwitch: FileSwitch) {
+        const uuid = hap.uuid.generate('homebridge:homepod:fileSwitch:' + fileSwitch.name);
+        const accessory = new this.api.platformAccessory(fileSwitch.name, uuid);
+
+        // Adding 26 as the category is some special sauce that gets this to work properly.
+        // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
+        accessory.category = 26;
+
+        new HomepodFileSwitch(this, fileSwitch, this.playbackController, accessory);
+
+        // SmartSpeaker service must be added as an external accessory.
+        // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
+        // There a no collision issues when calling this multiple times on accessories that already exist.
+        this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
     }
 }
