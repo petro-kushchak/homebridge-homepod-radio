@@ -26,7 +26,7 @@ export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
               platform.platformConfig.verboseMode,
               this.streamerName(),
               '',
-              fileConfig.artworkUrl,
+              '',
           );
 
           this.service =
@@ -101,7 +101,7 @@ export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
           await this.playbackController.requestStop(this);
           const mediaPath = this.platform.platformConfig.mediaPath || os.homedir();
           const filePath = path.join(mediaPath, this.fileConfig.fileName);
-          await this.device.playFile2(filePath, this.fileConfig.volume);
+          await this.device.playFile(filePath, this.fileConfig.volume);
       }
 
       async stopPlaying(): Promise<void> {

@@ -16,8 +16,6 @@ export interface FileSwitch {
       name: string;
       model: string;
       fileName: string;
-      artworkUrl: string;
-
       volume: number;
 }
 
@@ -53,7 +51,6 @@ export class HomepodRadioPlatformConfig {
                   name: fileConfig.name,
                   model: fileConfig.model || PLUGIN_MODEL,
                   fileName: fileConfig.fileName,
-                  artworkUrl: fileConfig.artworkUrl || '',
                   volume: fileConfig.volume || 0,
               } as FileSwitch;
 

@@ -54,16 +54,7 @@ export class AirPlayDevice {
         return result.stdout.replace(/\r?\n|\r/g, ' ');
     }
 
-    public async playFile(filePath: string): Promise<void> {
-        const playFileCmd = `atvremote --id ${this.homepodId} stream_file=${filePath}`;
-        const result = await execAsync(playFileCmd, {
-            cwd: this.pluginPath,
-        });
-        this.debug(`[${this.streamerName}] Executed "${playFileCmd}" result: ${JSON.stringify(result)}`);
-        this.logger.info(`[${this.streamerName}] Finished playing ${filePath}`);
-    }
-
-    public async playFile2(filePath: string, volume: number): Promise<boolean> {
+    public async playFile(filePath: string, volume: number): Promise<boolean> {
         // create pipe for the command:
         const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
 
@@ -77,7 +68,7 @@ export class AirPlayDevice {
                 this.streamerName,
                 '--album',
                 this.streamerName,
-                '-f',
+                '--file',
                 filePath,
                 '--verbose',
                 '--volume',
