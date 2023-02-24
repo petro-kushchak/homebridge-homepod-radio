@@ -494,7 +494,7 @@ async def do_streaming_file(
         await atv.stream.stream_file(file_path)
         await asyncio.sleep(1)
     except Exception as ex:
-        _LOGGER.error(f"ATV file streaming error: {ex}")
+        _LOGGER.error(f"ATV file streaming error: {ex} attempt: {retry_count}")
         if retry_count < 3:
             await do_streaming_file(atv, file_path, volume, retry_count + 1)
 
@@ -525,19 +525,26 @@ async def start_streaming_url(
     raop_stream = fetch_raop_from_atv(atv)
 
     try:
-        _LOGGER.info("* Starting to stream stdin",)
+        _LOGGER.info(f"* Starting to stream url: {metadata.stream_url}")
         if metadata.stream_volume > 0:
             await atv.audio.set_volume(metadata.stream_volume)
 
         await asyncio.gather(
             monitor_stream(atv, int(metadata.stream_timeout)),
             update_stream_metadata(metadata, raop_stream),
-            atv.stream.stream_file(BufferedReaderListener(ffmpeg_proc.stdout)))
+            do_stream_url(atv, BufferedReaderListener(ffmpeg_proc.stdout), 0))
         await asyncio.sleep(1)
     finally:
         STREAM_FINISHED = True
         atv.close()
 
+async def do_stream_url(atv: AppleTV, reader: BufferedReader, retry_count: int):
+    try:
+        await atv.stream.stream_file(reader)
+    except Exception as ex:
+        _LOGGER.error(f"ATV url streaming error: {ex} attempt: {retry_count}")
+        if retry_count < 3:
+            await do_stream_url(atv, reader, retry_count + 1)
 
 async def appstart(loop) -> None:
     """Start the asyncio event loop and runs the application."""

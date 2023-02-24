@@ -10,9 +10,10 @@ export interface Radio {
       metadataUrl: string;
       artworkUrl: string;
       onSwitch: boolean;
+      volume: number;
 }
 
-export interface FileSwitch {
+export interface AudioFile {
       name: string;
       model: string;
       fileName: string;
@@ -24,13 +25,13 @@ export class HomepodRadioPlatformConfig {
       public readonly serialNumber: string;
       public readonly verboseMode: boolean;
       public readonly radios: Radio[];
-      public readonly files: FileSwitch[];
+      public readonly audioFiles: AudioFile[];
       public readonly mediaPath: string;
       public readonly httpPort: number;
 
       constructor(private config: PlatformConfig) {
           this.radios = [];
-          this.files = [];
+          this.audioFiles = [];
           if (!config.homepodId) {
               throw 'Missing "homepodId" setting!';
           }
@@ -42,19 +43,19 @@ export class HomepodRadioPlatformConfig {
           this.mediaPath = this.config.mediaPath || '';
 
           this.loadRadios();
-          this.loadFiles();
+          this.loadAudioFiles();
       }
 
-      private loadFiles() {
-          this.config.files.forEach((fileConfig) => {
-              const fileSwitch = {
-                  name: fileConfig.name,
-                  model: fileConfig.model || PLUGIN_MODEL,
-                  fileName: fileConfig.fileName,
-                  volume: fileConfig.volume || 0,
-              } as FileSwitch;
+      private loadAudioFiles() {
+          this.config.files.forEach((audioConfig) => {
+              const audioFile = {
+                  name: audioConfig.name,
+                  model: audioConfig.model || PLUGIN_MODEL,
+                  fileName: audioConfig.fileName,
+                  volume: audioConfig.volume || 0,
+              } as AudioFile;
 
-              this.files.push(fileSwitch);
+              this.audioFiles.push(audioFile);
           });
       }
 
@@ -71,6 +72,7 @@ export class HomepodRadioPlatformConfig {
                   metadataUrl: this.config.metadataUrl || '',
                   artworkUrl: this.config.artworkUrl || '',
                   onSwitch: this.config.onSwitch || false,
+                  volume: this.config.volume || 0,
               } as Radio;
 
               this.radios.push(radio);
@@ -86,6 +88,7 @@ export class HomepodRadioPlatformConfig {
                       metadataUrl: radioConfig.metadataUrl || '',
                       artworkUrl: radioConfig.artworkUrl || '',
                       onSwitch: radioConfig.onSwitch || false,
+                      volume: radioConfig.volume || 0,
                   } as Radio;
 
                   this.radios.push(radio);

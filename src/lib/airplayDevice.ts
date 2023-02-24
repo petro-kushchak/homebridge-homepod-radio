@@ -97,7 +97,7 @@ export class AirPlayDevice {
         return true;
     }
 
-    public async playStream(streamUrl: string, streamName: string): Promise<boolean> {
+    public async playStream(streamUrl: string, streamName: string, volume: number): Promise<boolean> {
         this.streamingRetries = 0;
         const heartbeat = this.handleHearbeat.bind(this);
         const heartbeatFailed = async (): Promise<void> => {
@@ -108,7 +108,7 @@ export class AirPlayDevice {
             if (restartStreaming) {
                 //need to restart streaming, after some delay
                 await delay(this.STREAMING_RESTART_TIMEOUT * this.streamingRetries, 0);
-                await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
+                await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
             } else {
                 //device is used to play something else, need to change state to "STOPPED"
                 await this.endStreaming();
@@ -119,9 +119,9 @@ export class AirPlayDevice {
         if (this.isPlaying()) {
             await this.endStreaming();
             this.logger.info(`[${this.streamerName}] Previous streaming finished`);
-            return await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
+            return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
         } else {
-            return await this.startStreaming(streamUrl, streamName, heartbeat, heartbeatFailed);
+            return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
         }
     }
 
@@ -153,6 +153,7 @@ export class AirPlayDevice {
     private async startStreaming(
         streamUrl: string,
         streamName: string,
+        volume: number,
         heartbeat: (source: string, heartbeatFailed: () => Promise<void>) => Promise<void>,
         heartbeatFailed: () => Promise<void>,
     ): Promise<boolean> {
@@ -172,11 +173,13 @@ export class AirPlayDevice {
                 '--stream_url',
                 streamUrl,
                 '--stream_timeout',
-                '10',
+                '30',
                 '--stream_metadata',
                 this.streamMetadataUrl? this.streamMetadataUrl: '-1',
                 '--stream_artwork',
                 this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
+                '--volume',
+                '' + volume,
                 '--verbose',
             ],
             { cwd: this.pluginPath, env: { ...process.env } },

@@ -6,7 +6,7 @@ import { CharacteristicGetCallback, CharacteristicValue, CharacteristicSetCallba
 import { AirPlayDevice } from './lib/airplayDevice';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatform } from './platform';
-import { FileSwitch } from './platformConfig';
+import { AudioFile } from './platformConfig';
 import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
 
 export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
@@ -16,7 +16,7 @@ export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
 
       constructor(
             private readonly platform: HomepodRadioPlatform,
-            private readonly fileConfig: FileSwitch,
+            private readonly fileConfig: AudioFile,
             private readonly playbackController: PlaybackController,
             private readonly accessory: PlatformAccessory,
       ) {

@@ -10,7 +10,7 @@ import {
 } from 'homebridge';
 
 import { HomepodRadioPlatformAccessory } from './platformRadioAccessory';
-import { FileSwitch, HomepodRadioPlatformConfig, Radio } from './platformConfig';
+import { AudioFile, HomepodRadioPlatformConfig, Radio } from './platformConfig';
 import { HomepodRadioPlatformWebActions } from './platformWebActions';
 import { PlaybackController } from './lib/playbackController';
 import { delay } from './lib/promices';
@@ -54,7 +54,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
         this.api.on('didFinishLaunching', async () => {
             this.logger.info('Finished initializing platform:', this.config.platform);
             this.platformConfig.radios.forEach((radio) => this.addRadioAccessory(radio));
-            this.platformConfig.files.forEach((fileSwitch) => this.addFileSwitchAccessory(fileSwitch));
+            this.platformConfig.audioFiles.forEach((fileSwitch) => this.addFileSwitchAccessory(fileSwitch));
             await delay(1000, 0);
             this.playbackController.platformReady();
 
@@ -94,7 +94,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
         }
     }
 
-    private addFileSwitchAccessory(fileSwitch: FileSwitch) {
+    private addFileSwitchAccessory(fileSwitch: AudioFile) {
         const uuid = hap.uuid.generate('homebridge:homepod:fileSwitch:' + fileSwitch.name);
         const accessory = new this.api.platformAccessory(fileSwitch.name, uuid);
 

@@ -131,7 +131,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     async startPlaying(): Promise<void> {
         await this.playbackController.requestStop(this);
-        await this.device.playStream(this.radio.radioUrl, this.radio.trackName);
+        await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
     }
 
     async stopPlaying(): Promise<void> {
