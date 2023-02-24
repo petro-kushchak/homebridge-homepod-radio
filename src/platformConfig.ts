@@ -15,7 +15,6 @@ export interface Radio {
 
 export interface AudioFile {
       name: string;
-      model: string;
       fileName: string;
       volume: number;
 }
@@ -47,16 +46,17 @@ export class HomepodRadioPlatformConfig {
       }
 
       private loadAudioFiles() {
-          this.config.audioFiles.forEach((audioConfig) => {
-              const audioFile = {
-                  name: audioConfig.name,
-                  model: audioConfig.model || PLUGIN_MODEL,
-                  fileName: audioConfig.fileName,
-                  volume: audioConfig.volume || 0,
-              } as AudioFile;
+          if (this.config.audioFiles) {
+              this.config.audioFiles.forEach((audioConfig) => {
+                  const audioFile = {
+                      name: audioConfig.name,
+                      fileName: audioConfig.fileName,
+                      volume: audioConfig.volume || 0,
+                  } as AudioFile;
 
-              this.audioFiles.push(audioFile);
-          });
+                  this.audioFiles.push(audioFile);
+              });
+          }
       }
 
       private loadRadios() {
