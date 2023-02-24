@@ -39,6 +39,34 @@
                 "default": false,
                 "required": false
             },
+            "audioFiles": {
+                "title": "Audio Button",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "title": "Audio Button",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "type": "string",
+                            "placeholder": "Enter audio button name...",
+                            "required": true
+                        },
+                        "fileName": {
+                            "title": "Audio File Name",
+                            "type": "string",
+                            "placeholder": "Enter audio file name...",
+                            "required": true
+                        },
+                        "volume": {
+                            "title": "Audio default volume (0 to ignore volume)",
+                            "type": "number",
+                            "placeholder": 0,
+                            "required": false
+                        }
+                    }
+                }
+            },
             "radios": {
                 "title": "Radio Speaker",
                 "type": "array",
@@ -79,6 +107,12 @@
                             "title": "Radio Artwork URL",
                             "type": "string",
                             "placeholder": "Enter radio Artwork url...",
+                            "required": false
+                        },
+                        "volume": {
+                            "title": "Radio default volume (0 to ignore volume)",
+                            "type": "number",
+                            "placeholder": 0,
                             "required": false
                         }
                     }

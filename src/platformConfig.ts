@@ -47,7 +47,7 @@ export class HomepodRadioPlatformConfig {
       }
 
       private loadAudioFiles() {
-          this.config.files.forEach((audioConfig) => {
+          this.config.audioFiles.forEach((audioConfig) => {
               const audioFile = {
                   name: audioConfig.name,
                   model: audioConfig.model || PLUGIN_MODEL,
