@@ -6,17 +6,17 @@ import { CharacteristicGetCallback, CharacteristicValue, CharacteristicSetCallba
 import { AirPlayDevice } from './lib/airplayDevice';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatform } from './platform';
-import { AudioFile } from './platformConfig';
+import { AudioConfig } from './platformConfig';
 import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
 
-export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
+export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStreamer {
       private readonly device: AirPlayDevice;
       private readonly service: Service;
       private readonly informationService: Service;
 
       constructor(
             private readonly platform: HomepodRadioPlatform,
-            private readonly fileConfig: AudioFile,
+            private readonly audioConfig: AudioConfig,
             private readonly playbackController: PlaybackController,
             private readonly accessory: PlatformAccessory,
       ) {
@@ -90,7 +90,7 @@ export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
       }
 
       streamerName(): string {
-          return this.fileConfig.name;
+          return this.audioConfig.name;
       }
 
       isPlaying(): boolean {
@@ -100,8 +100,8 @@ export class HomepodFileSwitch implements AccessoryPlugin, PlaybackStreamer {
       async startPlaying(): Promise<void> {
           await this.playbackController.requestStop(this);
           const mediaPath = this.platform.platformConfig.mediaPath || os.homedir();
-          const filePath = path.join(mediaPath, this.fileConfig.fileName);
-          await this.device.playFile(filePath, this.fileConfig.volume);
+          const filePath = path.join(mediaPath, this.audioConfig.fileName);
+          await this.device.playFile(filePath, this.audioConfig.volume);
       }
 
       async stopPlaying(): Promise<void> {

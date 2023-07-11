@@ -212,11 +212,11 @@ class AtvWrapper:
                 f"METADATA updating media title:'{media.title}' album:'{media.album}'")
             payload = b""
             if metadata.title:
-                payload += tags.string_tag("minm", f"{metadata.artist} - {metadata.title}")
+                payload += tags.string_tag("minm", f"{metadata.album} - {metadata.title}")
             if metadata.album:
                 payload += tags.string_tag("asal", metadata.album)
             if metadata.artist:
-                payload += tags.string_tag("asar", metadata.artist)
+                payload += tags.string_tag("asar", metadata.album)
             payload += tags.uint32_tag("caps", 1)
 
             await raop_client.rtsp.exchange(

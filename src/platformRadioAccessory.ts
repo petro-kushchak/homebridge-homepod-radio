@@ -10,7 +10,7 @@ import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { Storage } from './lib/storage';
 
 import { HomepodRadioPlatform } from './platform';
-import { Radio } from './platformConfig';
+import { RadioConfig } from './platformConfig';
 import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants';
 
 interface AccessoryState extends Record<string, number> {
@@ -30,7 +30,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
-        private readonly radio: Radio,
+        private readonly radio: RadioConfig,
         private readonly accessory: PlatformAccessory,
         private readonly playbackController: PlaybackController,
     ) {

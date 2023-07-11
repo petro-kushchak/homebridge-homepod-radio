@@ -16,8 +16,9 @@
         "--album", "test_album", 
         "--stream_url", "https://online.radiojazz.ua/RadioJazz_Cover", 
         "--stream_timeout", "1000",
-        "--stream_metadata", "",
+        "--stream_metadata", "https://o.tavrmedia.ua/jazz3cover",
         "--stream_artwork", "https://www.apple.com/v/apple-music/q/images/shared/og__ckjrh2mu8b2a_image.png",
+        "--volume", "15",
         "--verbose"
       ],
     }
