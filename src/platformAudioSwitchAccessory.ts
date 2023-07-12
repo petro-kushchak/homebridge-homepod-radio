@@ -74,6 +74,11 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
           this.platform.logger.info(`[${this.streamerName()} Switch] finished initializing!`);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async volumeUpdated(homepodId: string, volume: number): Promise<void> {
+          return await Promise.resolve();
+      }
+
       async stopRequested(source: PlaybackStreamer): Promise<void> {
           this.platform.logger.info(
               `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,
@@ -102,6 +107,7 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
           const mediaPath = this.platform.platformConfig.mediaPath || os.homedir();
           const filePath = path.join(mediaPath, this.audioConfig.fileName);
           await this.device.playFile(filePath, this.audioConfig.volume);
+          await this.playbackController.updateVolume(this.platform.platformConfig.homepodId, this.audioConfig.volume);
       }
 
       async stopPlaying(): Promise<void> {

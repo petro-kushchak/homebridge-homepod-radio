@@ -113,6 +113,11 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async volumeUpdated(homepodId: string, volume: number): Promise<void> {
+        return await Promise.resolve();
+    }
+
     async stopRequested(source: PlaybackStreamer): Promise<void> {
         this.platform.logger.info(
             `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,

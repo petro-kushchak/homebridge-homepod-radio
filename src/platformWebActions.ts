@@ -40,6 +40,11 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async volumeUpdated(homepodId: string, volume: number): Promise<void> {
+        return await Promise.resolve();
+    }
+
     isPlaying(): boolean {
         return false;
     }
