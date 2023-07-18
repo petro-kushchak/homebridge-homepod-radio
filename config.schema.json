@@ -33,6 +33,13 @@
                 "placeholder": "If set to 0 - HTTP requests are ignored",
                 "required": false
             },
+            "enableVolumeControl": {
+                "title": "Enable Volume Control",
+                "type": "boolean",
+                "default": "true",
+                "placeholder": "Enable Volume Control",
+                "required": false
+            },
             "verboseMode": {
                 "title": "Debug Mode",
                 "type": "boolean",

@@ -68,6 +68,10 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
       }
 
       private addHomepodVolumeAccessory() {
+          if(!this.platformConfig.enableVolumeControl) {
+              this.logger.info('Platform: volume control disabled');
+              return;
+          }
           const volumeAccessoryName = this.platformConfig.homepodId;
           const volumeUuid = hap.uuid.generate('homebridge:homepod:volume:' + volumeAccessoryName);
           const volumeAccessory = new this.api.platformAccessory(`${volumeAccessoryName} volume`, volumeUuid);

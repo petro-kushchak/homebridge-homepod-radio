@@ -24,7 +24,7 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 - ffmpeg
-- pyatv
+- pyatv (>=0.13)
 
 For the HomePod you need to specify device Mac address. 
 
@@ -43,6 +43,7 @@ Config example:
     "homepodId": "<homepod id>",
     "httpPort": 7654,
     "mediaPath": "/media/homepod",
+    "enableVolumeControl": true,
     "radios": [
         {
             "name": "BBC - Radio 1",
@@ -50,6 +51,13 @@ Config example:
             "artworkUrl": "https://ichef.bbci.co.uk/images/ic/1920x1080/p05d68tx.jpg",
             "autoResume": true,
             "onSwitch": true
+        }
+    ],
+    "audioFiles": [
+        {
+            "name": "Alert",
+            "fileName": "police.mp3",
+            "volume": 85
         }
     ]
 }
@@ -82,9 +90,11 @@ Then plugin:
 1. updates radio stream with fetched `singer`/`song` data
 2. updates radio artwork with image downloaded using `cover`
 
-## Play mp3/wav file from Home automation
+> **_Note:_** due to some bugs/limitations TvOs 16/17 (beta) on HomePod are not showing this info
 
-> **_Note:_**  this feature does not add additional speaker/switch accessories (see TODO)
+## Audio file playback
+
+- Plugin allows to add swtich accessory to start file playback, also file playback can be triggered from web hook
 
 - Download your files to Homebridge server. For example download hello.wav 
 ```
@@ -97,16 +107,25 @@ $ ls /home/pi/media
 ```
   "mediaPath": "/home/pi/media",
 ```
-- Restart Homebridge
-- Configure automation to play file
-   - Select/Create automation in Home app
-   - Tap "Select Accessories and Scenes..."
-   - At the botton tap "Convert to Shortcut"
-   - Create shortcut:
-![Screenshot](images/play-file-shortcut.jpeg)
-   - Test shortcut
 
-> **_Note:_**  you should use homebridge server name or IP (default for Homebridge server is homebridge.local)
+
+###Switch accessory for the audio file playback
+
+This feature adds additional switch accessory for each audio file from `audioFiles` section:
+
+```
+    "audioFiles": [
+        {
+            "name": "Alert",
+            "fileName": "police.mp3",
+            "volume": 85
+        }
+    ]
+```
+
+### Web hook for audio file playback
+
+You should use homebridge server name or IP (default for Homebridge server is homebridge.local) to invoke playback with URL
 
 Example:
 - Homebridge server is running on host "homebridge.local"
@@ -115,6 +134,16 @@ Example:
 - Plugin's "mediaPath" is set to /var/www/media
 
 Then you can trigger playback of `hello.mp3` even from browser by navigating to: http://homebridge.local:4567/play/hello.mp3
+
+### Audio file playback automation example
+
+- Configure automation to play file
+   - Select/Create automation in Home app
+   - Tap "Select Accessories and Scenes..."
+   - At the botton tap "Convert to Shortcut"
+   - Create shortcut:
+![Screenshot](images/play-file-shortcut.jpeg)
+   - Test shortcut
 
 
 ## HomePod access setup

@@ -28,6 +28,8 @@ export class HomepodRadioPlatformConfig {
       public readonly mediaPath: string;
       public readonly httpPort: number;
 
+      public readonly enableVolumeControl: boolean;
+
       constructor(private config: PlatformConfig) {
           this.radios = [];
           this.audioConfigs = [];
@@ -40,6 +42,8 @@ export class HomepodRadioPlatformConfig {
 
           this.httpPort = this.config.httpPort || 4567;
           this.mediaPath = this.config.mediaPath || '';
+
+          this.enableVolumeControl = this.config.enableVolumeControl || true;
 
           this.loadRadios();
           this.loadAudioConfigs();
