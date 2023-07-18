@@ -271,10 +271,10 @@ class AtvStreamer:
 
             await asyncio.sleep(2)
 
-    async def get_artwork(self, artwork_url: str) -> bool:
+    async def get_artwork(self, artwork_url: str) -> bytes:
         if not artwork_url:
             self.logger.info(f"METADATA get artwork skipped: empty artwork")
-            artwork_url = self.default_artwork_url
+            return None
 
         artwork = None
         try:
@@ -331,12 +331,13 @@ class AtvStreamer:
             else:
                 raise ex
 
-    async def stream_file(self, file_path: str, metadata: MediaMetadata, volume: int) -> None:
+    async def stream_file(self, file_path: str, stream_config: StreamConfig) -> None:
         await self.atv.connect()
         try:
             self.logger.info(f"* Starting to stream {file_path} ",)
-            if volume > 0:
-                await self.set_volume(volume)
+            if stream_config.volume > 0:
+                await self.set_volume(stream_config.volume)
+            metadata = await self.prepare_metadata(stream_config)
             await self.internal_stream_file(file_path, metadata, 0)
         finally:
             self.atv.close()
@@ -511,7 +512,7 @@ async def cli_handler(loop) -> None:
     atvStreamer = AtvStreamer(args.id, loop, _LOGGER)
 
     if args.file_path is not None:
-        await atvStreamer.stream_file(args.file_path, stream_config.volume)
+        await atvStreamer.stream_file(args.file_path, stream_config)
     elif stream_config.stream_url is not None:
         await atvStreamer.stream_url(stream_config)
     elif stream_config.volume > 0: 
