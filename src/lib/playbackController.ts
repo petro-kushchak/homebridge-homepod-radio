@@ -2,6 +2,9 @@ export interface PlaybackStreamer {
     stopRequested(source: PlaybackStreamer): Promise<void>;
     shutdownRequested(): Promise<void>;
     platformLaunched(): Promise<void>;
+
+    volumeUpdated(homepodId: string, volume: number): Promise<void>;
+
     streamerName(): string;
     isPlaying(): boolean;
     startPlaying(): Promise<void>;
@@ -36,6 +39,12 @@ export class PlaybackController {
         this.streamers.forEach(async (streamer) => {
             await streamer.platformLaunched
             ();
+        });
+    }
+
+    public async updateVolume(homepodId: string, value: number): Promise<void> {
+        this.streamers.forEach(async (streamer) => {
+            await streamer.volumeUpdated(homepodId, value);
         });
     }
 }

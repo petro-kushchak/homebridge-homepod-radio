@@ -33,6 +33,11 @@ class PlaybackStreamerStub implements PlaybackStreamer {
   streamerName(): string {
       return 'test';
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async volumeUpdated(homepodId: string, volume: number): Promise<void> {
+      return await Promise.resolve();
+  }
 }
 describe('PlaybackController Tests', () => {
     describe('basic flow', () => {

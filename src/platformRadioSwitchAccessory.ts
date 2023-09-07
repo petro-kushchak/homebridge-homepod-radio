@@ -4,7 +4,7 @@ import { PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatform } from './platform';
 import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
 
-export class HomepodRadioSwitch implements AccessoryPlugin {
+export class HomepodRadioSwitchAccessory implements AccessoryPlugin {
     private readonly service: Service;
     private readonly informationService: Service;
 

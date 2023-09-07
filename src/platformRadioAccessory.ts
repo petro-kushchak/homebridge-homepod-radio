@@ -10,7 +10,7 @@ import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { Storage } from './lib/storage';
 
 import { HomepodRadioPlatform } from './platform';
-import { Radio } from './platformConfig';
+import { RadioConfig } from './platformConfig';
 import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants';
 
 interface AccessoryState extends Record<string, number> {
@@ -30,7 +30,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
-        private readonly radio: Radio,
+        private readonly radio: RadioConfig,
         private readonly accessory: PlatformAccessory,
         private readonly playbackController: PlaybackController,
     ) {
@@ -113,6 +113,11 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async volumeUpdated(homepodId: string, volume: number): Promise<void> {
+        return await Promise.resolve();
+    }
+
     async stopRequested(source: PlaybackStreamer): Promise<void> {
         this.platform.logger.info(
             `[${this.streamerName()}] Stopping playback - received stop request from ${source.streamerName()} `,
@@ -131,7 +136,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     async startPlaying(): Promise<void> {
         await this.playbackController.requestStop(this);
-        await this.device.playStream(this.radio.radioUrl, this.radio.trackName);
+        await this.device.playStream(this.radio.radioUrl, this.radio.trackName, this.radio.volume);
     }
 
     async stopPlaying(): Promise<void> {
