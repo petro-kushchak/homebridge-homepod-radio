@@ -11,6 +11,7 @@ export interface RadioConfig {
       artworkUrl: string;
       onSwitch: boolean;
       volume: number;
+      validateRadioUrl: boolean;
 }
 
 export interface AudioConfig {
@@ -29,6 +30,9 @@ export class HomepodRadioPlatformConfig {
       public readonly httpPort: number;
 
       public readonly enableVolumeControl: boolean;
+      public readonly telegramUpdateToken: string;
+      public readonly telegramUpdateChatId: string;
+
 
       constructor(private config: PlatformConfig) {
           this.radios = [];
@@ -42,6 +46,9 @@ export class HomepodRadioPlatformConfig {
 
           this.httpPort = this.config.httpPort || 4567;
           this.mediaPath = this.config.mediaPath || '';
+
+          this.telegramUpdateToken = this.config.telegramUpdateToken || '';
+          this.telegramUpdateChatId = this.config.telegramUpdateChatId || '';
 
           this.enableVolumeControl = this.config.enableVolumeControl || true;
 
@@ -77,6 +84,7 @@ export class HomepodRadioPlatformConfig {
                   artworkUrl: this.config.artworkUrl || '',
                   onSwitch: this.config.onSwitch || false,
                   volume: this.config.volume || 0,
+                  validateRadioUrl: this.config.validateRadioUrl || false,
               } as RadioConfig;
 
               this.radios.push(radio);
@@ -93,6 +101,7 @@ export class HomepodRadioPlatformConfig {
                       artworkUrl: radioConfig.artworkUrl || '',
                       onSwitch: radioConfig.onSwitch || false,
                       volume: radioConfig.volume || 0,
+                      validateRadioUrl: radioConfig.validateRadioUrl || false,
                   } as RadioConfig;
 
                   this.radios.push(radio);

@@ -10,6 +10,13 @@ import { delay } from './promices';
 
 const execAsync = promisify(child.exec);
 
+export interface StreamInfo {
+    streamUrl: string;
+    streamName: string;
+    volume: number;
+    telegramUpdateToken: string;
+    telegramUpdateChatId: string;
+}
 /**
  * AirPlay device
  */
@@ -103,7 +110,7 @@ export class AirPlayDevice {
           return true;
       }
 
-      public async playStream(streamUrl: string, streamName: string, volume: number): Promise<boolean> {
+      public async playStream(streamInfo: StreamInfo): Promise<boolean> {
           this.streamingRetries = 0;
           const heartbeat = this.handleHearbeat.bind(this);
           const heartbeatFailed = async (): Promise<void> => {
@@ -114,7 +121,7 @@ export class AirPlayDevice {
               if (restartStreaming) {
                   //need to restart streaming, after some delay
                   await delay(this.STREAMING_RESTART_TIMEOUT * this.streamingRetries, 0);
-                  await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+                  await this.startStreaming(streamInfo, heartbeat, heartbeatFailed);
               } else {
                   //device is used to play something else, need to change state to "STOPPED"
                   await this.endStreaming();
@@ -125,9 +132,9 @@ export class AirPlayDevice {
           if (this.isPlaying()) {
               await this.endStreaming();
               this.logger.info(`[${this.streamerName}] Previous streaming finished`);
-              return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+              return await this.startStreaming(streamInfo, heartbeat, heartbeatFailed);
           } else {
-              return await this.startStreaming(streamUrl, streamName, volume, heartbeat, heartbeatFailed);
+              return await this.startStreaming(streamInfo, heartbeat, heartbeatFailed);
           }
       }
 
@@ -159,9 +166,7 @@ export class AirPlayDevice {
       }
 
       private async startStreaming(
-          streamUrl: string,
-          streamName: string,
-          volume: number,
+          streamInfo: StreamInfo,
           heartbeat: (source: string, heartbeatFailed: () => Promise<void>) => Promise<void>,
           heartbeatFailed: () => Promise<void>,
       ): Promise<boolean> {
@@ -175,11 +180,11 @@ export class AirPlayDevice {
                   '--id',
                   this.homepodId,
                   '--title',
-                  streamName,
+                  streamInfo.streamName,
                   '--album',
                   this.streamerName,
                   '--stream_url',
-                  streamUrl,
+                  streamInfo.streamUrl,
                   '--stream_timeout',
                   '30',
                   '--stream_metadata',
@@ -187,8 +192,13 @@ export class AirPlayDevice {
                   '--stream_artwork',
                   this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
                   '--volume',
-                  '' + volume,
+                  '' +streamInfo.volume,
                   '--verbose',
+                  '--telegram_update_token',
+                  streamInfo.telegramUpdateToken,
+                  '--telegram_update_chat_id',
+                  streamInfo.telegramUpdateChatId,
+
               ],
               { cwd: this.pluginPath, env: { ...process.env } },
           );
@@ -221,7 +231,7 @@ export class AirPlayDevice {
           this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
 
           this.debug(`[${this.streamerName}] spawn streaming: ${this.streaming.pid}`);
-          this.logger.info(`[${this.streamerName}] Started streaming ${streamUrl}`);
+          this.logger.info(`[${this.streamerName}] Started streaming ${streamInfo.streamUrl}`);
           return true;
       }
 
