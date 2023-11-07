@@ -24,7 +24,7 @@ ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 - ffmpeg
-- pyatv (>=0.13)
+- pyatv (>=0.13) which require python (>= 3.8)
 
 For the HomePod you need to specify device Mac address. 
 
