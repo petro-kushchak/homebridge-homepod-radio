@@ -93,6 +93,35 @@ class StreamConfig:
     def toJSON(self) -> str:
         return json.dumps(self.__dict__)
 
+class TelegramApiClient:
+    chat_id: str
+    token: str
+
+    def __init__(self,
+                 chat_id: str,
+                 token: str
+                 ) -> None:
+        self.chat_id = chat_id
+        self.token = token
+        
+    def escape_content (txt: str) -> str: 
+        return [txt := txt.replace(c, f"\{c}") for c in list("-[]_.!()")][-1]
+
+    async def send_message(self, content: str) -> bool:
+        try:
+            telegram_api_url = f"https://api.telegram.org/bot{self.token}/sendMessage?"
+            params = {
+                'chat_id': self.chat_id,
+                'parse_mode': 'MarkdownV2',
+                'text': content
+            }
+            send_message_url = f"{telegram_api_url}{urllib.parse.urlencode(params)}"
+            await self.loop.run_in_executor(None, urllib.request.urlopen, send_message_url)
+        except Exception as ex:
+            _LOGGER.error(f"TelegramApiClient.send_message error: {ex}, url: {send_message_url}")
+            traceback.print_exception(*sys.exc_info())
+
+
 class StreamReaderListener (StreamReader):
     """Stream Reader with heartbeat"""
 
@@ -328,38 +357,34 @@ class AtvStreamer:
                 else:
                     metadata_updated = False
             
-            if metadata_updated and (stream_config.telegram_update_token is not None):
+            if metadata_updated:
                 await self.notify_stream_metadata_changed(stream_config, stream_metadata)
 
             await asyncio.sleep(5)
 
     async def notify_stream_metadata_changed(self, stream_config: StreamConfig, metadata: StreamMetadata) -> None:
-        escape_telegram_content = lambda txt: [txt := txt.replace(c, f"\{c}") for c in list("-[]_.!()")][-1]
+        if stream_config.telegram_update_token is None:
+            return
+
+        telegramApi = TelegramApiClient(stream_config.telegram_update_chat_id, stream_config.telegram_update_token)
         try:
             # notificaiton content:
             # \[*Radio%1*\][*The%20Beatles*%20\-%20Ob\-La\-Di,%20Ob\-La\-D](https://www.radio.com/static/img/content/cover/2/19/500x500.jpg)
 
             # escape reserved characters
-            stream_title = escape_telegram_content(stream_config.title)
-            metadata_artist = escape_telegram_content(metadata.artist)
-            metadata_title = escape_telegram_content(metadata.title)
+            stream_title = telegramApi.escape_content(stream_config.title)
+            metadata_artist = telegramApi.escape_content(metadata.artist)
+            metadata_title = telegramApi.escape_content(metadata.title)
             
             #if stream artwork_url empty - use default one
             artwork_url = metadata.artwork_url if metadata.artwork_url != '' else stream_config.artwork_url
 
-            telegram_api_url = f"https://api.telegram.org/bot{stream_config.telegram_update_token}/sendMessage?"
-            notification_content = f"\[*{stream_title}*\] [*{metadata_artist}* \- {metadata_title}]({artwork_url})"
-            params = {
-                'chat_id': stream_config.telegram_update_chat_id,
-                'parse_mode': 'MarkdownV2',
-                'text': notification_content
-            }
-            notification_url = f"{telegram_api_url}{urllib.parse.urlencode(params)}"
             self.logger.info(
                 f"NOTIFY stream Metadata: ({stream_title}, {metadata_artist}, {metadata_title}, {artwork_url})")
-            await self.loop.run_in_executor(None, urllib.request.urlopen, notification_url)
+            notification_content = f"\[*{stream_title}*\] [*{metadata_artist}* \- {metadata_title}]({artwork_url})"
+            telegramApi.send_message(notification_content)
         except Exception as ex:
-            _LOGGER.error(f"NOTIFY stream Metadata error: {ex}, url: {notification_url}")
+            _LOGGER.error(f"NOTIFY stream Metadata error: {ex}")
             traceback.print_exception(*sys.exc_info())
         
     async def internal_stream_url(self, metadata: MediaMetadata, reader: BufferedReader, retry_count: int):
