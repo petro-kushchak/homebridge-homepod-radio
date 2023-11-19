@@ -33,7 +33,6 @@ export class HomepodRadioPlatformConfig {
       public readonly telegramUpdateToken: string;
       public readonly telegramUpdateChatId: string;
 
-
       constructor(private config: PlatformConfig) {
           this.radios = [];
           this.audioConfigs = [];
@@ -71,24 +70,7 @@ export class HomepodRadioPlatformConfig {
       }
 
       private loadRadios() {
-          //backward compatibility - single accessory mode
-          if (!this.config.radios) {
-              const radio = {
-                  name: this.config.name || 'HomePod Radio',
-                  model: this.config.model || PLUGIN_MODEL,
-                  radioUrl: this.config.radioUrl,
-                  trackName: this.config.trackName || this.config.name,
-                  serialNumber: this.serialNumber,
-                  autoResume: false,
-                  metadataUrl: this.config.metadataUrl || '',
-                  artworkUrl: this.config.artworkUrl || '',
-                  onSwitch: this.config.onSwitch || false,
-                  volume: this.config.volume || 0,
-                  validateRadioUrl: this.config.validateRadioUrl || false,
-              } as RadioConfig;
-
-              this.radios.push(radio);
-          } else {
+          if (this.config.radios) {
               this.config.radios.forEach((radioConfig) => {
                   const radio = {
                       name: radioConfig.name,
