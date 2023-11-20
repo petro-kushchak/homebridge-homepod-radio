@@ -50,7 +50,7 @@ export class HomepodRadioPlatformConfig {
           this.telegramUpdateToken = this.config.telegramUpdateToken || '';
           this.telegramUpdateChatId = this.config.telegramUpdateChatId || '';
 
-          this.enableVolumeControl = this.config.enableVolumeControl || true;
+          this.enableVolumeControl = this.config.enableVolumeControl || false;
 
           this.loadRadios();
           this.loadAudioConfigs();
