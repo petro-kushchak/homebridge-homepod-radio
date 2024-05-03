@@ -109,7 +109,7 @@ $ ls /home/pi/media
 ```
 
 
-###Switch accessory for the audio file playback
+### Switch accessory for the audio file playback
 
 This feature adds additional switch accessory for each audio file from `audioFiles` section:
 
