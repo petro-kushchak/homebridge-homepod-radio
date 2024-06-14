@@ -5,6 +5,8 @@
     "httpPort": 7654,
     "mediaPath": "/media/homepod",
     "enableVolumeControl": true,
+    "telegramUpdateToken": "abc:123",
+    "telegramUpdateChatId": "-123",
     "radios": [
         {
             "name": "BBC - Radio 1",

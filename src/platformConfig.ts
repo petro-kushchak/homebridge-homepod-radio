@@ -11,6 +11,7 @@ export interface RadioConfig {
       artworkUrl: string;
       onSwitch: boolean;
       volume: number;
+      validateRadioUrl: boolean;
 }
 
 export interface AudioConfig {
@@ -29,6 +30,8 @@ export class HomepodRadioPlatformConfig {
       public readonly httpPort: number;
 
       public readonly enableVolumeControl: boolean;
+      public readonly telegramUpdateToken: string;
+      public readonly telegramUpdateChatId: string;
 
       constructor(private config: PlatformConfig) {
           this.radios = [];
@@ -43,7 +46,10 @@ export class HomepodRadioPlatformConfig {
           this.httpPort = this.config.httpPort || 4567;
           this.mediaPath = this.config.mediaPath || '';
 
-          this.enableVolumeControl = this.config.enableVolumeControl || true;
+          this.telegramUpdateToken = this.config.telegramUpdateToken || '';
+          this.telegramUpdateChatId = this.config.telegramUpdateChatId || '';
+
+          this.enableVolumeControl = this.config.enableVolumeControl || false;
 
           this.loadRadios();
           this.loadAudioConfigs();
@@ -64,23 +70,7 @@ export class HomepodRadioPlatformConfig {
       }
 
       private loadRadios() {
-          //backward compatibility - single accessory mode
-          if (!this.config.radios) {
-              const radio = {
-                  name: this.config.name || 'HomePod Radio',
-                  model: this.config.model || PLUGIN_MODEL,
-                  radioUrl: this.config.radioUrl,
-                  trackName: this.config.trackName || this.config.name,
-                  serialNumber: this.serialNumber,
-                  autoResume: false,
-                  metadataUrl: this.config.metadataUrl || '',
-                  artworkUrl: this.config.artworkUrl || '',
-                  onSwitch: this.config.onSwitch || false,
-                  volume: this.config.volume || 0,
-              } as RadioConfig;
-
-              this.radios.push(radio);
-          } else {
+          if (this.config.radios) {
               this.config.radios.forEach((radioConfig) => {
                   const radio = {
                       name: radioConfig.name,
@@ -93,6 +83,7 @@ export class HomepodRadioPlatformConfig {
                       artworkUrl: radioConfig.artworkUrl || '',
                       onSwitch: radioConfig.onSwitch || false,
                       volume: radioConfig.volume || 0,
+                      validateRadioUrl: radioConfig.validateRadioUrl || false,
                   } as RadioConfig;
 
                   this.radios.push(radio);
