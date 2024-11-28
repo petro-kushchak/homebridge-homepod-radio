@@ -5,34 +5,34 @@
 
 </p>
 
-# HomePod mini radio support
+# HomePod Mini radio support
 
-Homebridge accessory for streaming radio to the Homepod mini
+Homebridge accessory for streaming radio to the Homepod Mini
 
-## Streaming radio to HomePod (mini)
+## Streaming radio to HomePod (Mini)
 
-Main idea is to stream to the HomePod mini (or Apple TV) with the following command:
+Main idea is to stream to the HomePod Mini (or Apple TV) with the following command:
 ```
 ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
 ```
 
 - automatically stops streaming when HomePod is used by another app
-- sometimes audio streaming stops, so plugin automatically restarts it 
+- sometimes audio streaming stops, so plugin automatically restarts it
 
 > **_Note:_**  After plugin v2.0 - streaming and retry logic moved to stream.py script
 
-## Requirements 
+## Requirements
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
 - ffmpeg
 - pyatv (>=0.13) which require python (>= 3.8)
 
-For the HomePod you need to specify device Mac address. 
+For the HomePod you need to specify device MAC address.
 
 ## Usage Example:
 
 ### Multiple radio accessories support
 
-> **_Note:_** each radio speaker must be added to home separately with homebridge pin pairing
+> **_Note:_** each radio speaker must be added to Home app separately with Homebridge pin pairing
 
 Config example:
 
@@ -90,13 +90,13 @@ Then plugin:
 1. updates radio stream with fetched `singer`/`song` data
 2. updates radio artwork with image downloaded using `cover`
 
-> **_Note:_** due to some bugs/limitations TvOs 16/17 (beta) on HomePod are not showing this info
+> **_Note:_** due to some bugs/limitations tvOS 16/17, HomePods are not showing this info.
 
 ## Audio file playback
 
-- Plugin allows to add swtich accessory to start file playback, also file playback can be triggered from web hook
+- Plugin allows to add switch accessory to start file playback, also file playback can be triggered from webhook
 
-- Download your files to Homebridge server. For example download hello.wav 
+- Download your files to Homebridge server. For example download hello.wav
 ```
 $ mkdir -r /home/pi/media
 $ <downlaod files to /home/pi/media>
@@ -108,11 +108,9 @@ $ ls /home/pi/media
   "mediaPath": "/home/pi/media",
 ```
 
-
 ### Switch accessory for the audio file playback
 
 This feature adds additional switch accessory for each audio file from `audioFiles` section:
-
 ```
     "audioFiles": [
         {
@@ -123,7 +121,7 @@ This feature adds additional switch accessory for each audio file from `audioFil
     ]
 ```
 
-### Web hook for audio file playback
+### Webhook for audio file playback
 
 You should use homebridge server name or IP (default for Homebridge server is homebridge.local) to invoke playback with URL
 
@@ -145,7 +143,6 @@ Then you can trigger playback of `hello.mp3` even from browser by navigating to:
 ![Screenshot](images/play-file-shortcut.jpeg)
    - Test shortcut
 
-
 ## HomePod access setup
 
 In the Home app settings:
@@ -157,10 +154,9 @@ In the Home app settings:
 ## Siri support (works on iPhone/iPad)
 
 - Create shortcut with name (for example) "Start Radio"
-- Select "Control home" action, check corresponding speaker and in "Media" section select "Resume Audio")
+- Select "Control Home" action, check corresponding speaker and in "Media" section select "Resume Audio")
 ![Screenshot](images/bbc-radio-shortcut.png)
 - Say "Hey Siri, start radio" on iPhone/iPad (on HomePod mini Siri does not run it properly)
-
 
 ## Dependencies
 
@@ -176,15 +172,15 @@ sudo apt-get install ffmpeg
 
 For streaming to the HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
 
-- install python3  
+- install python3
 ```
 sudo apt-get install python3
 ```
 - install pip3
-``` 
+```
 sudo apt-get install python3-pip
 ```
-- install pyatv 
+- install pyatv
 ```
 pip3 install pyatv
 ```
@@ -195,7 +191,7 @@ sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 
 ### Docker image with preinstalled dependencies (ubuntu)
 
-Docker image build based on oznu/homebridge:ubuntu (with ffmpeg&Homebridge preinstalled)
+Docker image build based on oznu/homebridge:ubuntu (with ffmpeg & Homebridge preinstalled)
 
 Mode info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
 
@@ -222,7 +218,6 @@ Identifiers:
 The easieast would be to get streaming url from your favorite radio playlist (usually .m3u file)
 Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
 
-
 ## Known issues
 
 ### 1. Pairing setting for the HomePod (fixed by *HomePod access setup* step):
@@ -248,15 +243,15 @@ Sometimes (quite rarely) playback fails and in the logs there are errors like:
   pyatv.exceptions.HttpError: RTSP/1.0 method SETUP failed with code 500: Internal Server Error
 ```
 
-Typically this error dissapears after HomePod restart.
+Typically this error disappears after HomePod restart.
 
 ### 3. Streaming to stereo pair
 Looks like this is not supported at the moment by pyatv
 
 ### 4. Speaker accessory controls
-With iOS 15 Homekit does not support `volume control` and `start/stop` for speaker accessory (at least for speakers exposed by Homebridge). So I'd suggest to enable switch accessory for each radio
+With iOS 15 Homekit does not support `volume control` and `start/stop` for speaker accessory (at least for speakers exposed by Homebridge). So I'd suggest to enable switch accessory for each radio.
 
 ## TODO list
-1. Switch accessory for the audio file playback (with loop support)
-2. Play audio file on the HomePod with provided url
-3. Radio streaming to the multiple HomePods
+F1. Switch accessory for audio file playback (with loop support)
+2. Play audio file on HomePod with provided url
+3. Radio streaming to multiple HomePods
