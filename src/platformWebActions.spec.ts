@@ -18,6 +18,7 @@ describe('HomepodRadioPlatformWebActions Tests', () => {
             debug: () => {},
             error: () => {},
             log: () => {},
+            success: () => {},
         };
         const playbackController = new PlaybackController();
 

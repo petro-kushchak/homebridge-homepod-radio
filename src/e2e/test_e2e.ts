@@ -18,6 +18,9 @@ const logger = {
     log: (...args) => {
         console.log(args.join(' '));
     },
+    success: (...args) => {
+        console.log(args.join(' '));
+    },
 };
 
 const deviceE2E = async () => {
