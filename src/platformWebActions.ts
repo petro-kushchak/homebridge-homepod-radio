@@ -104,33 +104,33 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         const webAction = this.parseAction(actionUrl);
 
         switch (webAction.action) {
-            case WebActionType.PlayFile: {
-                const filePath = webAction.data;
-                const correctFile = await fileExists(filePath);
+        case WebActionType.PlayFile: {
+            const filePath = webAction.data;
+            const correctFile = await fileExists(filePath);
 
-                if (!correctFile) {
-                    return {
-                        error: false,
-                        message: `File does not exist: ${filePath}`,
-                    };
-                }
-
-                const message = `Started playing file: ${filePath}`;
-                this.logger.info(message);
-                await this.playbackController.requestStop(this);
-                await this.device.playFile(filePath, 0);
+            if (!correctFile) {
                 return {
                     error: false,
-                    message: message,
+                    message: `File does not exist: ${filePath}`,
                 };
             }
 
-            case WebActionType.Unsupported:
-            default:
-                return {
-                    error: true,
-                    message: webAction.data,
-                };
+            const message = `Started playing file: ${filePath}`;
+            this.logger.info(message);
+            await this.playbackController.requestStop(this);
+            await this.device.playFile(filePath, 0);
+            return {
+                error: false,
+                message: message,
+            };
+        }
+        // falls through
+        case WebActionType.Unsupported:
+        default:
+            return {
+                error: true,
+                message: webAction.data,
+            };
         }
     }
 }

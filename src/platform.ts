@@ -32,7 +32,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     constructor(
         public logger: Logging,
         private config: PlatformConfig,
-        private api: API
+        private api: API,
     ) {
         hap = api.hap;
 
