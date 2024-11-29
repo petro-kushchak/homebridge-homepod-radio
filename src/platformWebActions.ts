@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -40,7 +38,6 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async volumeUpdated(homepodId: string, volume: number): Promise<void> {
         return await Promise.resolve();
     }

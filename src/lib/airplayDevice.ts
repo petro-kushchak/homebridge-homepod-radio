@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as child from 'child_process';
 import * as path from 'path';
 import { Logger } from 'homebridge';

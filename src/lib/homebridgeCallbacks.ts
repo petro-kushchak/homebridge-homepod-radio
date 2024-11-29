@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 export function callbackify(task: (...taskArgs: any[]) => Promise<any>): any {
     return (...args: any[]) => {
         const onlyArgs: any[] = [];

@@ -74,7 +74,6 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
           this.platform.logger.info(`[${this.streamerName()} Switch] finished initializing!`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async volumeUpdated(homepodId: string, volume: number): Promise<void> {
           return await Promise.resolve();
       }

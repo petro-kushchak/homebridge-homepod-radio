@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { PlatformConfig } from 'homebridge';
 import { HomepodRadioPlatformConfig } from './platformConfig';
 import { Storage } from './lib/storage';

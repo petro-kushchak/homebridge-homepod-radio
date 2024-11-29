@@ -60,7 +60,6 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
           this.platform.logger.info(`[${this.streamerName()}] finished initializing!`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async stopRequested(source: PlaybackStreamer): Promise<void> {
           return await Promise.resolve();
       }
@@ -102,7 +101,6 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
       /**
        * Set On/Off
        */
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async setOn(value: CharacteristicValue): Promise<void> {
           this.platform.logger.info(`[${this.streamerName()}] Triggered SET On/Off`);
           return await Promise.resolve();

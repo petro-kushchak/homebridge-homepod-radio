@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PlaybackController, PlaybackStreamer } from './playbackController';
 
 class PlaybackStreamerStub implements PlaybackStreamer {

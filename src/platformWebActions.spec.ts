@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Logger, PlatformConfig } from 'homebridge';
 import { PlaybackController } from './lib/playbackController';
 import { HomepodRadioPlatformConfig } from './platformConfig';
