@@ -15,7 +15,11 @@
     "url": "https://github.com/petro-kushchak/homebridge-homepod-radio/issues"
   },
   "keywords": [
+    "homebridge",
     "homebridge-plugin",
+    "plugin",
+    "homebridge plugin",
+    "homepod",
     "homepod mini",
     "radio",
     "airplay",
