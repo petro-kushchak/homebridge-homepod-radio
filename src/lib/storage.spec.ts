@@ -14,8 +14,9 @@ describe('Storage Tests', () => {
             expect(storage).not.toBeNull();
             await storage.write({ test: 1 });
             const data = await storage.read();
-            expect(data['test']).not.toBeNull();
-            expect(data['test']).toBe(1);
+            expect(data).not.toBeNull();
+            expect(data!['test']).not.toBeNull();
+            expect(data!['test']).toBe(1);
         });
     });
 });

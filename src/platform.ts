@@ -24,13 +24,20 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
     private readonly httpService: HttpService;
     private readonly platformActions: HomepodRadioPlatformWebActions;
 
-    public readonly Service: typeof Service = this.api.hap.Service;
-    public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+    public readonly Service: typeof Service;
+    public readonly Characteristic: typeof Characteristic;
 
     public readonly platformConfig: HomepodRadioPlatformConfig;
 
-    constructor(public logger: Logging, private config: PlatformConfig, private api: API) {
+    constructor(
+        public logger: Logging,
+        private config: PlatformConfig,
+        private api: API
+    ) {
         hap = api.hap;
+
+        this.Service = api.hap.Service;
+        this.Characteristic = api.hap.Characteristic;
 
         this.platformConfig = new HomepodRadioPlatformConfig(this.config);
         this.platformActions = new HomepodRadioPlatformWebActions(

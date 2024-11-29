@@ -8,6 +8,7 @@ import { AutomationReturn } from './lib/httpService';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatformConfig } from './platformConfig';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fileExists = async (path) => !!(await fs.promises.stat(path).catch((e) => false));
 
 export enum WebActionType {
@@ -33,11 +34,10 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
             this.logger,
             this.config.verboseMode,
             this.streamerName(),
-            '',
-            null,
         );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async volumeUpdated(homepodId: string, volume: number): Promise<void> {
         return await Promise.resolve();
     }
@@ -54,6 +54,7 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         return Promise.resolve();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async stopRequested(source: PlaybackStreamer): Promise<void> {
         return Promise.resolve();
     }

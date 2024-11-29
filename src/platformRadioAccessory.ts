@@ -25,7 +25,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private service: Service;
 
     private currentMediaState: CharacteristicValue;
-    private targetMediaState: CharacteristicValue;
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
@@ -112,6 +111,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async volumeUpdated(homepodId: string, volume: number): Promise<void> {
         return await Promise.resolve();
     }
@@ -175,7 +175,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
      * Set the targetMediaState.
      */
     async setTargetMediaState(value: CharacteristicValue): Promise<void> {
-        this.targetMediaState = value;
         this.platform.logger.info(`[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`);
         if (
             value === this.platform.Characteristic.CurrentMediaState.PAUSE ||

@@ -8,7 +8,7 @@ export class Storage {
         await fs.writeFile(this.filePath, JSON.stringify(data), 'utf8');
     }
 
-    public async read<T>(): Promise<Record<string, T>> {
+    public async read<T>(): Promise<Record<string, T> | null> {
         try {
             const data = await fs.readFile(this.filePath);
             return JSON.parse(data.toString());
