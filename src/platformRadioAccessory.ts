@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as path from 'path';
 import * as os from 'os';
 
@@ -26,7 +25,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private service: Service;
 
     private currentMediaState: CharacteristicValue;
-    private targetMediaState: CharacteristicValue;
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
@@ -177,7 +175,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
      * Set the targetMediaState.
      */
     async setTargetMediaState(value: CharacteristicValue): Promise<void> {
-        this.targetMediaState = value;
         this.platform.logger.info(`[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`);
         if (
             value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
