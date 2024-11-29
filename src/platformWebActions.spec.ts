@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { PlatformConfig } from 'homebridge';
+import { Logger, PlatformConfig } from 'homebridge';
 import { PlaybackController } from './lib/playbackController';
 import { HomepodRadioPlatformConfig } from './platformConfig';
 import {
@@ -12,7 +12,7 @@ import {
 describe('HomepodRadioPlatformWebActions Tests', () => {
     describe('test action parsing', () => {
         let testConfig: HomepodRadioPlatformConfig;
-        const logger = {
+        const logger: Logger = {
             info: () => {},
             warn: () => {},
             debug: () => {},
