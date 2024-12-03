@@ -1,9 +1,8 @@
 {
   "files.eol": "\n",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
-  "typescript.referencesCodeLens.enabled": true,
   "typescript.suggest.enabled": true,
   "eslint.validate": ["javascript"],
   "editor.rulers": [140],

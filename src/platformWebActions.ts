@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -10,6 +8,7 @@ import { AutomationReturn } from './lib/httpService';
 import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
 import { HomepodRadioPlatformConfig } from './platformConfig';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fileExists = async (path) => !!(await fs.promises.stat(path).catch((e) => false));
 
 export enum WebActionType {
@@ -35,8 +34,6 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
             this.logger,
             this.config.verboseMode,
             this.streamerName(),
-            '',
-            null,
         );
     }
 
@@ -57,6 +54,7 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         return Promise.resolve();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async stopRequested(source: PlaybackStreamer): Promise<void> {
         return Promise.resolve();
     }
@@ -106,33 +104,33 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         const webAction = this.parseAction(actionUrl);
 
         switch (webAction.action) {
-            case WebActionType.PlayFile: {
-                const filePath = webAction.data;
-                const correctFile = await fileExists(filePath);
+        case WebActionType.PlayFile: {
+            const filePath = webAction.data;
+            const correctFile = await fileExists(filePath);
 
-                if (!correctFile) {
-                    return {
-                        error: false,
-                        message: `File does not exist: ${filePath}`,
-                    };
-                }
-
-                const message = `Started playing file: ${filePath}`;
-                this.logger.info(message);
-                await this.playbackController.requestStop(this);
-                await this.device.playFile(filePath, 0);
+            if (!correctFile) {
                 return {
                     error: false,
-                    message: message,
+                    message: `File does not exist: ${filePath}`,
                 };
             }
 
-            case WebActionType.Unsupported:
-            default:
-                return {
-                    error: true,
-                    message: webAction.data,
-                };
+            const message = `Started playing file: ${filePath}`;
+            this.logger.info(message);
+            await this.playbackController.requestStop(this);
+            await this.device.playFile(filePath, 0);
+            return {
+                error: false,
+                message: message,
+            };
+        }
+        // falls through
+        case WebActionType.Unsupported:
+        default:
+            return {
+                error: true,
+                message: webAction.data,
+            };
         }
     }
 }

@@ -1,23 +1,27 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "target": "ES2018",
-    "module": "commonjs",
+    "target": "ES2022",
     "lib": [
-      "ES2015",
-      "ES2016",
-      "ES2017",
-      "ES2018"
+      "DOM",
+      "ES2022"
     ],
-    "sourceMap": true,
     "rootDir": "src",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "strict": true,
+    "declaration": true,
     "outDir": "dist",
-    "strict": false,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
   "include": [
+    "eslint.config.js",
+    "homebridge-ui",
     "src"
   ]
 }
