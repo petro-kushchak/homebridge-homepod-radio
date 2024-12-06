@@ -1,0 +1,14 @@
+on:
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'SHA-1 hash of the commit to publish'
+        required: true
+---
+- name: Publish branch package to npm
+  uses: wistia/publish-branch-to-npm@mew/debugging
+  with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+    npm_token: ${{ secrets.NPM_AUTH_TOKEN }}
+    commit_hash: ${{ github.event.inputs.commit_hash }}
+    dry_run: true
