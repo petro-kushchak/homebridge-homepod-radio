@@ -1,8 +1,6 @@
-
-<p align="center">
-
-<img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
-
+<p align="center" vertical-align="middle">
+    <a href="https://github.com/petro-kushchak/homebridge-homepod-radio"><img src="HomePod-Mini.png" height="140"></a>
+    <a href="https://github.com/homebridge/homebridge"><img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-wordmark-logo-vertical.png" height="140"></a>
 </p>
 
 # HomePod Mini radio support
@@ -189,7 +187,17 @@ pip3 install pyatv
 sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 ```
 
-### Docker image with preinstalled dependencies (ubuntu)
+### Installing the PyATV lib in the Homebridge Docker container
+
+The Homebridge Docker image comes with the latest version of `python` pre-installed. At the time of writing, the image is based on `Ubuntu 22.04`, with `Python 3.10.12` included.
+
+To avoid having to reinstall `pyatv` every time the container is recreated (for example when updating the Homebridge image), Homebridge provides the `startup.sh` script, which is executed after the Docker container is finished starting up. Add the following line to the end of `startup.sh`:
+```
+pip3 install pyatv
+```
+You can do this from the command line (using your favorite editor) and finding the script in the Homebridge `config` folder. Alternatively you can edit it from the Homebridge UI, by going to `Settings`, `Startup & Environment`, `Startup Script`. If you edit the script from the UI or after the container has started, you will need to restart the container.
+
+### *** Deprecated *** Docker image with preinstalled dependencies (ubuntu)
 
 Docker image build based on oznu/homebridge:ubuntu (with ffmpeg & Homebridge preinstalled)
 
