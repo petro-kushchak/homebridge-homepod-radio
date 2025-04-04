@@ -26,6 +26,20 @@
                 "placeholder": "If not specified - will search in user home dir",
                 "required": false
             },
+            "telegramUpdateToken": {
+                "title": "Telegram channel bot token",
+                "type": "string",
+                "default": "",
+                "placeholder": "",
+                "required": false
+            },
+            "telegramUpdateChatId": {
+                "title": "Telegram channel chat id",
+                "type": "string",
+                "default": "",
+                "placeholder": "",
+                "required": false
+            },
             "httpPort": {
                 "title": "Port for HTTP requests",
                 "type": "number",
@@ -92,6 +106,11 @@
                             "type": "string",
                             "placeholder": "Enter radio stream url...",
                             "required": true
+                        },
+                        "validateRadioUrl": {
+                            "title": "Validate/Evaluate Radio Stream URL with redirects",
+                            "type": "boolean",
+                            "required": false
                         },
                         "onSwitch": {
                             "title": "Add switch accessory",
