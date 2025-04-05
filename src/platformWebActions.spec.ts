@@ -1,23 +1,20 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Logger, PlatformConfig } from 'homebridge';
 
-import { PlatformConfig } from 'homebridge';
-import { PlaybackController } from './lib/playbackController';
-import { HomepodRadioPlatformConfig } from './platformConfig';
-import {
-    HomepodRadioPlatformWebActions,
-    WebActionType,
-} from './platformWebActions';
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+import { HomepodRadioPlatformWebActions, WebActionType } from './platformWebActions.js';
+
+import { PlaybackController } from './lib/playbackController.js';
 
 describe('HomepodRadioPlatformWebActions Tests', () => {
     describe('test action parsing', () => {
         let testConfig: HomepodRadioPlatformConfig;
-        const logger = {
+        const logger: Logger = {
             info: () => {},
             warn: () => {},
             debug: () => {},
             error: () => {},
             log: () => {},
+            success: () => {},
         };
         const playbackController = new PlaybackController();
 

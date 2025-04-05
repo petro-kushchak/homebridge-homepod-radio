@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const semver = require('semver');
-const child_process = require('child_process');
+const child_process = require('node:child_process');
 
 function getTagVersionFromNpm(tag) {
   try {
