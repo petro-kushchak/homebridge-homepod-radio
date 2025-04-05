@@ -128,7 +128,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
     }
 
     streamerName(): string {
-        return `${this.platform.platformConfig.serialNumber}`;
+        return `Homepod Volume ${this.platform.platformConfig.homepodId}`;
     }
 
     /*
