@@ -1,4 +1,4 @@
-import { IndependentPlatformPlugin, Logging, PlatformConfig, API, HAP, Characteristic, Service, Categories } from 'homebridge';
+import { DynamicPlatformPlugin, PlatformAccessory, Logging, PlatformConfig, API, HAP, Characteristic, Service, Categories } from 'homebridge';
 
 import { HomepodRadioPlatformAccessory } from './platformRadioAccessory.js';
 import { AudioConfig, HomepodRadioPlatformConfig, RadioConfig } from './platformConfig.js';
@@ -19,7 +19,7 @@ let hap: HAP;
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class HomepodRadioPlatform implements IndependentPlatformPlugin {
+export class HomepodRadioPlatform implements DynamicPlatformPlugin {
     private readonly playbackController: PlaybackController = new PlaybackController();
 
     private readonly httpService: HttpService;
@@ -74,6 +74,17 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
         });
     }
 
+    /**
+     * This function is invoked when homebridge restores cached accessories from disk at startup.
+     * It should be used to set up event handlers for characteristics and update respective values.
+     */
+    configureAccessory(accessory: PlatformAccessory) {
+        this.logger.info(`Loading accessory from cache: ${accessory.displayName}`);
+
+        // add the restored accessory to the accessories cache, so we can track if it has already been registered
+        // this.accessories.push(accessory);
+    }
+
     private addHomepodVolumeAccessory() {
         if(!this.platformConfig.enableVolumeControl) {
             this.logger.info('Platform: volume control disabled');
@@ -102,7 +113,7 @@ export class HomepodRadioPlatform implements IndependentPlatformPlugin {
         this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
         if (radio.onSwitch) {
             const switchUuid = hap.uuid.generate('homebridge:homepod:radio:switch:' + radio.name);
-            const switchAccessory = new this.api.platformAccessory(`${radio.name} switch`, switchUuid);
+            const switchAccessory = new this.api.platformAccessory(`${radio.name} Switch`, switchUuid);
             new HomepodRadioSwitchAccessory(this, radioAccessory, switchAccessory);
             this.api.publishExternalAccessories(PLUGIN_NAME, [switchAccessory]);
         }
