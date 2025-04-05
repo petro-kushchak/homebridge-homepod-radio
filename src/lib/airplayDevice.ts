@@ -85,21 +85,21 @@ export class AirPlayDevice {
         );
 
         this.streaming.stdout!.on('data', (data) => {
-            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+            this.debug(`[${this.streamerName}] Streaming data: ${data}`);
         });
 
         this.streaming.on('exit', async (code, signal) => {
-            this.logger.info(`[${this.streamerName}] streaming exit: code ${code} signal ${signal}`);
+            this.debug(`[${this.streamerName}] Streaming exit: code ${code} signal ${signal}`);
             await this.endStreaming();
         });
 
         this.streaming.stderr!.on('data', (data) => {
-            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+            this.debug(`[${this.streamerName}] Streaming data: ${data}`);
         });
 
-        this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
+        this.debug(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
 
-        this.debug(`[${this.streamerName}] spawn streaming: ${this.streaming.pid}`);
+        this.debug(`[${this.streamerName}] Spawn streaming: ${this.streaming.pid}`);
         this.logger.info(`[${this.streamerName}] Started file streaming ${filePath}`);
         return true;
     }
@@ -110,7 +110,7 @@ export class AirPlayDevice {
         const heartbeatFailed = async (): Promise<void> => {
             //identify reason and restart streaming...
             const title = await this.getPlaybackTitle();
-            this.debug(`[${this.streamerName}] Received from device: ${this.homepodId} title: ${title}`);
+            this.debug(`[${this.streamerName}] Received from device: ${this.homepodId}; Title: ${title}`);
             const restartStreaming = false;
             if (restartStreaming) {
                 //need to restart streaming, after some delay
@@ -195,22 +195,22 @@ export class AirPlayDevice {
         );
 
         this.streaming.stdout!.on('data', (data) => {
-            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+            this.debug(`[${this.streamerName}] Streaming data: ${data}`);
             heartbeat('streaming', heartbeatFailed);
         });
 
         this.streaming.on('exit', async (code, signal) => {
-            this.logger.info(`[${this.streamerName}] streaming exit: code ${code} signal ${signal}`);
+            this.debug(`[${this.streamerName}] Streaming exit: code ${code} signal ${signal}`);
             await this.endStreaming();
         });
 
         this.streaming.stderr!.on('data', (data) => {
-            this.debug(`[${this.streamerName}] streaming data: ${data}`);
+            this.debug(`[${this.streamerName}] Streaming data: ${data}`);
             heartbeat('streaming', heartbeatFailed);
         });
 
         if (this.heartbeat !== undefined) {
-            this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - previous timer`);
+            this.debug(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - previous timer`);
             clearInterval(this.heartbeat);
             this.heartbeat = undefined;
         }
@@ -219,9 +219,9 @@ export class AirPlayDevice {
             heartbeat('heartbeat', heartbeatFailed);
         }, this.HEARTBEAT_TIMEOUT);
 
-        this.logger.info(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
+        this.debug(`[${this.streamerName}] Started hearbeat ${this.heartbeat}`);
 
-        this.debug(`[${this.streamerName}] spawn streaming: ${this.streaming.pid}`);
+        this.debug(`[${this.streamerName}] Spawn streaming: ${this.streaming.pid}`);
         this.logger.info(`[${this.streamerName}] Started streaming ${streamUrl}`);
         return true;
     }
@@ -234,7 +234,7 @@ export class AirPlayDevice {
             }
             this.debug(`[${this.streamerName}] Killing process: streaming: ${this.streaming.pid}`);
 
-            this.logger.info(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - stop requested`);
+            this.debug(`[${this.streamerName}] Cleared hearbeat ${this.heartbeat} - stop requested`);
             clearInterval(this.heartbeat);
             this.heartbeat = undefined;
 

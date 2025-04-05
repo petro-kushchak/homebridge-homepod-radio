@@ -59,7 +59,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
             // this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.isPlaying());
         }, 3000);
 
-        this.platform.logger.info(`[${this.streamerName()}] finished initializing!`);
+        this.platform.logger.info(`[${this.streamerName()}] Finished initializing`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,7 +97,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      * Get On/Off
      */
     async getOn(): Promise<CharacteristicValue> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET On/Off`);
+        this.platform.logger.debug(`[${this.streamerName()}] Triggered GET On/Off`);
         return Promise.resolve(true);
     }
 
@@ -114,7 +114,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      * Get the current volume.
      */
     async getCurrentVolume(): Promise<CharacteristicValue> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET CurrentVolume:`);
+        this.platform.logger.debug(`[${this.streamerName()}] Triggered GET CurrentVolume:`);
         return Promise.resolve(this.currentVolume);
     }
 

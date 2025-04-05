@@ -22,11 +22,11 @@ export class HomepodRadioSwitchAccessory implements AccessoryPlugin {
         this.service
             .getCharacteristic(this.platform.Characteristic.On)
             .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-                this.platform.logger.info(`[${this.streamer.streamerName()} Switch] GET ON`);
+                this.platform.logger.debug(`[${this.streamer.streamerName()} Radio Switch] GET ON`);
                 callback(undefined, this.streamer.isPlaying());
             })
             .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-                this.platform.logger.info(`[${this.streamer.streamerName()} Switch] SET ON: ${value}`);
+                this.platform.logger.info(`[${this.streamer.streamerName()} Radio Switch] SET ON: ${value}`);
                 if (value) {
                     this.streamer.startPlaying();
                 } else {
@@ -51,7 +51,7 @@ export class HomepodRadioSwitchAccessory implements AccessoryPlugin {
                 .updateValue(this.streamer.isPlaying());
         }, 3000);
 
-        this.platform.logger.info(`[${this.streamer.streamerName()} Switch] finished initializing!`);
+        this.platform.logger.info(`[${this.streamer.streamerName()} Radio Switch] Finished initializing`);
     }
 
     /*
