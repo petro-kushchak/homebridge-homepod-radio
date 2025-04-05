@@ -1,11 +1,15 @@
-import * as child from 'child_process';
-import * as path from 'path';
 import { Logger } from 'homebridge';
 
+import { delay } from './promices.js';
+
+import * as child from 'child_process';
+import * as path from 'path';
 import { promisify } from 'util';
-import { delay } from './promices';
+import { fileURLToPath } from 'url';
 
 const execAsync = promisify(child.exec);
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * AirPlay device

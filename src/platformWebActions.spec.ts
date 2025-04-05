@@ -1,10 +1,9 @@
 import { Logger, PlatformConfig } from 'homebridge';
-import { PlaybackController } from './lib/playbackController';
-import { HomepodRadioPlatformConfig } from './platformConfig';
-import {
-    HomepodRadioPlatformWebActions,
-    WebActionType,
-} from './platformWebActions';
+
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+import { HomepodRadioPlatformWebActions, WebActionType } from './platformWebActions.js';
+
+import { PlaybackController } from './lib/playbackController.js';
 
 describe('HomepodRadioPlatformWebActions Tests', () => {
     describe('test action parsing', () => {

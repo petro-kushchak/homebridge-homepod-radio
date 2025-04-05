@@ -1,4 +1,4 @@
-import { Storage } from './storage';
+import { Storage } from './storage.js';
 
 import * as path from 'path';
 import * as os from 'os';

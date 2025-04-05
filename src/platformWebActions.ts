@@ -1,12 +1,14 @@
+import { Logger } from 'homebridge';
+
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+
+import { AirPlayDevice } from './lib/airplayDevice.js';
+import { AutomationReturn } from './lib/httpService.js';
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController.js';
+
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
-
-import { Logger } from 'homebridge';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { AutomationReturn } from './lib/httpService';
-import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
-import { HomepodRadioPlatformConfig } from './platformConfig';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fileExists = async (path) => !!(await fs.promises.stat(path).catch((e) => false));

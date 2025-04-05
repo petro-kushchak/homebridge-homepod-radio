@@ -1,13 +1,15 @@
-import * as os from 'os';
-import * as path from 'path';
-
 import { AccessoryPlugin, Service, CharacteristicEventTypes, PlatformAccessory } from 'homebridge';
 import { CharacteristicGetCallback, CharacteristicValue, CharacteristicSetCallback } from 'homebridge';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
-import { HomepodRadioPlatform } from './platform';
-import { AudioConfig } from './platformConfig';
-import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
+
+import { HomepodRadioPlatform } from './platform.js';
+import { AudioConfig } from './platformConfig.js';
+import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants.js';
+
+import { AirPlayDevice } from './lib/airplayDevice.js';
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController.js';
+
+import * as os from 'os';
+import * as path from 'path';
 
 export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStreamer {
     private readonly device: AirPlayDevice;

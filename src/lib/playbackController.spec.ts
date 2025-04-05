@@ -1,4 +1,4 @@
-import { PlaybackController, PlaybackStreamer } from './playbackController';
+import { PlaybackController, PlaybackStreamer } from './playbackController.js';
 
 class PlaybackStreamerStub implements PlaybackStreamer {
     isPlaying(): boolean {

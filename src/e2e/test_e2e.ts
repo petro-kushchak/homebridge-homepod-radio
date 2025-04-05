@@ -1,6 +1,7 @@
 import { Logger } from 'homebridge';
-import { AirPlayDevice } from '../lib/airplayDevice';
-import { delay } from '../lib/promices';
+
+import { AirPlayDevice } from '../lib/airplayDevice.js';
+import { delay } from '../lib/promices.js';
 
 const homepodId = 'F434F0108877';
 const logger: Logger = {

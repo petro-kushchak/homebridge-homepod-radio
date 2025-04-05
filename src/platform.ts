@@ -1,15 +1,16 @@
 import { IndependentPlatformPlugin, Logging, PlatformConfig, API, HAP, Characteristic, Service, Categories } from 'homebridge';
 
-import { HomepodRadioPlatformAccessory } from './platformRadioAccessory';
-import { AudioConfig, HomepodRadioPlatformConfig, RadioConfig } from './platformConfig';
-import { HomepodRadioPlatformWebActions } from './platformWebActions';
-import { PlaybackController } from './lib/playbackController';
-import { delay } from './lib/promices';
-import { HttpService } from './lib/httpService';
-import { HomepodRadioSwitchAccessory } from './platformRadioSwitchAccessory';
-import { PLUGIN_NAME } from './platformConstants';
-import { HomepodAudioSwitchAccessory } from './platformAudioSwitchAccessory';
-import { HomepodVolumeAccessory } from './platformHomepodVolumeAccessory';
+import { HomepodRadioPlatformAccessory } from './platformRadioAccessory.js';
+import { AudioConfig, HomepodRadioPlatformConfig, RadioConfig } from './platformConfig.js';
+import { HomepodRadioPlatformWebActions } from './platformWebActions.js';
+import { PlaybackController } from './lib/playbackController.js';
+import { HomepodRadioSwitchAccessory } from './platformRadioSwitchAccessory.js';
+import { PLUGIN_NAME } from './platformConstants.js';
+import { HomepodAudioSwitchAccessory } from './platformAudioSwitchAccessory.js';
+import { HomepodVolumeAccessory } from './platformHomepodVolumeAccessory.js';
+
+import { delay } from './lib/promices.js';
+import { HttpService } from './lib/httpService.js';
 
 let hap: HAP;
 

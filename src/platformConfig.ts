@@ -1,5 +1,6 @@
 import { PlatformConfig } from 'homebridge';
-import { PLUGIN_MODEL } from './platformConstants';
+
+import { PLUGIN_MODEL } from './platformConstants.js';
 
 export interface RadioConfig {
     name: string;

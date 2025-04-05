@@ -1,6 +1,8 @@
 import { PlatformConfig } from 'homebridge';
-import { HomepodRadioPlatformConfig } from './platformConfig';
-import { Storage } from './lib/storage';
+
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+
+import { Storage } from './lib/storage.js';
 
 describe('HomepodRadioPlatformConfig Tests', () => {
     describe('basic flow: config loading', () => {

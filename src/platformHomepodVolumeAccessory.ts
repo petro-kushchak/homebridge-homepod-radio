@@ -1,9 +1,11 @@
 import { AccessoryPlugin, Service, PlatformAccessory, CharacteristicEventTypes, CharacteristicValue } from 'homebridge';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { callbackify } from './lib/homebridgeCallbacks';
-import { HomepodRadioPlatform } from './platform';
-import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
-import { PlaybackStreamer } from './lib/playbackController';
+
+import { HomepodRadioPlatform } from './platform.js';
+import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants.js';
+
+import { AirPlayDevice } from './lib/airplayDevice.js';
+import { callbackify } from './lib/homebridgeCallbacks.js';
+import { PlaybackStreamer } from './lib/playbackController.js';
 
 export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer {
     private readonly device: AirPlayDevice;

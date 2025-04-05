@@ -3,14 +3,14 @@ import * as os from 'os';
 
 import { Service, PlatformAccessory, CharacteristicValue, CharacteristicEventTypes } from 'homebridge';
 
-import { callbackify } from './lib/homebridgeCallbacks';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
-import { Storage } from './lib/storage';
+import { HomepodRadioPlatform } from './platform.js';
+import { RadioConfig } from './platformConfig.js';
+import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants.js';
 
-import { HomepodRadioPlatform } from './platform';
-import { RadioConfig } from './platformConfig';
-import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants';
+import { callbackify } from './lib/homebridgeCallbacks.js';
+import { AirPlayDevice } from './lib/airplayDevice.js';
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController.js';
+import { Storage } from './lib/storage.js';
 
 interface AccessoryState extends Record<string, number> {
     playbackState: number;
