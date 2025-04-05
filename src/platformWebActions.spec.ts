@@ -1,24 +1,28 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { PlatformConfig } from 'homebridge';
-import { PlaybackController } from './lib/playbackController';
-import { HomepodRadioPlatformConfig } from './platformConfig';
-import {
-    HomepodRadioPlatformWebActions,
-    WebActionType,
-} from './platformWebActions';
+import { Logger, PlatformConfig } from 'homebridge';
+
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+import { HomepodRadioPlatformWebActions, WebActionType } from './platformWebActions.js';
+
+import { PlaybackController } from './lib/playbackController.js';
+
+class TestLogger implements Logger {
+
+    constructor() {}
+
+    info (...args): void {}
+    debug (...args): void {}
+    warn (...args): void {}
+    error (...args): void {}
+    log (...args): void {}
+    success (...args): void {}
+}
 
 describe('HomepodRadioPlatformWebActions Tests', () => {
     describe('test action parsing', () => {
         let testConfig: HomepodRadioPlatformConfig;
-        const logger = {
-            info: () => {},
-            warn: () => {},
-            debug: () => {},
-            error: () => {},
-            log: () => {},
-        };
+        const logger: Logger = new TestLogger();
         const playbackController = new PlaybackController();
 
         beforeAll(async () => {

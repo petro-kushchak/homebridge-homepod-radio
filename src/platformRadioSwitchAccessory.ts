@@ -1,8 +1,10 @@
 import { AccessoryPlugin, Service, CharacteristicEventTypes, PlatformAccessory } from 'homebridge';
 import { CharacteristicGetCallback, CharacteristicValue, CharacteristicSetCallback } from 'homebridge';
-import { PlaybackStreamer } from './lib/playbackController';
-import { HomepodRadioPlatform } from './platform';
-import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants';
+
+import { HomepodRadioPlatform } from './platform.js';
+import { PLUGIN_MANUFACTURER, PLUGIN_MODEL } from './platformConstants.js';
+
+import { PlaybackStreamer } from './lib/playbackController.js';
 
 export class HomepodRadioSwitchAccessory implements AccessoryPlugin {
     private readonly service: Service;

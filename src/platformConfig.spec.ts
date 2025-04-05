@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { PlatformConfig } from 'homebridge';
-import { HomepodRadioPlatformConfig } from './platformConfig';
-import { Storage } from './lib/storage';
+
+import { HomepodRadioPlatformConfig } from './platformConfig.js';
+
+import { Storage } from './lib/storage.js';
 
 describe('HomepodRadioPlatformConfig Tests', () => {
     describe('basic flow: config loading', () => {
@@ -22,6 +22,7 @@ describe('HomepodRadioPlatformConfig Tests', () => {
             const platformConfig = new HomepodRadioPlatformConfig(testConfig);
             expect(platformConfig.homepodId).toEqual(testConfig.homepodId);
             expect(platformConfig.serialNumber).toEqual(testConfig.serialNumber);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             expect(platformConfig.verboseMode).toBeFalsy;
             expect(platformConfig.radios.length).toEqual(1);
             expect(platformConfig.radios[0].name).toEqual(testConfig.radios[0].name);
@@ -29,6 +30,7 @@ describe('HomepodRadioPlatformConfig Tests', () => {
 
         it('loading from exmpty config', async () => {
             const test = () => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const platformConfig = new HomepodRadioPlatformConfig({
                     platform: 'test',
                 });
@@ -46,6 +48,7 @@ describe('HomepodRadioPlatformConfig Tests', () => {
 
             const platformConfig = new HomepodRadioPlatformConfig(testConfig);
             expect(platformConfig.homepodId).toEqual(testConfig.homepodId);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             expect(platformConfig.verboseMode).toBeFalsy;
             expect(platformConfig.radios.length).toEqual(1);
             expect(platformConfig.radios[0].name).toEqual(testConfig.name);

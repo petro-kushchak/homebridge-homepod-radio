@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/ban-types */
 export function callbackify(task: (...taskArgs: any[]) => Promise<any>): any {
     return (...args: any[]) => {
         const onlyArgs: any[] = [];
-        let callback: Function = undefined;
+        let callback: Function | undefined;
 
         for (const arg of args) {
             if (typeof arg === 'function') {
@@ -11,7 +10,7 @@ export function callbackify(task: (...taskArgs: any[]) => Promise<any>): any {
             }
             onlyArgs.push(arg);
         }
-        if (!callback) {
+        if (typeof callback === 'undefined') {
             throw new Error('Missing callback parameter!');
         }
         task(...onlyArgs)

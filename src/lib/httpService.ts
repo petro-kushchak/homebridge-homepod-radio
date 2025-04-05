@@ -1,5 +1,6 @@
-import http from 'http';
 import { Logging } from 'homebridge';
+
+import http from 'http';
 
 export interface AutomationReturn {
   error: boolean;

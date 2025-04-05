@@ -1,17 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as path from 'path';
 import * as os from 'os';
 
 import { Service, PlatformAccessory, CharacteristicValue, CharacteristicEventTypes } from 'homebridge';
 
-import { callbackify } from './lib/homebridgeCallbacks';
-import { AirPlayDevice } from './lib/airplayDevice';
-import { PlaybackController, PlaybackStreamer } from './lib/playbackController';
-import { Storage } from './lib/storage';
+import { HomepodRadioPlatform } from './platform.js';
+import { RadioConfig } from './platformConfig.js';
+import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants.js';
 
-import { HomepodRadioPlatform } from './platform';
-import { RadioConfig } from './platformConfig';
-import { PLUGIN_MANUFACTURER, PLUGIN_NAME } from './platformConstants';
+import { callbackify } from './lib/homebridgeCallbacks.js';
+import { AirPlayDevice } from './lib/airplayDevice.js';
+import { PlaybackController, PlaybackStreamer } from './lib/playbackController.js';
+import { Storage } from './lib/storage.js';
 
 interface AccessoryState extends Record<string, number> {
     playbackState: number;
@@ -26,7 +25,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
     private service: Service;
 
     private currentMediaState: CharacteristicValue;
-    private targetMediaState: CharacteristicValue;
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
@@ -177,7 +175,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
      * Set the targetMediaState.
      */
     async setTargetMediaState(value: CharacteristicValue): Promise<void> {
-        this.targetMediaState = value;
         this.platform.logger.info(`[${this.streamerName()}] Triggered SET TargetMediaState: ${value}`);
         if (
             value === this.platform.Characteristic.CurrentMediaState.PAUSE ||
