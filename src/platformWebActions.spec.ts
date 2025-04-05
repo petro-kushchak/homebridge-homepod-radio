@@ -5,17 +5,22 @@ import { HomepodRadioPlatformWebActions, WebActionType } from './platformWebActi
 
 import { PlaybackController } from './lib/playbackController.js';
 
+class TestLogger implements Logger {
+
+    constructor() {}
+
+    info (...args): void {}
+    debug (...args): void {}
+    warn (...args): void {}
+    error (...args): void {}
+    log (...args): void {}
+    success (...args): void {}
+}
+
 describe('HomepodRadioPlatformWebActions Tests', () => {
     describe('test action parsing', () => {
         let testConfig: HomepodRadioPlatformConfig;
-        const logger: Logger = {
-            info: () => {},
-            warn: () => {},
-            debug: () => {},
-            error: () => {},
-            log: () => {},
-            success: () => {},
-        };
+        const logger: Logger = new TestLogger();
         const playbackController = new PlaybackController();
 
         beforeAll(async () => {

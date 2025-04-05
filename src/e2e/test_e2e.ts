@@ -3,27 +3,32 @@ import { Logger } from 'homebridge';
 import { AirPlayDevice } from '../lib/airplayDevice.js';
 import { delay } from '../lib/promices.js';
 
+class TestLogger implements Logger {
+
+    constructor() {}
+
+    info (...args): void {
+        console.log(args.join(' '));
+    }
+    debug (...args): void {
+        console.log(args.join(' '));
+    }
+    warn (...args): void {
+        console.log(args.join(' '));
+    }
+    error (...args): void {
+        console.log(args.join(' '));
+    }
+    log (...args): void {
+        console.log(args.join(' '));
+    }
+    success (...args): void {
+        console.log(args.join(' '));
+    }
+}
+
 const homepodId = 'F434F0108877';
-const logger: Logger = {
-    info: (...args) => {
-        console.log(args.join(' '));
-    },
-    debug: (...args) => {
-        console.log(args.join(' '));
-    },
-    warn: (...args) => {
-        console.log(args.join(' '));
-    },
-    error: (...args) => {
-        console.log(args.join(' '));
-    },
-    log: (...args) => {
-        console.log(args.join(' '));
-    },
-    success: (...args) => {
-        console.log(args.join(' '));
-    },
-};
+const logger: Logger = new TestLogger();
 
 const deviceE2E = async () => {
     const device = new AirPlayDevice(
