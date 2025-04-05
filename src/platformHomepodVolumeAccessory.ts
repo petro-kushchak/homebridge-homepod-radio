@@ -59,7 +59,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
             // this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.isPlaying());
         }, 3000);
 
-        this.platform.logger.info(`[${this.streamerName()}] finished initializing!`);
+        this.platform.logger.info(`[${this.streamerName()} Volume] Finished initializing`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,7 +97,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      * Get On/Off
      */
     async getOn(): Promise<CharacteristicValue> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET On/Off`);
+        this.platform.logger.debug(`[${this.streamerName()} Volume] Triggered GET On/Off`);
         return Promise.resolve(true);
     }
 
@@ -106,7 +106,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async setOn(value: CharacteristicValue): Promise<void> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered SET On/Off`);
+        this.platform.logger.info(`[${this.streamerName()} Volume] Triggered SET On/Off`);
         return await Promise.resolve();
     }
 
@@ -114,7 +114,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      * Get the current volume.
      */
     async getCurrentVolume(): Promise<CharacteristicValue> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET CurrentVolume:`);
+        this.platform.logger.debug(`[${this.streamerName()} Volume] Triggered GET CurrentVolume:`);
         return Promise.resolve(this.currentVolume);
     }
 
@@ -122,13 +122,13 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
      * Set the current volume.
      */
     async setCurrentVolume(value: CharacteristicValue): Promise<void> {
-        this.platform.logger.info(`[${this.streamerName()}] Triggered SET CurrentVolume: ${value}`);
+        this.platform.logger.info(`[${this.streamerName()} Volume] Triggered SET CurrentVolume: ${value}`);
         this.currentVolume = parseInt('' + value);
         await this.device.setVolume(this.currentVolume);
     }
 
     streamerName(): string {
-        return `Homepod Volume ${this.platform.platformConfig.homepodId}`;
+        return `${this.platform.platformConfig.serialNumber}`;
     }
 
     /*

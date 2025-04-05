@@ -38,7 +38,7 @@ export class HomepodRadioPlatformConfig {
             throw 'Missing "homepodId" setting!';
         }
         this.homepodId = config.homepodId;
-        this.serialNumber = config.serialNumber || `HPD${this.homepodId}`;
+        this.serialNumber = config.serialNumber || `HPD-${this.homepodId}`;
         this.verboseMode = !!config.verboseMode && config.verboseMode ? true : false;
 
         this.httpPort = this.config.httpPort || 4567;

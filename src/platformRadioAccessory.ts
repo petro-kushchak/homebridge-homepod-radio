@@ -89,7 +89,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             return;
         }
         const state = (await this.storage.read()) as AccessoryState;
-        this.platform.logger.info(`[${this.streamerName()}] state: ${JSON.stringify(state)}`);
+        this.platform.logger.info(`[${this.streamerName()}] State: ${JSON.stringify(state)}`);
         if (state) {
             await this.setTargetMediaState(state.playbackState);
         }
@@ -108,7 +108,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             playbackState: this.currentMediaState,
         };
         await this.storage.write(state);
-        this.platform.logger.info(`[${this.streamerName()}] stored state: ${JSON.stringify(state)}`);
+        this.platform.logger.info(`[${this.streamerName()}] Stored state: ${JSON.stringify(state)}`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -149,7 +149,6 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
         }
     }
 
-
     /**
      * Set the setSpeakerOn.
      */
@@ -167,7 +166,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
      */
     async getCurrentMediaState(): Promise<CharacteristicValue> {
         this.currentMediaState = this.getMediaState();
-        this.platform.logger.info(`[${this.streamerName()}] Triggered GET CurrentMediaState:`, this.currentMediaState);
+        this.platform.logger.debug(`[${this.streamerName()}] Triggered GET CurrentMediaState:`, this.currentMediaState);
         return Promise.resolve(this.currentMediaState);
     }
 
