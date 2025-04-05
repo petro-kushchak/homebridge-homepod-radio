@@ -38,13 +38,13 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
         this.service
             .getCharacteristic(this.platform.Characteristic.On)
             .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-                this.platform.logger.debug(`[${this.streamerName()} Switch] Getting State On: ${this.isPlaying()}`);
+                this.platform.logger.debug(`[${this.streamerName()}] Getting State On: ${this.isPlaying()}`);
                 callback(undefined, this.isPlaying());
             })
             .on(
                 CharacteristicEventTypes.SET,
                 (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-                    this.platform.logger.info(`[${this.streamerName()} Switch] Setting State On: ${value}`);
+                    this.platform.logger.info(`[${this.streamerName()}] Setting State On: ${value}`);
                     if (value) {
                         this.startPlaying();
                     } else {
@@ -73,7 +73,7 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
 
         this.playbackController.addStreamer(this);
 
-        this.platform.logger.info(`[${this.streamerName()} Switch] Finished initializing`);
+        this.platform.logger.info(`[${this.streamerName()}] Finished initializing`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
