@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Logger, PlatformConfig } from 'homebridge';
 
 import { HomepodRadioPlatformConfig } from './platformConfig.js';
