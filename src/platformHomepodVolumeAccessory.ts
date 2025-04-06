@@ -16,7 +16,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
-        private readonly accessory: PlatformAccessory
+        private readonly accessory: PlatformAccessory,
     ) {
         this.device = new AirPlayDevice(
             this.platform.platformConfig.homepodId,
