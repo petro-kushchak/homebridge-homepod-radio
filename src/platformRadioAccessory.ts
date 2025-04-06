@@ -28,8 +28,8 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
-        private readonly radio: RadioConfig,
         private readonly accessory: PlatformAccessory,
+        private readonly radio: RadioConfig,
         private readonly playbackController: PlaybackController,
     ) {
         this.device = new AirPlayDevice(
@@ -52,7 +52,7 @@ export class HomepodRadioPlatformAccessory implements PlaybackStreamer {
             .setCharacteristic(this.platform.Characteristic.Manufacturer, PLUGIN_MANUFACTURER)
             .setCharacteristic(this.platform.Characteristic.Model, this.radio.model)
             .setCharacteristic(this.platform.Characteristic.SerialNumber, this.platform.platformConfig.serialNumber)
-            .setCharacteristic(this.platform.Characteristic.Name, this.accessory.displayName);
+            .setCharacteristic(this.platform.Characteristic.Name, this.radio.name);
 
         this.service =
             this.accessory.getService(this.platform.Service.SmartSpeaker) ||

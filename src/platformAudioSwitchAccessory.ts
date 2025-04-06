@@ -18,9 +18,9 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
 
     constructor(
         private readonly platform: HomepodRadioPlatform,
+        private readonly accessory: PlatformAccessory,
         private readonly audioConfig: AudioConfig,
         private readonly playbackController: PlaybackController,
-        private readonly accessory: PlatformAccessory,
     ) {
         this.device = new AirPlayDevice(
             this.platform.platformConfig.homepodId,
@@ -61,10 +61,8 @@ export class HomepodAudioSwitchAccessory implements AccessoryPlugin, PlaybackStr
         this.informationService
             .setCharacteristic(this.platform.Characteristic.Manufacturer, PLUGIN_MANUFACTURER)
             .setCharacteristic(this.platform.Characteristic.Model, PLUGIN_MODEL)
-            .setCharacteristic(
-                this.platform.Characteristic.SerialNumber,
-                this.platform.platformConfig.serialNumber,
-            );
+            .setCharacteristic(this.platform.Characteristic.SerialNumber, this.platform.platformConfig.serialNumber)
+            .setCharacteristic(this.platform.Characteristic.Name, this.audioConfig.name);
 
         // This will do its best to keep the actual outputs status up to date with Homekit.
         setInterval(async () => {

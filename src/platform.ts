@@ -92,7 +92,7 @@ export class HomepodRadioPlatform implements DynamicPlatformPlugin {
         }
         const volumeAccessoryName = this.platformConfig.homepodId;
         const volumeUuid = hap.uuid.generate('homebridge:homepod:volume:' + volumeAccessoryName);
-        const volumeAccessory = new this.api.platformAccessory(`${volumeAccessoryName} volume`, volumeUuid);
+        const volumeAccessory = new this.api.platformAccessory(`${volumeAccessoryName} Volume`, volumeUuid);
         new HomepodVolumeAccessory(this, volumeAccessory);
         this.api.publishExternalAccessories(PLUGIN_NAME, [volumeAccessory]);
     }
@@ -105,7 +105,7 @@ export class HomepodRadioPlatform implements DynamicPlatformPlugin {
         // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
         accessory.category = Categories.SPEAKER;
 
-        const radioAccessory = new HomepodRadioPlatformAccessory(this, radio, accessory, this.playbackController);
+        const radioAccessory = new HomepodRadioPlatformAccessory(this, accessory, radio, this.playbackController);
 
         // SmartSpeaker service must be added as an external accessory.
         // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
@@ -114,7 +114,7 @@ export class HomepodRadioPlatform implements DynamicPlatformPlugin {
         if (radio.onSwitch) {
             const switchUuid = hap.uuid.generate('homebridge:homepod:radio:switch:' + radio.name);
             const switchAccessory = new this.api.platformAccessory(`${radio.name} Switch`, switchUuid);
-            new HomepodRadioSwitchAccessory(this, radioAccessory, switchAccessory);
+            new HomepodRadioSwitchAccessory(this, switchAccessory, radioAccessory);
             this.api.publishExternalAccessories(PLUGIN_NAME, [switchAccessory]);
         }
     }
@@ -127,7 +127,7 @@ export class HomepodRadioPlatform implements DynamicPlatformPlugin {
         // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-623675893
         accessory.category = Categories.SPEAKER;
 
-        new HomepodAudioSwitchAccessory(this, fileSwitch, this.playbackController, accessory);
+        new HomepodAudioSwitchAccessory(this, accessory, fileSwitch, this.playbackController);
 
         // SmartSpeaker service must be added as an external accessory.
         // @see https://github.com/homebridge/homebridge/issues/2553#issuecomment-622961035
