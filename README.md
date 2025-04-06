@@ -1,3 +1,11 @@
+<div>
+    <a href="https://www.npmjs.com/package/@petro-kushchak/homebridge-homepod-radio"><img src="https://img.shields.io/github/package-json/v/petro-kushchak/homebridge-homepod-radio?color=F99211" /></a>
+    <a href="https://www.npmjs.com/package/@petro-kushchak/homebridge-homepod-radio"><img src="https://img.shields.io/github/v/release/petro-kushchak/homebridge-homepod-radio?color=FFd461" /></a>
+    <a href="https://github.com/petro-kushchak/homebridge-homepod-radio"><img src="https://img.shields.io/badge/_homebridge_v2.0_-_ready_-4CAF50" /></a>
+    <a href="https://discord.gg/Z8jmyvb"><img src="https://img.shields.io/badge/discord-%23homepod--radio-737CF8" /></a>
+</div>
+
+<br/><br/>
 <p align="center" vertical-align="middle">
     <a href="https://github.com/petro-kushchak/homebridge-homepod-radio"><img src="HomePod-Mini.png" height="140"></a>
     <a href="https://github.com/homebridge/homebridge"><img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-wordmark-logo-vertical.png" height="140"></a>
