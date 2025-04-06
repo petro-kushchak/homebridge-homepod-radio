@@ -11,7 +11,7 @@
     <a href="https://github.com/homebridge/homebridge"><img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-wordmark-logo-vertical.png" height="140"></a>
 </p>
 
-# HomePod Mini radio support
+# HomePod Mini Radio Support
 
 Homebridge accessory for streaming radio to the Homepod Mini
 
