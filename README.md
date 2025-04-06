@@ -7,7 +7,7 @@
 
 <br/><br/>
 <p align="center" vertical-align="middle">
-    <a href="https://github.com/petro-kushchak/homebridge-homepod-radio"><img src="HomePod-Mini.png" height="140"></a>
+    <a href="https://github.com/petro-kushchak/homebridge-homepod-radio"><img src="antique-radio.png" height="140"></a>
     <a href="https://github.com/homebridge/homebridge"><img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-wordmark-logo-vertical.png" height="140"></a>
 </p>
 
