@@ -2,7 +2,7 @@ name: Mark Stale Issues
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # Run every day at midnight
+    - cron: '0 0 * * *'  # Run every day at midnight
 
 jobs:
   mark-stale-issues:
