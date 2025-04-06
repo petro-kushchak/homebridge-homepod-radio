@@ -14,7 +14,10 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
 
     private currentVolume: number;
 
-    constructor(private readonly platform: HomepodRadioPlatform, private readonly accessory: PlatformAccessory) {
+    constructor(
+        private readonly platform: HomepodRadioPlatform,
+        private readonly accessory: PlatformAccessory,
+    ) {
         this.device = new AirPlayDevice(
             this.platform.platformConfig.homepodId,
             platform.logger,
@@ -49,10 +52,8 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
         this.informationService
             .setCharacteristic(this.platform.Characteristic.Manufacturer, PLUGIN_MANUFACTURER)
             .setCharacteristic(this.platform.Characteristic.Model, PLUGIN_MODEL)
-            .setCharacteristic(
-                this.platform.Characteristic.SerialNumber,
-                this.platform.platformConfig.serialNumber,
-            );
+            .setCharacteristic(this.platform.Characteristic.SerialNumber, this.platform.platformConfig.serialNumber)
+            .setCharacteristic(this.platform.Characteristic.Name, this.platform.platformConfig.homepodId);
 
         // This will do its best to keep the actual outputs status up to date with Homekit.
         setInterval(async () => {
@@ -128,7 +129,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
     }
 
     streamerName(): string {
-        return `Homepod Volume ${this.platform.platformConfig.homepodId}`;
+        return `${this.platform.platformConfig.homepodId} Volume`;
     }
 
     /*
