@@ -17,7 +17,9 @@
 
 </span>
 
-Homebridge accessory for streaming radio to the Homepod Mini.
+### HomePod Mini Radio Support is a Homebridge plugin for streaming radio and audio files to the Homepod Mini.
+
+## <!-- Thin separator line -->
 
 ## Streaming radio to HomePod (Mini)
 
