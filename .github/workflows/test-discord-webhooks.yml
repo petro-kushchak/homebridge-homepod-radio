@@ -10,7 +10,7 @@ jobs:
   post-test-release-to-discord:
     name: Discord Webhooks
 
-    uses: petro-kushchak/homebridge-homepod-radio/.github/workflows/discord-webhooks.yml@latest
+    uses: petro-kushchak/homebridge-homepod-radio/.github/workflows/discord-webhooks.yml@master
 
     with:
       title: Test
