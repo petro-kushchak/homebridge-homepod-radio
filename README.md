@@ -17,7 +17,7 @@
 
 </span>
 
-### HomePod Mini Radio is a Homebridge plugin for streaming radio and audio files to the Homepod Mini.
+### HomePod Mini Radio is a Homebridge plugin for streaming radio urls and audio files to a Homepod Mini or an Apple TV.
 
 ## <!-- Thin separator line -->
 
