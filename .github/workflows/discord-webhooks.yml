@@ -61,8 +61,7 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           ### TODO:
-          webhook: 'https://discord.com/api/webhooks/1358459073921814710/g8q8b1KWAKtltvZzAojOvwVBe6FzZGettnIHOx_K8BI-SJCHaQBxJt7JyUiFKAPHnIJH'
-          # webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
           status: ${{ inputs.status || 'Success'}}
           content: ${{ inputs.content || ''}}
