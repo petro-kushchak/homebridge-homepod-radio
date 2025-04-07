@@ -48,10 +48,6 @@ on:
       notimestamp:
         required: false
         type: boolean
-      ### TODO: read from secrets
-      discord_webhook:
-        required: true
-        type: string
     # secrets:
     #   DISCORD_WEBHOOK:
     #     required: true
@@ -64,7 +60,7 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           ### TODO: read from secrets
-          webhook: ${{ inputs.discord_webhook }}
+          webhook: 'https://discord.com/api/webhooks/1358459073921814710/g8q8b1KWAKtltvZzAojOvwVBe6FzZGettnIHOx_K8BI-SJCHaQBxJt7JyUiFKAPHnIJH'
           # webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
           status: ${{ inputs.status || 'Success'}}
