@@ -13,11 +13,11 @@
 
 <span align="center">
 
-# HomePod Mini Radio Support
+# HomePod Mini Radio
 
 </span>
 
-### HomePod Mini Radio Support is a Homebridge plugin for streaming radio and audio files to the Homepod Mini.
+### HomePod Mini Radio is a Homebridge plugin for streaming radio and audio files to the Homepod Mini.
 
 ## <!-- Thin separator line -->
 
