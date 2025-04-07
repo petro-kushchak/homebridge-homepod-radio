@@ -48,7 +48,7 @@ on:
       notimestamp:
         required: false
         type: boolean
-
+      ### TODO: move to secrets
       discord_webhook:
         required: true
         type: string
@@ -63,8 +63,9 @@ jobs:
       - name: Discord notification
         uses: sarisia/actions-status-discord@v1
         with:
-          # webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          ### TODO: move to secrets
           webhook: ${{ inputs.discord_webhook }}
+          # webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
           status: ${{ inputs.status || 'Success'}}
           content: ${{ inputs.content || ''}}
