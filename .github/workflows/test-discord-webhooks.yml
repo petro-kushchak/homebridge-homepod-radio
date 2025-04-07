@@ -17,5 +17,6 @@ jobs:
       description: |
         Version `Test`
       url: 'https://github.com/petro-kushchak/homebridge-homepod-radio/releases/tag/v${{ needs.publish.outputs.NPM_VERSION }}'
+    # TODO:
     # secrets:
     #   DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
