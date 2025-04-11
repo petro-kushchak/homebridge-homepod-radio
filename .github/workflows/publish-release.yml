@@ -35,18 +35,17 @@ jobs:
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
 
-  post-release-to-discord:
-    name: Discord Webhooks
+  # post-release-to-discord:
+  #   name: Discord Webhooks
 
-    needs: [publish]
+  #   needs: [publish]
 
-    uses: petro-kushchak/homebridge-homepod-radio/.github/workflows/discord-webhooks.yml@master
-    with:
-      title: HomePod Mini Radio - Latest Release
-      description: |
-        Version `${{ github.event.release.tag_name }}`
-      color: '0xAFFF8F'
-      url: 'https://github.com/petro-kushchak/homebridge-homepod-radio/releases/tag/v${{ needs.publish.outputs.NPM_PACKAGE_VERSION }}'
-    # TODO:
-    # secrets:
-    #   DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+  #   uses: petro-kushchak/homebridge-homepod-radio/.github/workflows/discord-webhooks.yml@master
+  #   with:
+  #     title: HomePod Mini Radio - Latest Release
+  #     description: |
+  #       Version `${{ github.event.release.tag_name }}`
+  #     color: '0xAFFF8F'
+  #     url: 'https://github.com/petro-kushchak/homebridge-homepod-radio/releases/tag/v${{ needs.publish.outputs.NPM_PACKAGE_VERSION }}'
+  #   secrets:
+  #     DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
