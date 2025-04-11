@@ -90,7 +90,8 @@ export class AirPlayDevice {
 
         this.streaming.on('exit', async (code, signal) => {
             this.debug(`[${this.streamerName}] Streaming exit: code ${code} signal ${signal}`);
-            await this.endStreaming();
+            const streamExited = true;
+            await this.endStreaming(streamExited);
         });
 
         this.streaming.stderr!.on('data', (data) => {
@@ -201,7 +202,8 @@ export class AirPlayDevice {
 
         this.streaming.on('exit', async (code, signal) => {
             this.debug(`[${this.streamerName}] Streaming exit: code ${code} signal ${signal}`);
-            await this.endStreaming();
+            const streamExited = true;
+            await this.endStreaming(streamExited);
         });
 
         this.streaming.stderr!.on('data', (data) => {
@@ -226,7 +228,7 @@ export class AirPlayDevice {
         return true;
     }
 
-    private async endStreaming(): Promise<boolean> {
+    private async endStreaming(streamExited: boolean = false): Promise<boolean> {
         try {
             if (this.streaming === undefined) {
                 this.debug(`[${this.streamerName}] End streaming: streaming: ${this.streaming}`);
@@ -238,7 +240,9 @@ export class AirPlayDevice {
             clearInterval(this.heartbeat);
             this.heartbeat = undefined;
 
-            await this.killProcess(this.streaming.pid!);
+            if (!streamExited) {
+                await this.killProcess(this.streaming.pid!);
+            }
             this.streaming = undefined;
         } catch (err) {
             this.logger.error(`[${this.streamerName}] Error while trying to stop: ${err}`);
