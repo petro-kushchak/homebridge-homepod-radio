@@ -1,5 +1,6 @@
 # !/usr/bin/python3
 
+import argparse
 import io
 import urllib.request
 import traceback
@@ -8,21 +9,21 @@ import logging
 import json
 import asyncio
 import asyncio.subprocess as asp
+import re
+import pyatv
+
 from asyncio.streams import StreamReader
 from io import BufferedReader, BufferedReader
 from datetime import datetime
 
-from pyatv.interface import MediaMetadata
-
-import argparse
 from urllib.parse import urlparse
 
-
-import pyatv
 from pyatv.interface import PushListener, DeviceListener, AppleTV
+from pyatv.interface import MediaMetadata
 from pyatv.scripts import (
     log_current_version,
 )
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ def is_valid_url(url) -> bool:
 
 class StreamMetadata:
     """Stream Metadata"""
+
     title: str
     album: str
     artist: str
@@ -48,7 +50,8 @@ class StreamMetadata:
                  album: str,
                  artist: str,
                  artwork_url: str,
-                 ready: str) -> None:
+                 ready: str
+                 ) -> None:
         self.title = title
         self.album = album
         self.artist = artist
@@ -86,6 +89,7 @@ class StreamConfig:
 
     def toJSON(self) -> str:
         return json.dumps(self.__dict__)
+
 
 class StreamReaderListener (StreamReader):
     """Stream Reader with heartbeat"""
@@ -344,13 +348,32 @@ class AtvStreamer:
 
     async def internal_stream_file(self, file_path: str, metadata: MediaMetadata, retry_count: int):
         try:
-            await self.atv.stream_file(file_path, metadata)
-            await asyncio.sleep(1)
+            song_files = []
+            if (file_path.endswith(".m3u") or file_path.endswith(".m3u8")):
+                with open(file_path, 'r', encoding='UTF-8') as playlist_file:
+                    song_files = await self.filter_filenames([ line for line in playlist_file if line!= "" ])
+            else:
+                song_files = await self.filter_filenames([ file_path ])
+
+            for song_path in song_files:
+                await self.atv.stream_file(song_path, metadata)
+                await asyncio.sleep(1)
+
         except Exception as ex:
             self.logger.error(
                 f"ATV file streaming error: {ex} attempt: {retry_count}")
             if retry_count < 3:
                 await self.internal_stream_file(file_path, retry_count + 1)
+
+    async def filter_filenames(self, filenames = []):
+        filtered_filenames = [
+            filename.strip()
+            for filename in filenames
+            if re.match(r'^[A-Za-z0-9]', filename.strip()) and      # file path starts with letter or number
+                not re.match(r'^[A-Za-z]:\\', filename.strip()) and # file does not start with "x:"
+                not re.match(r'^http[s]?://', filename.strip())     # file does not start with "http"
+        ]
+        return filtered_filenames
 
 
 async def fetch_stream_metadata(loop, stream_config: StreamConfig) -> MediaMetadata:
@@ -395,6 +418,7 @@ async def fetch_stream_metadata(loop, stream_config: StreamConfig) -> MediaMetad
 
 async def cli_handler(loop) -> None:
     """Application starts here."""
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -519,7 +543,6 @@ async def cli_handler(loop) -> None:
         await atvStreamer.set_volume(stream_config.volume, True)
     else:
         _LOGGER.error("Nothing to do")
-
 
 
 async def appstart(loop) -> None:

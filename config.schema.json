@@ -20,7 +20,7 @@
                 "required": false
             },
             "mediaPath": {
-                "title": "Path to MP3 files",
+                "title": "Path to MP3 audio or M3U playlist files",
                 "type": "string",
                 "default": "",
                 "placeholder": "If not specified - will search in user home dir",
@@ -60,9 +60,9 @@
                             "required": true
                         },
                         "fileName": {
-                            "title": "Audio File Name",
+                            "title": "MP3 Audio/M3U Playlist File Name",
                             "type": "string",
-                            "placeholder": "Enter audio file name...",
+                            "placeholder": "Enter mp3 audio or m3u playlist file name...",
                             "required": true
                         },
                         "volume": {
