@@ -20,7 +20,8 @@
                 "required": false
             },
             "mediaPath": {
-                "title": "Path to MP3 audio or M3U playlist files",
+                "title": "Path to audio/playlist files",
+                "description": "Supported audio formats are MP3, WAV, FLAC, and OGG. Supported playlist formats are M3U and M3U8.",
                 "type": "string",
                 "default": "",
                 "placeholder": "If not specified - will search in user home dir",
@@ -60,9 +61,11 @@
                             "required": true
                         },
                         "fileName": {
-                            "title": "MP3 Audio/M3U Playlist File Name",
+                            "title": "Audio/Playlist File Name",
+                            "description": "Supported audio formats are MP3, WAV, FLAC, and OGG. Supported playlist formats are M3U and M3U8.",
                             "type": "string",
-                            "placeholder": "Enter mp3 audio or m3u playlist file name...",
+                            "placeholder": "Enter audio or playlist file name...",
+                            "pattern": "^.+[.](mp3|wav|ogg|flac|m3u|m3u8)$",
                             "required": true
                         },
                         "volume": {
