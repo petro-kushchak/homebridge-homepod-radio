@@ -132,7 +132,9 @@ This feature adds additional switch accessory for each audio file from `audioFil
         }
     ]
 ```
-You can specify an `.m3u` playlist file to stream multiple files:
+Supported audio file formats are `mp3`, `wav`, `flac`, and `ogg`.
+
+You can also specify an `.m3u` playlist file to stream multiple files:
 ```
     "audioFiles": [
         {
@@ -142,6 +144,7 @@ You can specify an `.m3u` playlist file to stream multiple files:
         }
     ]
 ```
+
 The `.m3u` file format is just a list of audio files:
 ```
 # My playlist
