@@ -132,6 +132,30 @@ This feature adds additional switch accessory for each audio file from `audioFil
         }
     ]
 ```
+You can specify an `.m3u` playlist file to stream multiple files:
+```
+    "audioFiles": [
+        {
+            "name": "Relaxing Mood",
+            "fileName": "death_metal.m3u",
+            "volume": 85
+        }
+    ]
+```
+The `.m3u` file format is just a list of audio files:
+```
+# My playlist
+
+# Metallica, 1991
+Nothing Else Matters.mp3
+
+# Master Of Puppets, 1986
+Master Of Puppets.mp3
+
+# Ride The Lightning, 1984
+For Whom The Bell Tolls.mp3
+```
+Comments starting with `#` and empty lines are ignored.
 
 ### Webhook for audio file playback
 
