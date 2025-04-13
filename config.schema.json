@@ -6,6 +6,12 @@
     "schema": {
         "type": "object",
         "properties": {
+            "name": {
+                "title": "Platform Name",
+                "type": "string",
+                "required": true,
+                "default": "HomePod Mini Radio"
+              },
             "homepodId": {
                 "title": "HomePod Id",
                 "type": "string",
@@ -48,11 +54,13 @@
                 "required": false
             },
             "audioFiles": {
-                "title": "Audio Button",
+                "title": "Audio Buttons",
                 "type": "array",
                 "items": {
                     "type": "object",
-                    "title": "Audio Button",
+                    "title": " {{ value.name || 'New Audio Button' }}",
+                    "expandable": true,
+                    "expanded": false,
                     "properties": {
                         "name": {
                             "title": "Name",
@@ -78,11 +86,13 @@
                 }
             },
             "radios": {
-                "title": "Radio Speaker",
+                "title": "Radio Speakers",
                 "type": "array",
                 "items": {
                     "type": "object",
-                    "title": "Radio",
+                    "title": " {{ value.name || 'New Radio' }}",
+                    "expandable": true,
+                    "expanded": false,
                     "properties": {
                         "name": {
                             "title": "Name",
