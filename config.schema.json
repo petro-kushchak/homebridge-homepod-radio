@@ -1,7 +1,6 @@
 {
     "pluginAlias": "HomepodRadioPlatform",
     "pluginType": "platform",
-    "singular": true,
     "headerDisplay": "Radio speakers are exposed to HomeKit as separate accessories and each needs to be manually paired",
     "footerDisplay": "The **ffmpeg** and **pyatv** must be installed on your system for this plugin to work.",
     "schema": {
