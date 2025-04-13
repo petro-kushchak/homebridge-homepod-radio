@@ -15,6 +15,7 @@
               },
             "homepodId": {
                 "title": "HomePod Id",
+                "description": "HomePod Id can be MAC address (ex: '00-B0-D0-63-C2-26') or HK name (ex: 'My HomePod')",
                 "type": "string",
                 "default": "",
                 "required": true
