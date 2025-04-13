@@ -8,6 +8,7 @@
         "properties": {
             "name": {
                 "title": "Platform Name",
+                "description": "Platform Name must be unique within the plugin",
                 "type": "string",
                 "required": true,
                 "default": "HomePod Mini Radio"
