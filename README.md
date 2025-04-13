@@ -246,7 +246,7 @@ More info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
 
 ## Setup steps
 
-Starting with various OS versions, Apple devices have started generating, by default, a new random MAC address for each wireless network they connect to. The HomePod Identifiers are based on the MAC address and while the MAC address will not change every time a HomePod reconnects to your home wifi, resetting a HomePod will indeed generate a new randomized MAC address and therefore new HomePod Identifiers.
+Starting with various OS versions, Apple devices have started generating, by default, a new random MAC address for each wireless network they connect to. The HomePod Identifiers are based on the MAC address and while it will not change every time a HomePod reconnects to your home wifi, resetting a HomePod will indeed generate a new randomized MAC address and therefore new HomePod Identifiers.
 
 Due to Apple's use of MAC address randomization and simply to make it easier to setup and read the plugin configuration, you can use the HomePod name (as displayed in the Home app) in the `HomePod Id` field, as well as any of the HomePod Identifiers. If you use the HomePod name, you will have to update the plugin configuration if you change it in the Home app.
 
