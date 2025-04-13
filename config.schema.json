@@ -11,8 +11,7 @@
                 "title": "Platform Name",
                 "type": "string",
                 "required": true,
-                "default": "HomePod Mini Radio",
-                "readonly": true
+                "default": "HomePod Mini Radio"
               },
             "homepodId": {
                 "title": "HomePod Id",
