@@ -18,6 +18,7 @@ from datetime import datetime
 
 from urllib.parse import urlparse
 
+from pyatv.const import Protocol
 from pyatv.interface import PushListener, DeviceListener, AppleTV
 from pyatv.interface import MediaMetadata
 from pyatv.scripts import (
@@ -149,9 +150,30 @@ class AtvWrapper:
             self.atv.close()
 
     async def connect(self) -> bool:
-        """Find a device and print what is playing."""
+        # Scanning by Protocol does not return all the identifiers
+        # Scanning by Protocol.RAOP does not return '4A:A8:53:82:93:7C' identifier or MAC address
+        # Scanning by Protocol.AirPlay does not return '4AA85382937C' identifier
+
         self.logger.debug("* Discovering device on network...")
-        atvs = await pyatv.scan(self.loop, identifier=self.atv_identifier, timeout=5)
+
+        atvs = []
+
+        # If atv_identifier format is '4AA85382937C' or '4A:A8:53:82:93:7C' scan by identifier
+        ident_regex = re.compile(r"^[0-9A-Fa-f]{12}$")
+        mac_regex = re.compile(r"^[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}$")
+        if (
+            (len(self.atv_identifier) == 12 and ident_regex.match(self.atv_identifier)) or
+            mac_regex.match(self.atv_identifier)
+        ):
+            self.logger.info(f"Scanning by MAC: {self.atv_identifier}")
+            atvs = await pyatv.scan(self.loop, identifier=self.atv_identifier, timeout=5)    
+
+        # If atv_identifier format is other, scan by protocol and filter by nanme
+        if not atvs:
+            self.logger.info(f"scanning by name: {self.atv_identifier}")
+            atvs = await pyatv.scan(self.loop, protocol=Protocol.RAOP, timeout=5)
+
+            atvs[:] = [atv for atv in atvs if self.atv_identifier == atv.name]
 
         if not atvs:
             self.logger.error("* No Device found")
@@ -336,7 +358,13 @@ class AtvStreamer:
                 raise ex
 
     async def stream_file(self, file_path: str, stream_config: StreamConfig) -> None:
-        await self.atv.connect()
+        atv_connected = await self.atv.connect()
+
+        if not atv_connected:
+            self.logger.error(
+                f"* Could not connect to ATV id: {self.atv.atv_identifier}")
+            return
+
         try:
             self.logger.info(f"* Starting to stream {file_path} ",)
             if stream_config.volume > 0:
