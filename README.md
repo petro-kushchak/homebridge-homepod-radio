@@ -77,7 +77,7 @@ Config example:
 
 ### Radio metadata support
 
-Some radios provide metadata about currently played tracks. Plugin support optional `metadataUrl` parameter and tries to fetch JSON in format (example URL: https://o.tavrmedia.ua/rokscla):
+Some radios provide metadata about currently played tracks. The plugin supports an optional `metadataUrl` parameter and tries to fetch JSON in the following format (example: https://o.tavrmedia.ua/rokscla):
 ```
 [
       {
@@ -98,31 +98,31 @@ Some radios provide metadata about currently played tracks. Plugin support optio
   ]
 ```
 
-Then plugin:
-1. updates radio stream with fetched `singer`/`song` data
-2. updates radio artwork with image downloaded using `cover`
+The plugin then
+- Enriches the radio stream with `singer` and `song` values from the retrieved metadata
+- Enriches the radio artwork with the image downloaded using the `cover` metadata URL
 
-> **_Note:_** due to some bugs/limitations tvOS 16/17, HomePods are not showing this info.
+> **_Note:_** due to some bugs/limitations in tvOS 16/17, HomePods are not showing this info.
 
 ## Audio file playback
 
-- Plugin allows to add switch accessory to start file playback, also file playback can be triggered from webhook
+The plugin allows to start file playback either through a add switch accessory (see below) or it can be triggered from a webhook.
 
-- Download your files to Homebridge server. For example download hello.wav
+Make sure your audio files are available to the Homebridge server, for example by downloading them to the server:
 ```
 $ mkdir -r /home/pi/media
 $ <downlaod files to /home/pi/media>
 $ ls /home/pi/media
 -rw-r--r-- 1 pi   pi     94622 Jan 10 16:46 hello.wav
 ```
-- Configure plugin to play files from /home/pi/media, set mediaPath property:
+Configure the plugin to play files from `/home/pi/media` by setting the `mediaPath` property:
 ```
   "mediaPath": "/home/pi/media",
 ```
 
-### Switch accessory for the audio file playback
+### Switch accessory for audio file playback
 
-This feature adds additional switch accessory for each audio file from `audioFiles` section:
+This feature adds a switch accessory in the `audioFiles` section for each audio file you want to stream
 ```
     "audioFiles": [
         {
@@ -158,7 +158,7 @@ Master Of Puppets.mp3
 # Ride The Lightning, 1984
 For Whom The Bell Tolls.mp3
 ```
-Comments starting with `#` and empty lines are ignored.
+Note: Comments starting with `#` and empty lines are ignored.
 
 ### Webhook for audio file playback
 
@@ -199,31 +199,31 @@ In the Home app settings:
 
 ## Dependencies
 
-### ffmpeg lib
+### *** Deprecated *** ffmpeg lib
 
-- install ffmpeg
-
+Install ffmpeg:
 ```
 sudo apt-get install ffmpeg
 ```
 
 ### PyATV lib
 
-For streaming to the HomePod we are using pyatv (https://pyatv.dev). Setup instructions (for RaspberryPi)
+For streaming to the HomePod the plugin uses pyatv (https://pyatv.dev).
+Follow these setup instructions for RaspberryPi/Linux. If installing on a different platform, adjust as needed.
 
-- install python3
+Install python3:
 ```
 sudo apt-get install python3
 ```
-- install pip3
+Install pip3:
 ```
 sudo apt-get install python3-pip
 ```
-- install pyatv
+Install pyatv:
 ```
 pip3 install pyatv
 ```
-- make atvremote available for homebridge
+Make atvremote available for homebridge:
 ```
 sudo ln -s /home/pi/.local/bin/atvremote /usr/local/bin/atvremote
 ```
@@ -242,16 +242,20 @@ You can do this from the command line (using your favorite editor) and finding t
 
 Docker image build based on oznu/homebridge:ubuntu (with ffmpeg & Homebridge preinstalled)
 
-Mode info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
+More info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
 
 ## Setup steps
 
-### Identify HomePod mini ID:
-- run command:
+Starting with various OS versions, Apple devices have started generating, by default, a new random MAC address for each wireless network they connect to. The HomePod Identifiers are based on the it's MAC address and while the MAC address will not change every time a HomePod reconnects to your home wifi, resetting a HomePod will indeed generate a new randomized MAC address and therefore new HomePod Identifiers.
+Due to Apple's use of MAC address randomization and simply to make it easier to setup and read the plugin configuration, you can use the HomePod name (as displayed in the Home app) in the `HomePod Id` field, as well as any of the HomePod Identifiers. If you use the HomePod name, you will have to update the plugin configuration if you change it in the Home app.
+
+### Find HomePod mini Identifiers:
+
+Scan for devices:
 ```
 atvremote scan
 ```
-- from output select one of Identifiers:
+Select one of `Identifiers` values from the chosen device:
 ```
        Name: HomePod
    Model/SW: HomePod Mini, tvOS 15.2
@@ -264,18 +268,21 @@ Identifiers:
 ```
 
 ### Stream URL format
-The easieast would be to get streaming url from your favorite radio playlist (usually .m3u file)
-Example For BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
+
+The easieast path would be to get the streaming url from your favorite radio playlist (usually .m3u file).
+Example for BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3
 
 ## Known issues
 
 ### 1. Pairing setting for the HomePod (fixed by *HomePod access setup* step):
 
-Make sure your HomePod has ```Pairing: NotNeeded``` set for RAOP protocol. Command
+Make sure your HomePod has ```Pairing: NotNeeded``` set for RAOP protocol.
+
+Scan for devices:
 ```
 atvremote scan
 ```
-Should show for your device:
+Select for your device:
 ```
 Services:
  - Protocol: Companion, Port: 49152, Credentials: None, Requires Password: False, Password: None, Pairing: Unsupported
@@ -295,12 +302,15 @@ Sometimes (quite rarely) playback fails and in the logs there are errors like:
 Typically this error disappears after HomePod restart.
 
 ### 3. Streaming to stereo pair
+
 Looks like this is not supported at the moment by pyatv
 
 ### 4. Speaker accessory controls
+
 With iOS 15 Homekit does not support `volume control` and `start/stop` for speaker accessory (at least for speakers exposed by Homebridge). So I'd suggest to enable switch accessory for each radio.
 
 ## TODO list
-F1. Switch accessory for audio file playback (with loop support)
+
+1. Switch accessory for audio file playback (with loop support)
 2. Play audio file on HomePod with provided url
 3. Radio streaming to multiple HomePods
