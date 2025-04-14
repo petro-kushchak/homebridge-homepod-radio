@@ -21,19 +21,22 @@ export interface AudioConfig {
 }
 
 export class HomepodRadioPlatformConfig {
+    public readonly name: string;
     public readonly homepodId: string;
     public readonly serialNumber: string;
     public readonly verboseMode: boolean;
     public readonly radios: RadioConfig[];
-    public readonly audioConfigs: AudioConfig[];
+    public readonly audioFiles: AudioConfig[];
     public readonly mediaPath: string;
     public readonly httpPort: number;
 
     public readonly enableVolumeControl: boolean;
 
     constructor(private config: PlatformConfig) {
+        this.name = config.name || 'HomePod Mini Radio';
+
         this.radios = [];
-        this.audioConfigs = [];
+        this.audioFiles = [];
         if (!config.homepodId) {
             throw 'Missing "homepodId" setting!';
         }
@@ -46,26 +49,25 @@ export class HomepodRadioPlatformConfig {
 
         this.enableVolumeControl = this.config.enableVolumeControl || true;
 
-        this.loadRadios();
+        this.loadRadioConfigs();
         this.loadAudioConfigs();
     }
 
     private loadAudioConfigs() {
         if (this.config.audioFiles) {
             this.config.audioFiles.forEach((audioConfig) => {
-                const config = {
+                const audioFile = {
                     name: audioConfig.name,
                     fileName: audioConfig.fileName,
                     volume: audioConfig.volume || 0,
                 } as AudioConfig;
 
-                this.audioConfigs.push(config);
+                this.audioFiles.push(audioFile);
             });
         }
     }
 
-    private loadRadios() {
-        //backward compatibility - single accessory mode
+    private loadRadioConfigs() {
         if (this.config.radios) {
             this.config.radios.forEach((radioConfig) => {
                 const radio = {

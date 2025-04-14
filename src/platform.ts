@@ -54,7 +54,7 @@ export class HomepodRadioPlatform implements DynamicPlatformPlugin {
         this.api.on('didFinishLaunching', async () => {
             this.logger.info('Finished initializing platform');
             this.platformConfig.radios.forEach((radio) => this.addRadioAccessory(radio));
-            this.platformConfig.audioConfigs.forEach((fileSwitch) => this.addFileSwitchAccessory(fileSwitch));
+            this.platformConfig.audioFiles.forEach((fileSwitch) => this.addFileSwitchAccessory(fileSwitch));
             await delay(1000, 0);
             this.playbackController.platformReady();
 
