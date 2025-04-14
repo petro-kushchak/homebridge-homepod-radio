@@ -27,7 +27,7 @@ export class HomepodVolumeAccessory implements AccessoryPlugin, PlaybackStreamer
             '',
         );
 
-        this.currentVolume = 25;
+        this.currentVolume = this.platform.platformConfig.volume;
 
         this.service =
             this.accessory.getService(this.platform.Service.Lightbulb) ||
