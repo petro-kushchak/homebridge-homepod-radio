@@ -50,6 +50,17 @@
                 "placeholder": "Enable Volume Control",
                 "required": false
             },
+            "volume": {
+                "title": "Volume",
+                "type": "integer",
+                "placeholder": "Volume Level",
+                "required": false,
+                "minimum": 0,
+                "maximum": 100,
+                "condition": {
+                  "functionBody": "return model.enableVolumeControl && model.enableVolumeControl === true;"
+                }
+          },
             "verboseMode": {
                 "title": "Debug Mode",
                 "type": "boolean",
