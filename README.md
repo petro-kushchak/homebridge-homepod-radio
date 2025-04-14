@@ -167,11 +167,13 @@ You should use homebridge server name or IP (default for Homebridge server is ho
 
 Example:
 - Homebridge server is running on host "homebridge.local"
-- hello.mp3 file is on the same server on /var/www/media
-- Plugin's "httpPort" is set to 4567
-- Plugin's "mediaPath" is set to /var/www/media
+- `hello.mp3` file is on the same server on `/var/www/media`
+- Plugin's "httpPort" is set to `4567`
+- Plugin's "mediaPath" is set to `/var/www/media`
 
-Then you can trigger playback of `hello.mp3` even from browser by navigating to: http://homebridge.local:4567/play/hello.mp3
+Then you can trigger playback of `hello.mp3` even from browser by navigating to: `http://homebridge.local:4567/play/hello.mp3`
+
+You can specify the playback volume level, by adding it to the end of the playback URL: `http://homebridge.local:4567/play/hello.mp3/75`
 
 ### Audio file playback automation example
 
