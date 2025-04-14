@@ -19,12 +19,14 @@ export enum WebActionType {
 }
 
 export interface WebAction {
-    data: string;
     action: WebActionType;
+    data: string;
+    extra?: number;
 }
 
 export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
     private readonly device: AirPlayDevice;
+
     constructor(
         private readonly config: HomepodRadioPlatformConfig,
         private readonly playbackController: PlaybackController,
@@ -74,7 +76,7 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
     }
 
     public parseAction(actionUri: string): WebAction {
-        const parts = actionUri.split('/');
+        const parts: string[] = actionUri.split('/');
 
         if (parts.length < 2) {
             return {
@@ -85,14 +87,30 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
         if (parts[1] === 'play') {
             // play mp3/wav from mediaPath by name
             // uri example: /play/<mp3/wav-file>
+            // uri example: /play/<mp3/wav-file>/25
             const fileName = parts[2];
 
             const mediaPath = this.config.mediaPath || os.homedir();
             const filePath = path.join(mediaPath, fileName);
 
+            let volume: number = 0;
+            if (parts.length > 2) {
+                if (isNaN(Number(parts[2]))) {
+                    return {
+                        action: WebActionType.Unsupported,
+                        data: 'Unsupported request',
+                    };
+                } else {
+                    volume = Number(parts[2]);
+                    volume = Math.max(volume, 0);
+                    volume = Math.min(volume, 100);
+                }
+            }
+
             return {
                 action: WebActionType.PlayFile,
                 data: filePath,
+                extra: volume,
             };
         }
         return {
@@ -103,24 +121,26 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
 
     public async handleAction(actionUrl: string): Promise<AutomationReturn> {
         this.logger.info('Received request: %s', actionUrl);
-        const webAction = this.parseAction(actionUrl);
+        const webAction: WebAction = this.parseAction(actionUrl);
 
         switch (webAction.action) {
         case WebActionType.PlayFile: {
-            const filePath = webAction.data;
-            const correctFile = await fileExists(filePath);
+            const filePath: string = webAction.data;
+            const fileFound = await fileExists(filePath);
 
-            if (!correctFile) {
+            if (!fileFound) {
                 return {
                     error: false,
                     message: `File does not exist: ${filePath}`,
                 };
             }
 
+            const volume: number = (webAction.extra) ? webAction.extra : 0;
+
             const message = `Started playing file: ${filePath}`;
             this.logger.info(message);
             await this.playbackController.requestStop(this);
-            await this.device.playFile(filePath, 0);
+            await this.device.playFile(filePath, volume);
             return {
                 error: false,
                 message: message,
