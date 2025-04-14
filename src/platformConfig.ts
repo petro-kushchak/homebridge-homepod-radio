@@ -33,7 +33,7 @@ export class HomepodRadioPlatformConfig {
     public readonly enableVolumeControl: boolean;
 
     constructor(private config: PlatformConfig) {
-        this.name = config.name || 'HomePod Mini Radio'
+        this.name = config.name || 'HomePod Mini Radio';
 
         this.radios = [];
         this.audioFiles = [];
