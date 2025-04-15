@@ -28,6 +28,7 @@ export class AirPlayDevice {
     private heartbeat: ReturnType<typeof setInterval> | undefined;
     private streamingRetries = 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly debug: (message: string, ...parameters: any[]) => void;
     private readonly pluginPath: string;
 
@@ -65,22 +66,26 @@ export class AirPlayDevice {
         // create pipe for the command:
         const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
 
+        const streamParams: string[] = [
+            scriptPath,
+            '--id',
+            this.homepodId,
+            '--title',
+            this.streamerName,
+            '--album',
+            this.streamerName,
+            '--file',
+            filePath,
+            '--verbose',
+            '--volume',
+            '' + volume,
+        ];
+
+        this.logger.info(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
+
         this.streaming = child.spawn(
             'python3',
-            [
-                scriptPath,
-                '--id',
-                this.homepodId,
-                '--title',
-                this.streamerName,
-                '--album',
-                this.streamerName,
-                '--file',
-                filePath,
-                '--verbose',
-                '--volume',
-                '' + volume,
-            ],
+            streamParams,
             { cwd: this.pluginPath, env: { ...process.env } },
         );
 
@@ -170,28 +175,32 @@ export class AirPlayDevice {
         // create pipe for the command:
         const scriptPath = path.resolve(path.dirname(__filename), '..', 'stream.py');
 
+        const streamParams: string[] = [
+            scriptPath,
+            '--id',
+            this.homepodId,
+            '--title',
+            streamName,
+            '--album',
+            this.streamerName,
+            '--stream_url',
+            streamUrl,
+            '--stream_timeout',
+            '30',
+            '--stream_metadata',
+            this.streamMetadataUrl ? this.streamMetadataUrl : '-1',
+            '--stream_artwork',
+            this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
+            '--volume',
+            '' + volume,
+            '--verbose',
+        ];
+
+        this.logger.info(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
+
         this.streaming = child.spawn(
             'python3',
-            [
-                scriptPath,
-                '--id',
-                this.homepodId,
-                '--title',
-                streamName,
-                '--album',
-                this.streamerName,
-                '--stream_url',
-                streamUrl,
-                '--stream_timeout',
-                '30',
-                '--stream_metadata',
-                this.streamMetadataUrl ? this.streamMetadataUrl : '-1',
-                '--stream_artwork',
-                this.streamArtworkUrl ? this.streamArtworkUrl : this.DEFAULT_ARTWORK_URL,
-                '--volume',
-                '' + volume,
-                '--verbose',
-            ],
+            streamParams,
             { cwd: this.pluginPath, env: { ...process.env } },
         );
 
