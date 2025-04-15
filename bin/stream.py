@@ -10,6 +10,7 @@ import json
 import asyncio
 import asyncio.subprocess as asp
 import re
+import os
 import pyatv
 
 from asyncio.streams import StreamReader
@@ -378,12 +379,14 @@ class AtvStreamer:
         try:
             song_files = []
             if (file_path.endswith(".m3u") or file_path.endswith(".m3u8")):
+                audio_folder = os.path.dirname(file_path)
                 with open(file_path, 'r', encoding='UTF-8') as playlist_file:
-                    song_files = await self.filter_filenames([ line for line in playlist_file if line!= "" ])
+                    song_files = await self.filter_filenames(audio_folder, [line for line in playlist_file if line!= "" ])
             else:
-                song_files = await self.filter_filenames([ file_path ])
+                song_files = [ file_path ]
 
             for song_path in song_files:
+                self.logger.info(f"Playing {song_path}")
                 await self.atv.stream_file(song_path, metadata)
                 await asyncio.sleep(1)
 
@@ -393,9 +396,9 @@ class AtvStreamer:
             if retry_count < 3:
                 await self.internal_stream_file(file_path, retry_count + 1)
 
-    async def filter_filenames(self, filenames = []):
+    async def filter_filenames(self, audio_folder, filenames = []):
         filtered_filenames = [
-            filename.strip()
+            audio_folder + '/' + filename.strip()
             for filename in filenames
             if re.match(r'^[A-Za-z0-9]', filename.strip()) and      # file path starts with letter or number
                 not re.match(r'^[A-Za-z]:\\', filename.strip()) and # file does not start with "x:"
