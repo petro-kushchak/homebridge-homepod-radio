@@ -1,7 +1,7 @@
 import { Logger } from 'homebridge';
 
 import { AirPlayDevice } from '../lib/airplayDevice.js';
-import { delay } from '../lib/promices.js';
+import { delay } from '../lib/promises.js';
 
 class TestLogger implements Logger {
 
