@@ -1,6 +1,6 @@
 import { Logger } from 'homebridge';
 
-import { delay } from './promices.js';
+import { delay } from './promises.js';
 
 import * as child from 'child_process';
 import * as path from 'path';

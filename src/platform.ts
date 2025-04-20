@@ -9,7 +9,7 @@ import { PLUGIN_NAME } from './platformConstants.js';
 import { HomepodAudioSwitchAccessory } from './platformAudioSwitchAccessory.js';
 import { HomepodVolumeAccessory } from './platformHomepodVolumeAccessory.js';
 
-import { delay } from './lib/promices.js';
+import { delay } from './lib/promises.js';
 import { HttpService } from './lib/httpService.js';
 
 let hap: HAP;
