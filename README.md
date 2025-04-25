@@ -278,7 +278,7 @@ Example for BBC Radio: https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad
 
 ## Known issues
 
-### 1. Pairing setting for the HomePod (fixed by *HomePod access setup* step):
+### 1. Pairing setting for the HomePod (fixed by *[HomePod access setup](#homepod-access-setup)* step):
 
 Make sure your HomePod has ```Pairing: NotNeeded``` set for RAOP protocol.
 
