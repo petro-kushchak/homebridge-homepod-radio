@@ -94,14 +94,14 @@ export class HomepodRadioPlatformWebActions implements PlaybackStreamer {
             const filePath = path.join(mediaPath, fileName);
 
             let volume: number = 0;
-            if (parts.length > 2) {
-                if (isNaN(Number(parts[2]))) {
+            if (parts.length > 3) {
+                if (isNaN(Number(parts[3]))) {
                     return {
                         action: WebActionType.Unsupported,
                         data: 'Unsupported request',
                     };
                 } else {
-                    volume = Number(parts[2]);
+                    volume = Number(parts[3]);
                     volume = Math.max(volume, 0);
                     volume = Math.min(volume, 100);
                 }
