@@ -12,7 +12,7 @@
                 "type": "string",
                 "required": true,
                 "default": "HomePod Mini Radio"
-              },
+            },
             "homepodId": {
                 "title": "HomePod Id",
                 "description": "HomePod Id can be MAC address (ex: '00-B0-D0-63-C2-26') or HK name (ex: 'Living Room HomePod')",
@@ -60,7 +60,7 @@
                 "condition": {
                   "functionBody": "return model.enableVolumeControl && model.enableVolumeControl === true;"
                 }
-          },
+            },
             "verboseMode": {
                 "title": "Debug Mode",
                 "type": "boolean",
