@@ -30,7 +30,7 @@ The main idea is to stream to the HomePod Mini (or Apple TV) using the `pyatv` A
 - Sometimes audio streaming stops, so plugin automatically restarts it
 
 > [!NOTE]
-> After plugin v2.0 - streaming and retry logic moved to `stream.py`
+> As the plugin is streaming via AirPlay, it should work with any AirPlay enabled speakers. YMMV.
 
 ## Requirements
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
