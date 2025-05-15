@@ -81,7 +81,7 @@ export class AirPlayDevice {
             '' + volume,
         ];
 
-        this.logger.info(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
+        this.logger.debug(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
 
         this.streaming = child.spawn(
             'python3',
@@ -196,7 +196,7 @@ export class AirPlayDevice {
             '--verbose',
         ];
 
-        this.logger.info(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
+        this.logger.debug(`[${this.streamerName}] Child: python3 ${streamParams.join(' ')}`);
 
         this.streaming = child.spawn(
             'python3',
