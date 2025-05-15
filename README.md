@@ -24,28 +24,26 @@
 
 ## Streaming radio to HomePod (Mini)
 
-Main idea is to stream to the HomePod Mini (or Apple TV) with the following command:
-```
-ffmpeg -i <streamUrl> -f mp3 - | atvremote --id <homepodId> stream_file=-
-```
+The main idea is to stream to the HomePod Mini (or Apple TV) using the `pyatv` AirPlay library.
 
-- automatically stops streaming when HomePod is used by another app
-- sometimes audio streaming stops, so plugin automatically restarts it
+- Automatically stops streaming when HomePod is used by another app
+- Sometimes audio streaming stops, so plugin automatically restarts it
 
-> **_Note:_**  After plugin v2.0 - streaming and retry logic moved to stream.py script
+> [!NOTE]
+> After plugin v2.0 - streaming and retry logic moved to `stream.py`
 
 ## Requirements
 - NodeJS (>=8.9.3) with NPM (>=6.4.1)
-- ffmpeg
 - pyatv (>=0.13) which require python (>= 3.8)
 
-For the HomePod you need to specify device MAC address.
+For the HomePod you can specify device MAC address or device name.
 
 ## Usage Example:
 
 ### Multiple radio accessories support
 
-> **_Note:_** each radio speaker must be added to Home app separately with Homebridge pin pairing
+> [!IMPORTANT]
+> Each radio speaker must be added to Home app separately with Homebridge pin pairing
 
 Config example:
 
@@ -53,7 +51,7 @@ Config example:
 {
     "platform": "HomepodRadioPlatform",
     "serialNumber": "20020105:00",
-    "homepodId": "<homepod id>",
+    "homepodId": "<homepod id or name>",
     "httpPort": 7654,
     "mediaPath": "/media/homepod",
     "enableVolumeControl": true,
@@ -103,7 +101,8 @@ The plugin then
 - Enriches the radio stream with `singer` and `song` values from the retrieved metadata
 - Enriches the radio artwork with the image downloaded using the `cover` metadata URL
 
-> **_Note:_** due to some bugs/limitations in tvOS 16/17, HomePods are not showing this info.
+> [!NOTE]
+> Due to some bugs/limitations in tvOS 16/17, HomePods are not showing this info.
 
 ## Audio file playback
 
@@ -159,14 +158,15 @@ Master Of Puppets.mp3
 # Ride The Lightning, 1984
 For Whom The Bell Tolls.mp3
 ```
-Note: Comments starting with `#` and empty lines are ignored.
+> [!NOTE]
+> Comments starting with `#` and empty lines are ignored.
 
 ### Webhook for audio file playback
 
-You should use homebridge server name or IP (default for Homebridge server is homebridge.local) to invoke playback with URL
+You should use the Homebridge server name (default for Homebridge server is homebridge.local) or IP to invoke playback via URL
 
 Example:
-- Homebridge server is running on host "homebridge.local"
+- Homebridge is running on host "homebridge.local"
 - `hello.mp3` file is on the same server on `/var/www/media`
 - Plugin's "httpPort" is set to `4567`
 - Plugin's "mediaPath" is set to `/var/www/media`
@@ -202,13 +202,6 @@ In the Home app settings:
 
 ## Dependencies
 
-### *** Deprecated *** ffmpeg lib
-
-Install ffmpeg:
-```
-sudo apt-get install ffmpeg
-```
-
 ### PyATV lib
 
 For streaming to the HomePod the plugin uses pyatv (https://pyatv.dev).
@@ -241,15 +234,9 @@ pip3 install pyatv
 ```
 You can do this from the command line (using your favorite editor) and finding the script in the Homebridge `config` folder. Alternatively you can edit it from the Homebridge UI, by going to `Settings`, `Startup & Environment`, `Startup Script`. If you edit the script from the UI or after the container has started, you will need to restart the container.
 
-### *** Deprecated *** Docker image with preinstalled dependencies (ubuntu)
-
-Docker image build based on oznu/homebridge:ubuntu (with ffmpeg & Homebridge preinstalled)
-
-More info: https://hub.docker.com/r/pkushchak/homebridge-pyatv/tags
-
 ## Setup steps
 
-Starting with various OS versions, Apple devices have started generating, by default, a new random MAC address for each wireless network they connect to. The HomePod Identifiers are based on the MAC address and while it will not change every time a HomePod reconnects to your home wifi, resetting a HomePod will indeed generate a new randomized MAC address and therefore new HomePod Identifiers.
+Starting with various OS versions, Apple devices have started generating, by default, a new random MAC address for each wireless network they connect to. The HomePod Identifiers are based on the MAC address and while it will not change every time the HomePod reconnects to your home wifi, resetting a HomePod will indeed generate a new randomized MAC address and therefore new HomePod Identifiers. If this happens, you will have to update the plugin configuration.
 
 Due to Apple's use of MAC address randomization and simply to make it easier to setup and read the plugin configuration, you can use the HomePod name (as displayed in the Home app) in the `HomePod Id` field, as well as any of the HomePod Identifiers. If you use the HomePod name, you will have to update the plugin configuration if you change it in the Home app.
 
@@ -259,7 +246,7 @@ Scan for devices:
 ```
 atvremote scan
 ```
-Select one of `Identifiers` values from the chosen device:
+Select one of `Identifiers` values from the chosen device (or the `Name` value):
 ```
        Name: HomePod
    Model/SW: HomePod Mini, tvOS 15.2
@@ -294,7 +281,8 @@ Services:
  - Protocol: RAOP, Port: 7000, Credentials: None, Requires Password: False, Password: None, Pairing: NotNeeded
 ```
 
-> **_Note:_**  streaming will not work if you get ```Pairing: Disabled``` or ```Pairing: Unsupported```
+> [!IMPORTANT]
+> Streaming will not work if you get `Pairing: Disabled` or `Pairing: Unsupported`
 
 ### 2. HomePod playback errors
 
@@ -312,9 +300,3 @@ Looks like this is not supported at the moment by pyatv
 ### 4. Speaker accessory controls
 
 With iOS 15 Homekit does not support `volume control` and `start/stop` for speaker accessory (at least for speakers exposed by Homebridge). So I'd suggest to enable switch accessory for each radio.
-
-## TODO list
-
-1. Switch accessory for audio file playback (with loop support)
-2. Play audio file on HomePod with provided url
-3. Radio streaming to multiple HomePods
