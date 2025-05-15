@@ -18,13 +18,13 @@
 
 </span>
 
-### HomePod Mini Radio is a Homebridge plugin for streaming radio urls and audio files to a Homepod Mini or an Apple TV.
+### HomePod Mini Radio is a Homebridge plugin for streaming radio urls and audio files to a Homepod (Mini or OG) or an Apple TV.
 
 ## <!-- Thin separator line -->
 
-## Streaming radio to HomePod (Mini)
+## Streaming radio to HomePod
 
-The main idea is to stream to the HomePod Mini (or Apple TV) using the `pyatv` AirPlay library.
+The main idea is to stream audio to the HomePod or Apple TV using the `pyatv` AirPlay library.
 
 - Automatically stops streaming when HomePod is used by another app
 - Sometimes audio streaming stops, so plugin automatically restarts it
@@ -240,7 +240,7 @@ Starting with various OS versions, Apple devices have started generating, by def
 
 Due to Apple's use of MAC address randomization and simply to make it easier to setup and read the plugin configuration, you can use the HomePod name (as displayed in the Home app) in the `HomePod Id` field, as well as any of the HomePod Identifiers. If you use the HomePod name, you will have to update the plugin configuration if you change it in the Home app.
 
-### Find HomePod mini Identifiers:
+### Find HomePod Identifiers:
 
 Scan for devices:
 ```
