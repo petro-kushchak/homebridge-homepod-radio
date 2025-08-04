@@ -14,11 +14,11 @@
 
 <span align="center">
 
-# HomePod Mini Radio
+# HomePod Radio
 
 </span>
 
-### HomePod Mini Radio is a Homebridge plugin for streaming radio urls and audio files to a Homepod (Mini or OG) or an Apple TV.
+### HomePod Radio is a Homebridge plugin for streaming radio urls and audio files to a Homepod (Mini or OG) or an Apple TV.
 
 ## <!-- Thin separator line -->
 
@@ -198,7 +198,7 @@ In the Home app settings:
 - Create shortcut with name (for example) "Start Radio"
 - Select "Control Home" action, check corresponding speaker and in "Media" section select "Resume Audio")
 ![Screenshot](images/bbc-radio-shortcut.png)
-- Say "Hey Siri, start radio" on iPhone/iPad (on HomePod mini Siri does not run it properly)
+- Say "Hey Siri, start radio" on iPhone/iPad (on HomePod Mini Siri does not run it properly)
 
 ## Dependencies
 
