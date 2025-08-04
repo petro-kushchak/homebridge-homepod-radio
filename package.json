@@ -2,7 +2,7 @@
   "name": "@petro-kushchak/homebridge-homepod-radio",
   "displayName": "Homepod Mini Radio",
   "type": "module",
-  "version": "3.1.31",
+  "version": "3.1.32",
   "description": "Homebridge accessory for streaming radio to Homepod Mini and Apple TV",
   "author": "Petro Kushchak",
   "license": "MIT",
@@ -39,7 +39,6 @@
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc && npm run copy",
     "copy": "cp bin/* dist",
-    "test": "jest --forceExit --detectOpenHandles",
     "e2e": "npm run build && node dist/e2e/test_e2e.js",
     "prepublishOnly": "npm run lint && npm run build"
   },
@@ -48,15 +47,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.1",
     "eslint": "^9.21.0",
-    "eslint-plugin-jest": "^29.0.1",
     "homebridge": "^2.0.0-beta.0",
-    "jest": "^30.0.2",
     "nodemon": "^3.1.9",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1"
