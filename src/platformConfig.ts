@@ -43,12 +43,12 @@ export class HomepodRadioPlatformConfig {
         }
         this.homepodId = config.homepodId;
         this.serialNumber = config.serialNumber || `HPD-${this.homepodId}`;
-        this.verboseMode = !!config.verboseMode && config.verboseMode ? true : false;
+        this.verboseMode = (config.enableVolumeControl ??= false);
 
         this.httpPort = this.config.httpPort || 4567;
         this.mediaPath = this.config.mediaPath || '';
 
-        this.enableVolumeControl = this.config.enableVolumeControl || true;
+        this.enableVolumeControl = (this.config.enableVolumeControl ??= false);
         this.volume = this.config.volume || 25;
 
         this.loadRadioConfigs();
