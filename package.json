@@ -31,7 +31,7 @@
   ],
   "main": "dist/index.js",
   "engines": {
-    "node": "^18.20.4 || ^20.18.0 || ^22.10.0",
+    "node": "^20.0.0 || ^22.0.0 || ^24.0.0",
     "homebridge": "^1.8.0 || ^2.0.0-beta.0"
   },
   "scripts": {
@@ -49,7 +49,7 @@
     "@eslint/js": "^9.21.0",
     "@types/node": "^24.0.1",
     "eslint": "^9.21.0",
-    "homebridge": "^2.0.0-beta.0",
+    "homebridge": "^2.0.0-beta.55",
     "nodemon": "^3.1.9",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
